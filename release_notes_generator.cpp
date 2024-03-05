@@ -102,9 +102,11 @@ int main(int argc, char* argv[]){
         }
     }
     catch (const exception& e) {
-        cout << e.what();
+        cout << e.what() << endl;
+        return 0;
     }
 
+    cout << "Release notes generated successfully, check " + MARKDOWN_OUTPUT_FILE_NAME + " in the current directory" << endl;
     return 0;
 }
 
@@ -303,7 +305,7 @@ string getNormalCommitsNotes(int commitTypeIndex) {
 
     FILE* pipe = _popen(commandToRetrieveCommitsMessages.c_str(), "r");
     if (!pipe) {
-        throw runtime_error("Error: Unable to open pipe to read git log commmand output");
+        throw runtime_error("Unable to open pipe to read git log commmand output");
     }
 
     char buffer[150];
@@ -342,6 +344,8 @@ void generateReleaseNotes(Commits commit, OutputTypes outputType, ReleaseNoteMod
             throw runtime_error("Unable to open markdown release notes file");
         }
     }
+
+    cout << "Generating release notes......." << endl;
 
     string commandToRetrieveCommitsMessages;
     string currentCommitMessage;
