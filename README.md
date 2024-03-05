@@ -7,9 +7,17 @@
   <br>
 </h1>
 
+
+
 <h4 align="center">A C++ script, to demonstrate the ability to work on the <a href="https://www.synfig.org/" target="_blank">Synfig</a> 
 <a href="https://summerofcode.withgoogle.com/" target="_blank">GSoC</a> 2024 
 <a href="https://synfig-docs-dev.readthedocs.io/en/latest/gsoc/2024/ideas.html#projects-ideas" target="_blank">Automated release notes generator project</a>, the script generates markdown release notes from <a href="https://www.conventionalcommits.org/en/v1.0.0/" target="_blank">conventional git commits</a>.</h4>
+
+<p align="center">
+<a href="https://ahmed-khaled-dev.github.io/automated-release-notes-generator/files.html">
+        <img src="https://img.shields.io/badge/Code Docs- Webpage-blue?style=for-the-badge&logo=none" >
+</a>
+</p>
 
 <p align="center">
   <a href="#key-features">Key Features</a> •
@@ -18,7 +26,7 @@
 </p>
 
 <p align="center">
-    <img src="https://i.imgur.com/Wsld5Xz.png" alt="Automated release notes generator">
+    <img src="https://i.imgur.com/Wsld5Xz.png" alt="Script Markdown Output">
 </p>
 
 ## Key Features
