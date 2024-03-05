@@ -35,3 +35,4 @@
 .vscode
 *.md
 *.lua
+Doxyfile

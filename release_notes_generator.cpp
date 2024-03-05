@@ -1,17 +1,16 @@
-// Author: Ahmed Khaled
-// Description: This is a script made as an exercise to demonstrate the ability to work on the Synfig GSoC 24
-// "Automated release notes generator" project, the script generates markdown release notes from conventional git commits
-// Synfig : https://www.synfig.org/
-// Project : https://synfig-docs-dev.readthedocs.io/en/latest/gsoc/2024/ideas.html#projects-ideas
+/**
+ * @file release_notes_generator.cpp
+ * @author Ahmed Khaled
+ * @brief A C++ script, to demonstrate the ability to work on the Synfig GSoC 2024 Automated release notes generator project, 
+ * the script generates markdown release notes from conventional git commits
+ */
 
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <cstring>
-// Used to make api requests
-#include <curl/curl.h>
-// Used to parse json files returned by the GitHub API
-#include <nlohmann/json.hpp>
+#include <curl/curl.h> // Used to make api requests
+#include <nlohmann/json.hpp> // Used to parse json files returned by the GitHub API
 
 using namespace std;
 using namespace nlohmann;
@@ -19,7 +18,9 @@ using namespace nlohmann;
 const int MAX_DISPLAYED_COMMITS_PER_TYPE = 3;
 const int COMMIT_TYPES_COUNT = 3;
 const string MARKDOWN_OUTPUT_FILE_NAME = "release_notes.md";
-// Used to retrieve merge commits' pull request info
+/**
+ * @brief GitHub API URL to retrieve merge commits' pull request info
+ */
 const string GITHUB_API_URL = "https://api.github.com/repos/synfig/synfig/pulls/";
 
 enum class Commits{
@@ -39,9 +40,12 @@ enum class InputErrors{
     IncorrectReleaseNotesMode
 };
 
+/**
+ * @brief Enumeration for all the info related to commit types
+ */
 enum class CommitTypeInfo{
-    ConventionalName,
-    MarkdownTitle
+    ConventionalName, /**< Conventional name of the commit type (Ex: fix, feat, refactor, etc.)*/
+    MarkdownTitle /**< Markdown title to be displayed in the release notes section of this commit type (Ex: 🐛 Bug Fixes)*/
 };
 
 enum class ReleaseNoteModes{
@@ -49,6 +53,9 @@ enum class ReleaseNoteModes{
     Full
 };
 
+/**
+ * @brief 2d array storing conventional commit types and their corresponding markdown titles, can easily later on modify these types
+ */
 string commitTypes[COMMIT_TYPES_COUNT][2] = {
     {"fix", "## 🐛 Bug Fixes"}, 
     {"feat", "## ✨ New Features"},
@@ -101,6 +108,10 @@ int main(int argc, char* argv[]){
     return 0;
 }
 
+/**
+ * @brief Prints error messages when user runs the script with incorrect parameters/input
+ * @param inputError The type of input error
+ */
 void printInputError(InputErrors inputError) {
     if (inputError == InputErrors::IncorrectCommitType) {
         cout << "Incorrect commit type!" << endl;
@@ -119,6 +130,11 @@ void printInputError(InputErrors inputError) {
     cout << "2 - release_notes_generator m [s/f] (Merge Commits) (short or full release notes)";
 }
 
+/**
+ * @brief Indents (puts 4 spaces) before all lines in a string
+ * @param s The input string
+ * @return The indented string
+ */
 string indentAllLinesInString(string s) {
     bool isNewLine = 1;
     string result;
@@ -134,6 +150,13 @@ string indentAllLinesInString(string s) {
     return result;
 }
 
+/**
+ * @brief Adds merge commits' pull request information (title, body) in the release notes, based on the release notes mode, using GitHub API
+ * @param pullRequestInfo JSON object containing pull request information
+ * @param mergeCommitsNotes Existing release notes generated from merge commits
+ * @param releaseNotesMode The release notes mode that will decide if the Pull request body will be included or not
+ * @return The updated release notes generated from merge commits
+ */
 string addPullRequestInfoInNotes(json pullRequestInfo, string mergeCommitsNotes, ReleaseNoteModes releaseNotesMode) {
     if (!pullRequestInfo["title"].is_null()) {
         string title = pullRequestInfo["title"];
@@ -159,12 +182,25 @@ string addPullRequestInfoInNotes(json pullRequestInfo, string mergeCommitsNotes,
     return mergeCommitsNotes;
 }
 
+/**
+ * @brief Callback function that is requried to handle API response in libcurl
+ * @param data Pointer to the data received
+ * @param size Size of each data element
+ * @param numOfBytes Number of bytes received
+ * @param buffer Pointer to the buffer storing the response
+ * @return Total size of the received data
+ */
 size_t handleApiCallBack(char* data, size_t size, size_t numOfBytes, string* buffer) {
     size_t totalSize = size * numOfBytes;
     buffer->append(data, totalSize);
     return totalSize;
 }
 
+/**
+ * @brief Retrieves merge commit's Pull request info from the GitHub API using libcurl
+ * @param pullRequestUrl The GitHub API URL of the merge commit's pull request
+ * @return The Pull request info in JSON
+ */
 string getApiResponse(string pullRequestUrl) {
     // Initializing libcurl
     CURL* curl;
@@ -204,10 +240,22 @@ string getApiResponse(string pullRequestUrl) {
     }
 }
 
+/**
+ * @brief Checks if the commit message is of the expected conventional commit type
+ * @param commitMessage The commit message
+ * @param commitTypeIndex Index of the commit type in the commit types 2d array
+ * @return True if the commit is of expected type, otherwise false
+ */
 bool commitIsCorrectType(string commitMessage, int commitTypeIndex) {
     return commitMessage.substr(0, commitMessage.find(":")) == commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName];
 }
 
+/**
+ * @brief Retrieves release notes from merge commits based on the given conventional commit type and release notes mode
+ * @param commitTypeIndex Index of the commit type in the commit types 2d array, to only generate release notes from the given commit type (fix, feat, etc.)
+ * @param releaseNotesMode The release notes mode
+ * @return The generated release notes from merge commits
+ */
 string getMergeCommitsNotes(int commitTypeIndex, ReleaseNoteModes releaseNotesMode) {
     string commandToRetrieveCommitsMessages = "git log --max-count " + to_string(MAX_DISPLAYED_COMMITS_PER_TYPE) +
         " --merges --oneline --format=\"%s\" --grep=\"^" + commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName] + ": \"";
@@ -244,6 +292,11 @@ string getMergeCommitsNotes(int commitTypeIndex, ReleaseNoteModes releaseNotesMo
     return mergeCommitsNotes;
 }
 
+/**
+ * @brief Retrieves release notes from normal commits based on the given conventional commit type
+ * @param commitTypeIndex Index of the commit type in the commit types 2d array, to only generate release notes from the given commit type (fix, feat, etc.)
+ * @return The generated release notes from normal commits
+ */
 string getNormalCommitsNotes(int commitTypeIndex) {
     string commandToRetrieveCommitsMessages = "git log --max-count " + to_string(MAX_DISPLAYED_COMMITS_PER_TYPE) +
         " --no-merges --oneline --format=\"%s\" --grep=\"^" + commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName] + ": \"";
@@ -274,6 +327,12 @@ string getNormalCommitsNotes(int commitTypeIndex) {
     return normalCommitsNotes;
 }
 
+/**
+ * @brief Generates release notes based on the given commit type, output type, and release notes mode
+ * @param commit The type of commits to generate release notes from (Normal, Merge)
+ * @param outputType The document/output type that the release notes will be generated in (Markdown, HTMl, etc.)
+ * @param releaseNoteMode The release notes mode when the commit type is merge
+ */
 void generateReleaseNotes(Commits commit, OutputTypes outputType, ReleaseNoteModes releaseNoteMode) {
     ofstream outputFile;
     if (outputType == OutputTypes::Markdown) {
