@@ -42,7 +42,7 @@ To use this script you'll need <a href="https://git-scm.com/" target="_blank">Gi
 
 1. Download the <a href="https://drive.google.com/drive/folders/1ustJy8Znff_TrAfIbGwQJpSmiq4ULA_h?usp=sharing" target="_blank">executable and dlls</a>
    
-2. Copy the files into a directory that contains a git repo that uses conventional commits
+2. Copy the files into a directory that contains a git repo that uses conventional commits, If you don't have a repo that uses conventional commits, you can download <a href="https://drive.google.com/drive/folders/1RSMgekJLUEygaDpKpFud_DdF0AQTsKRx?usp=sharing" target="_blank">Synfig's .git folder</a> and test the script on it
    
 3. Run the executable from the command line using suitable parameters
     ``` 
