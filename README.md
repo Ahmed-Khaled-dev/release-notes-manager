@@ -38,6 +38,8 @@
     <img src="https://i.imgur.com/Z8LRRgz.png" alt="Automated release notes generator">
 
 ## How To Use
+**Required Operating System:** Windows
+
 To use this script you'll need <a href="https://git-scm.com/" target="_blank">Git</a> installed on your computer
 
 1. Download the <a href="https://drive.google.com/drive/folders/1ustJy8Znff_TrAfIbGwQJpSmiq4ULA_h?usp=sharing" target="_blank">executable and dlls</a>
@@ -52,11 +54,11 @@ To use this script you'll need <a href="https://git-scm.com/" target="_blank">Gi
         ``` 
         $ release_notes_generator n
         ```
-    2. Generate **short** release notes from **merge commits**
+    2. Generate **short** release notes from **merge commits** (Internet connection required)
         ``` 
         $ release_notes_generator m s
         ```
-    3. Generate **full** release notes from **merge commits**
+    3. Generate **full** release notes from **merge commits** (Internet connection required)
         ``` 
         $ release_notes_generator m f
         ```
