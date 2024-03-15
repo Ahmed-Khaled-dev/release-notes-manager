@@ -10,7 +10,13 @@
 #include <string>
 #include <cstring>
 #include <curl/curl.h> // Used to make api requests
-#include <nlohmann/json.hpp> // Used to parse json files returned by the GitHub API
+#include <json.hpp> // Used to parse json files returned by the GitHub API
+
+// To allow for code compatibility between different compilers/OS (Microsoft's Visual C++ compiler and GCC)
+#ifdef _WIN32
+#define popen _popen
+#define pclose _pclose
+#endif
 
 using namespace std;
 using namespace nlohmann;
@@ -129,7 +135,7 @@ void printInputError(InputErrors inputError) {
     }
     cout << "Expected Syntax:" << endl;
     cout << "1 - release_notes_generator n (Normal Commits)" << endl;
-    cout << "2 - release_notes_generator m [s/f] (Merge Commits) (short or full release notes)";
+    cout << "2 - release_notes_generator m [s/f] (Merge Commits) (short or full release notes)" << endl;
 }
 
 /**
@@ -262,7 +268,7 @@ string getMergeCommitsNotes(int commitTypeIndex, ReleaseNoteModes releaseNotesMo
     string commandToRetrieveCommitsMessages = "git log --max-count " + to_string(MAX_DISPLAYED_COMMITS_PER_TYPE) +
         " --merges --oneline --format=\"%s\" --grep=\"^" + commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName] + ": \"";
 
-    FILE* pipe = _popen(commandToRetrieveCommitsMessages.c_str(), "r");
+    FILE* pipe = popen(commandToRetrieveCommitsMessages.c_str(), "r");
     if (!pipe) {
         throw runtime_error("Unable to open pipe to read git log commmand output");
     }
@@ -290,7 +296,7 @@ string getMergeCommitsNotes(int commitTypeIndex, ReleaseNoteModes releaseNotesMo
             }
         }
     }
-    _pclose(pipe);
+    pclose(pipe);
     return mergeCommitsNotes;
 }
 
@@ -303,7 +309,7 @@ string getNormalCommitsNotes(int commitTypeIndex) {
     string commandToRetrieveCommitsMessages = "git log --max-count " + to_string(MAX_DISPLAYED_COMMITS_PER_TYPE) +
         " --no-merges --oneline --format=\"%s\" --grep=\"^" + commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName] + ": \"";
 
-    FILE* pipe = _popen(commandToRetrieveCommitsMessages.c_str(), "r");
+    FILE* pipe = popen(commandToRetrieveCommitsMessages.c_str(), "r");
     if (!pipe) {
         throw runtime_error("Unable to open pipe to read git log commmand output");
     }
@@ -325,7 +331,7 @@ string getNormalCommitsNotes(int commitTypeIndex) {
         }
     }
 
-    _pclose(pipe);
+    pclose(pipe);
     return normalCommitsNotes;
 }
 
