@@ -112,7 +112,6 @@ int main(int argc, char* argv[]){
         return 0;
     }
 
-    cout << "Release notes generated successfully, check " + MARKDOWN_OUTPUT_FILE_NAME + " in the current directory" << endl;
     return 0;
 }
 
@@ -377,4 +376,6 @@ void generateReleaseNotes(Commits commit, OutputTypes outputType, ReleaseNoteMod
             }
         }
     }
+
+    cout << "Release notes generated successfully, check " + MARKDOWN_OUTPUT_FILE_NAME + " in the current directory" << endl;
 }
