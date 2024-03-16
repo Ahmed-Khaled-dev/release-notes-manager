@@ -71,7 +71,6 @@
           $ ./release_notes_generator.AppImage m f
           ```
 </details>
-<br>
 <details>
   <summary>Windows</summary>
   
