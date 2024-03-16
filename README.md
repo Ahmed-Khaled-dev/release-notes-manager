@@ -22,7 +22,8 @@
 <p align="center">
   <a href="#key-features">Key Features</a> •
   <a href="#how-to-use">How To Use</a> •
-  <a href="#how-to-use">Notes</a>
+  <a href="#how-to-build">How To Build</a> •
+  <a href="#notes">Notes</a>
 </p>
 
 <p align="center">
@@ -38,30 +39,91 @@
     <img src="https://i.imgur.com/Z8LRRgz.png" alt="Automated release notes generator">
 
 ## How To Use
-**Required Operating System:** Windows
 
-To use this script you'll need <a href="https://git-scm.com/" target="_blank">Git</a> installed on your computer
+> [!IMPORTANT]
+> For any of the following, you'll need <a href="https://git-scm.com/" target="_blank">Git</a> installed on your computer.
 
-1. Download the <a href="https://drive.google.com/drive/folders/1ustJy8Znff_TrAfIbGwQJpSmiq4ULA_h?usp=sharing" target="_blank">executable and dlls</a>
+<details>
+  <summary>Linux</summary>
+  
+  1. Download the [AppImage](https://drive.google.com/file/d/1blyizMY7ejLM9J2-BILO_K0kKfU_UZsl/view?usp=sharing)
    
-2. Copy the files into a directory that contains a git repo that uses conventional commits, If you don't have a repo that uses conventional commits, you can download <a href="https://drive.google.com/drive/folders/1RSMgekJLUEygaDpKpFud_DdF0AQTsKRx?usp=sharing" target="_blank">Synfig's .git folder</a> and test the script on it
+  2. Copy the AppImage into a directory that contains a git repo that uses conventional commits, If you don't have a repo that uses conventional commits, you can download <a href="https://drive.google.com/drive/folders/1RSMgekJLUEygaDpKpFud_DdF0AQTsKRx?usp=sharing" target="_blank">Synfig's .git folder</a> and test the script on it
    
-3. Run the executable from the command line using suitable parameters
-    ``` 
-    $ release_notes_generator commit_type [release_notes_mode]
-    ```
-    1. Generate release notes from **normal commits**
-        ``` 
-        $ release_notes_generator n
+  3. Make the AppImage executable
+      ```
+      $ chmod +x release_notes_generator.AppImage
+      ```
+  4. Run the AppImage from the command line using suitable parameters
+      ``` 
+      $ ./release_notes_generator.AppImage commit_type [release_notes_mode]
+      ```
+      1. Generate release notes from **normal commits**
+          ``` 
+          $ ./release_notes_generator.AppImage n
+          ```
+      2. Generate **short** release notes from **merge commits** (Internet connection required)
+          ``` 
+          $ ./release_notes_generator.AppImage m s
+          ```
+      3. Generate **full** release notes from **merge commits** (Internet connection required)
+          ``` 
+          $ ./release_notes_generator.AppImage m f
+          ```
+</details>
+<br>
+<details>
+  <summary>Windows</summary>
+  
+  1. Download the <a href="https://drive.google.com/drive/folders/1ustJy8Znff_TrAfIbGwQJpSmiq4ULA_h?usp=sharing" target="_blank">executable and dlls</a>
+   
+  2. Copy the files into a directory that contains a git repo that uses conventional commits, If you don't have a repo that uses conventional commits, you can download <a href="https://drive.google.com/drive/folders/1RSMgekJLUEygaDpKpFud_DdF0AQTsKRx?usp=sharing" target="_blank">Synfig's .git folder</a> and test the script on it
+   
+  3. Run the executable from the command line using suitable parameters
+      ``` 
+      $ release_notes_generator commit_type [release_notes_mode]
+      ```
+      1. Generate release notes from **normal commits**
+          ``` 
+          $ release_notes_generator n
+          ```
+      2. Generate **short** release notes from **merge commits** (Internet connection required)
+          ``` 
+          $ release_notes_generator m s
+          ```
+      3. Generate **full** release notes from **merge commits** (Internet connection required)
+          ```
+          $ release_notes_generator m f
+          ```
+</details>
+
+## How To Build
+
+  ### 1. Clone the repo
+  ```
+  $ git clone https://github.com/Ahmed-Khaled-dev/automated-release-notes-generator.git
+  ```
+
+  ### 2. Install Dependencies
+  The program has only 2 dependencies
+
+  1. [libcurl](https://github.com/curl/curl)
+    
+      The easiest way to install libcurl is using any package manager ([chocolatey](https://github.com/chocolatey/choco) or [vcpkg](https://github.com/microsoft/vcpkg) for Windows and your distro's package manager in Linux)
+    
+  2. [nlohmann/json.hpp](https://github.com/nlohmann/json)
+      
+      Download the json.hpp file in the same directory that the script is in, on Windows open [json.hpp](https://github.com/nlohmann/json/blob/develop/single_include/nlohmann/json.hpp) and then download raw file, 
+      on Linux run:
+
         ```
-    2. Generate **short** release notes from **merge commits** (Internet connection required)
-        ``` 
-        $ release_notes_generator m s
+        $ wget https://raw.githubusercontent.com/nlohmann/json/develop/ single_include/nlohmann/json.hpp
         ```
-    3. Generate **full** release notes from **merge commits** (Internet connection required)
-        ``` 
-        $ release_notes_generator m f
-        ```
+  
+  ### 3. Execute the Makefile
+  ```
+  $ make
+  ```
 
 ## Notes
 - The current prototype displays a maximum of 3 release notes for each commit type section to prevent excessive markdown output in large repositories like Synfig's. Future iterations may include options to customize this limit via an external configuration file or through user input or based on the date of the last commit or git tags, etc.
