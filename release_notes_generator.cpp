@@ -1,8 +1,8 @@
 /**
  * @file release_notes_generator.cpp
  * @author Ahmed Khaled
- * @brief A C++ script, to demonstrate the ability to work on the Synfig GSoC 2024 Automated release notes generator project, 
- * the script generates markdown release notes from conventional git commits
+ * @brief A C++ script, done while working at Synfig during Google Summer of Code 2024, 
+ * the script automatically generates nice-looking markdown/HTML release notes from conventional git commits
  */
 
 #include <iostream>
@@ -22,7 +22,7 @@ using namespace std;
 using namespace nlohmann;
 
 const int MAX_DISPLAYED_COMMITS_PER_TYPE = 3;
-const int COMMIT_TYPES_COUNT = 3;
+const int COMMIT_TYPES_COUNT = 10;
 const string MARKDOWN_OUTPUT_FILE_NAME = "release_notes.md";
 /**
  * @brief GitHub API URL to retrieve merge commits' pull request info
@@ -54,25 +54,42 @@ enum class CommitTypeInfo{
     MarkdownTitle /**< Markdown title to be displayed in the release notes section of this commit type (Ex: 🐛 Bug Fixes)*/
 };
 
+/**
+ * @brief Enumeration for the result of matching a commit type (e.g., fix: or fix(GUI):) against any commit type (fix, feat, etc.)
+ */
+enum class CommitTypeMatchResult {
+    MatchWithoutSubCategory, /**< when for example "fix:" is matched against "fix", they match and "fix:" doesn't have a subcategory "()"*/
+    MatchWithSubCategory, /**< when for example "fix(GUI):" is matched against "fix", they match and "fix(GUI):" has a subcategory which is "GUI"*/
+    NoMatch /**< when for example "fix:" or "fix(GUI):" is matched against "feat", they don't match*/
+};
+
 enum class ReleaseNoteModes{
     Short,
     Full
 };
 
 /**
- * @brief 2d array storing conventional commit types and their corresponding markdown titles, can easily later on modify these types
+ * @brief 2d array storing conventional commit types and their corresponding markdown titles
+ * mostly retrieved from https://github.com/pvdlg/conventional-changelog-metahub?tab=readme-ov-file#commit-types but I edited some emojis/titles
  */
 string commitTypes[COMMIT_TYPES_COUNT][2] = {
-    {"fix", "## 🐛 Bug Fixes"}, 
     {"feat", "## ✨ New Features"},
-    {"refactor", "## ♻️ Code Refactoring"}};
+    {"fix", "## 🐛 Bug Fixes"},
+    {"docs", "## 📚 Documentation"},
+    {"style", "## 💎 Styles"},
+    {"refactor", "## ♻️ Code Refactoring"},
+    {"perf", "## 🚀 Performance Improvements"},
+    {"test", "## ✔️ Tests"},
+    {"build", "## 📦 Builds"},
+    {"ci", "## ⚙️ Continuous Integrations"},
+    {"chore", "## 🔧 Chores"}};
 
 void printInputError(InputErrors inputError);
 string indentAllLinesInString(string s);
 string addPullRequestInfoInNotes(json pullRequestInfo, string mergeCommitsNotes, ReleaseNoteModes releaseNotesMode);
 size_t handleApiCallBack(char* data, size_t size, size_t numOfBytes, string* buffer);
 string getApiResponse(string pullRequestUrl);
-bool commitIsCorrectType(string commitMessage, int commitTypeIndex);
+CommitTypeMatchResult checkCommitTypeMatch(string commitMessage, int commitTypeIndex);
 string getMergeCommitsNotes(int commitTypeIndex, ReleaseNoteModes releaseNotesMode = ReleaseNoteModes::Short);
 string getNormalCommitsNotes(int commitTypeIndex);
 void generateReleaseNotes(Commits commit, OutputTypes outputType, ReleaseNoteModes releaseNoteMode = ReleaseNoteModes::Short);
@@ -161,7 +178,7 @@ string indentAllLinesInString(string s) {
  * @brief Adds merge commits' pull request information (title, body) in the release notes, based on the release notes mode, using GitHub API
  * @param pullRequestInfo JSON object containing pull request information
  * @param mergeCommitsNotes Existing release notes generated from merge commits
- * @param releaseNotesMode The release notes mode that will decide if the Pull request body will be included or not
+ * @param releaseNotesMode The release notes mode that will decide if the pull request body will be included or not
  * @return The updated release notes generated from merge commits
  */
 string addPullRequestInfoInNotes(json pullRequestInfo, string mergeCommitsNotes, ReleaseNoteModes releaseNotesMode) {
@@ -206,7 +223,7 @@ size_t handleApiCallBack(char* data, size_t size, size_t numOfBytes, string* buf
 /**
  * @brief Retrieves merge commit's Pull request info from the GitHub API using libcurl
  * @param pullRequestUrl The GitHub API URL of the merge commit's pull request
- * @return The Pull request info in JSON
+ * @return The pull request info in JSON
  */
 string getApiResponse(string pullRequestUrl) {
     // Initializing libcurl
@@ -248,13 +265,23 @@ string getApiResponse(string pullRequestUrl) {
 }
 
 /**
- * @brief Checks if the commit message is of the expected conventional commit type
+ * @brief Checks how the given commit message matches the expected conventional commit type
  * @param commitMessage The commit message
- * @param commitTypeIndex Index of the commit type in the commit types 2d array
- * @return True if the commit is of expected type, otherwise false
+ * @param commitTypeIndex Index of the commit type to check against in the commit types 2d array
+ * @return The type of match that happened between the two commit types
  */
-bool commitIsCorrectType(string commitMessage, int commitTypeIndex) {
-    return commitMessage.substr(0, commitMessage.find(":")) == commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName];
+CommitTypeMatchResult checkCommitTypeMatch(string commitMessage, int commitTypeIndex) {
+    string correctCommitType = commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName];
+
+    if (commitMessage.substr(0, commitMessage.find(":")) == correctCommitType) {
+        return CommitTypeMatchResult::MatchWithoutSubCategory;
+    }
+    else if (commitMessage.substr(0, commitMessage.find("(")) == correctCommitType) {
+        return CommitTypeMatchResult::MatchWithSubCategory;
+    }
+    else {
+        return CommitTypeMatchResult::NoMatch;
+    }
 }
 
 /**
@@ -265,7 +292,7 @@ bool commitIsCorrectType(string commitMessage, int commitTypeIndex) {
  */
 string getMergeCommitsNotes(int commitTypeIndex, ReleaseNoteModes releaseNotesMode) {
     string commandToRetrieveCommitsMessages = "git log --max-count " + to_string(MAX_DISPLAYED_COMMITS_PER_TYPE) +
-        " --merges --oneline --format=\"%s\" --grep=\"^" + commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName] + ": \"";
+        " --merges --oneline --format=\"%s\" --grep=\"^" + commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName] + "[:(]\"";
 
     FILE* pipe = popen(commandToRetrieveCommitsMessages.c_str(), "r");
     if (!pipe) {
@@ -279,7 +306,9 @@ string getMergeCommitsNotes(int commitTypeIndex, ReleaseNoteModes releaseNotesMo
     while (fgets(buffer, sizeof(buffer), pipe) != NULL) {
         commitMessage = buffer;
 
-        if (commitIsCorrectType(commitMessage, commitTypeIndex)) {
+        CommitTypeMatchResult matchResult = checkCommitTypeMatch(commitMessage, commitTypeIndex);
+
+        if (matchResult != CommitTypeMatchResult::NoMatch) {
             commitPullRequestNumber = commitMessage.substr(commitMessage.find("#") + 1, 4);
 
             try
@@ -306,7 +335,7 @@ string getMergeCommitsNotes(int commitTypeIndex, ReleaseNoteModes releaseNotesMo
  */
 string getNormalCommitsNotes(int commitTypeIndex) {
     string commandToRetrieveCommitsMessages = "git log --max-count " + to_string(MAX_DISPLAYED_COMMITS_PER_TYPE) +
-        " --no-merges --oneline --format=\"%s\" --grep=\"^" + commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName] + ": \"";
+        " --no-merges --oneline --format=\"%s\" --grep=\"^" + commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName] + "[:(]\"";
 
     FILE* pipe = popen(commandToRetrieveCommitsMessages.c_str(), "r");
     if (!pipe) {
@@ -314,17 +343,29 @@ string getNormalCommitsNotes(int commitTypeIndex) {
     }
 
     char buffer[150];
-    string commitMessage, normalCommitsNotes;
+    string commitMessage, normalCommitsNotes, subCategoryText;
 
     // Reading commit messages line-by-line from the output of the git log command
     while (fgets(buffer, sizeof(buffer), pipe) != NULL) {
         commitMessage = buffer;
+        subCategoryText = "";
 
-        if (commitIsCorrectType(commitMessage, commitTypeIndex)) {
+        CommitTypeMatchResult matchResult = checkCommitTypeMatch(commitMessage, commitTypeIndex);
+
+        if (matchResult != CommitTypeMatchResult::NoMatch) {
+            if (matchResult == CommitTypeMatchResult::MatchWithSubCategory) {
+                size_t startPos = commitMessage.find("(") + 1;
+                // Adding the sub category title
+                subCategoryText = " (" + commitMessage.substr(startPos, commitMessage.find(")") - startPos) + " Related) ";
+            }
+            
             commitMessage = "- " + commitMessage.substr(commitMessage.find(":") + 2) + "\n";
 
             // Capitalizing the first letter in the commit message
             commitMessage[2] = toupper(commitMessage[2]);
+
+            // Inserting the commit type subcategory (will be empty if there is no subcategory)
+            commitMessage.insert(2, subCategoryText);
 
             normalCommitsNotes += commitMessage;
         }
