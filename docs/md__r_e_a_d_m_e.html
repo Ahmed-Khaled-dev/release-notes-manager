@@ -79,11 +79,11 @@ $(function() {
  <img src="https://upload.wikimedia.org/wikipedia/commons/1/10/Synfig_logo.svg" alt="Synfig" style="pointer-events: none;" width="150" class="inline"/> <img src="https://avatars.githubusercontent.com/u/18133?s=280&amp;v=4" alt="Git" width="180" style="position:relative; bottom:17px;" class="inline"/> <br  />
  Synfig Automated Release Notes Generator <br  />
  </h1>
-<h4 align="center">A C++ script, to demonstrate the ability to work on the <a href="https://www.synfig.org/" target="_blank">Synfig</a> <a href="https://summerofcode.withgoogle.com/" target="_blank">GSoC</a> 2024 <a href="https://synfig-docs-dev.readthedocs.io/en/latest/gsoc/2024/ideas.html#projects-ideas" target="_blank">Automated release notes generator project</a>, the script generates markdown release notes from <a href="https://www.conventionalcommits.org/en/v1.0.0/" target="_blank">conventional git commits</a>.</h4>
+<h4 align="center">A C++ script, done while working at <a href="https://www.synfig.org/" target="_blank">Synfig</a> during <a href="https://summerofcode.withgoogle.com/" target="_blank">Google Summer of Code</a> 2024, the script automatically generates nice-looking markdown/HTML release notes from <a href="https://www.conventionalcommits.org/en/v1.0.0/" target="_blank">conventional git commits</a></h4>
 <p align="center"></p>
 <p><a href="https://ahmed-khaled-dev.github.io/automated-release-notes-generator/files.html"><img src="https://img.shields.io/badge/Code Docs- Webpage-blue?style=for-the-badge&amp;logo=none" alt="" class="inline"/> </a> </p>
 <p align="center"></p>
-<p><a href="#key-features">Key Features</a> • <a href="#how-to-use">How To Use</a> • <a href="#how-to-use">Notes</a> </p>
+<p><a href="#key-features">Key Features</a> • <a href="#how-to-use">How To Use</a> • <a href="#how-to-build">How To Build</a> • <a href="#notes">Notes</a> </p>
 <p align="center"></p>
 <p><img src="https://i.imgur.com/Wsld5Xz.png" alt="Script Markdown Output" class="inline"/> </p>
 <h2><a class="anchor" id="autotoc_md0"></a>
@@ -100,24 +100,64 @@ Key Features</h2>
 </ul>
 <h2><a class="anchor" id="autotoc_md1"></a>
 How To Use</h2>
-<p>To use this script you'll need <a href="https://git-scm.com/" target="_blank">Git</a> installed on your computer</p>
+<blockquote class="doxtable">
+<p>&zwj;[!IMPORTANT] For any of the following, you'll need <a href="https://git-scm.com/" target="_blank">Git</a> installed on your computer. </p>
+</blockquote>
+<details >
+<summary >
+Linux</summary>
+<p></p>
 <ol type="1">
-<li>Download the <a href="https://drive.google.com/drive/folders/1ustJy8Znff_TrAfIbGwQJpSmiq4ULA_h?usp=sharing" target="_blank">executable and dlls</a></li>
-<li>Copy the files into a directory that contains a git repo that uses conventional commits, If you don't have a repo that uses conventional commits, you can download <a href="https://drive.google.com/drive/folders/1RSMgekJLUEygaDpKpFud_DdF0AQTsKRx?usp=sharing" target="_blank">Synfig's .git folder</a> and test the script on it</li>
-<li>Run the executable from the command line using suitable parameters <div class="fragment"><div class="line">$ release_notes_generator commit_type [release_notes_mode]</div>
-</div><!-- fragment --> <br  />
-<ol type="a">
-<li>Generate release notes from <b>normal commits</b> <code> $ release_notes_generator n </code></li>
-<li>Generate <b>short</b> release notes from <b>merge commits</b> <code> $ release_notes_generator m s </code></li>
-<li>Generate <b>full</b> release notes from <b>merge commits</b> <code> $ release_notes_generator m f </code></li>
+<li>Download the <a href="https://drive.google.com/file/d/1blyizMY7ejLM9J2-BILO_K0kKfU_UZsl/view?usp=sharing">AppImage</a></li>
+<li>Copy the AppImage into a directory that contains a git repo that uses conventional commits, If you don't have a repo that uses conventional commits, you can download <a href="https://drive.google.com/drive/folders/1RSMgekJLUEygaDpKpFud_DdF0AQTsKRx?usp=sharing" target="_blank">Synfig's .git folder</a> and test the script on it</li>
+<li>Make the AppImage executable <code> $ chmod +x release_notes_generator.AppImage </code></li>
+<li>Run the AppImage from the command line using suitable parameters <code> $ ./release_notes_generator.AppImage commit_type [release_notes_mode] </code><ol type="a">
+<li>Generate release notes from <b>normal commits</b> <code> $ ./release_notes_generator.AppImage n </code></li>
+<li>Generate <b>short</b> release notes from <b>merge commits</b> (Internet connection required) <code> $ ./release_notes_generator.AppImage m s </code></li>
+<li>Generate <b>full</b> release notes from <b>merge commits</b> (Internet connection required) <code> $ ./release_notes_generator.AppImage m f </code> </li>
 </ol>
 </li>
 </ol>
+</details>
+<details >
+<summary >
+Windows</summary>
+<p></p>
+<ol type="1">
+<li>Download the <a href="https://drive.google.com/drive/folders/1ustJy8Znff_TrAfIbGwQJpSmiq4ULA_h?usp=sharing" target="_blank">executable and dlls</a></li>
+<li>Copy the files into a directory that contains a git repo that uses conventional commits, If you don't have a repo that uses conventional commits, you can download <a href="https://drive.google.com/drive/folders/1RSMgekJLUEygaDpKpFud_DdF0AQTsKRx?usp=sharing" target="_blank">Synfig's .git folder</a> and test the script on it</li>
+<li>Run the executable from the command line using suitable parameters <code> $ release_notes_generator commit_type [release_notes_mode] </code><ol type="a">
+<li>Generate release notes from <b>normal commits</b> <code> $ release_notes_generator n </code></li>
+<li>Generate <b>short</b> release notes from <b>merge commits</b> (Internet connection required) <code> $ release_notes_generator m s </code></li>
+<li>Generate <b>full</b> release notes from <b>merge commits</b> (Internet connection required) <code> $ release_notes_generator m f </code> </li>
+</ol>
+</li>
+</ol>
+</details>
 <h2><a class="anchor" id="autotoc_md2"></a>
+How To Build</h2>
+<h3><a class="anchor" id="autotoc_md3"></a>
+1. Clone the repo</h3>
+<div class="fragment"><div class="line">$ git clone https://github.com/Ahmed-Khaled-dev/automated-release-notes-generator.git</div>
+</div><!-- fragment --><h3><a class="anchor" id="autotoc_md4"></a>
+2. Install Dependencies</h3>
+<p>The program has only 2 dependencies</p>
+<ol type="1">
+<li><p class="startli"><a href="https://github.com/curl/curl">libcurl</a></p>
+<p class="startli">The easiest way to install libcurl is using any package manager (<a href="https://github.com/chocolatey/choco">chocolatey</a> or <a href="https://github.com/microsoft/vcpkg">vcpkg</a> for Windows and your distro's package manager in Linux)</p>
+</li>
+<li><p class="startli"><a href="https://github.com/nlohmann/json">nlohmann/json.hpp</a></p>
+<p class="startli">Download the json.hpp file in the same directory that the script is in, on Windows open <a href="https://github.com/nlohmann/json/blob/develop/single_include/nlohmann/json.hpp">json.hpp</a> and then download raw file, on Linux run:</p>
+<p class="startli"><code> $ wget <a href="https://raw.githubusercontent.com/nlohmann/json/develop/single_include/nlohmann/json.hpp">https://raw.githubusercontent.com/nlohmann/json/develop/single_include/nlohmann/json.hpp</a> </code></p>
+</li>
+</ol>
+<h3><a class="anchor" id="autotoc_md5"></a>
+3. Execute the Makefile</h3>
+<div class="fragment"><div class="line">$ make</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md6"></a>
 Notes</h2>
 <ul>
-<li>The current prototype displays a maximum of 3 release notes for each commit type section to prevent excessive markdown output in large repositories like Synfig's. Future iterations may include options to customize this limit via an external configuration file or through user input or based on the date of the last commit or git tags, etc.</li>
-<li>The current prototype demonstrates the display of three common commit types (fix, feat, and refactor). later on these can be modified very easily </li>
+<li>Currently the script displays a maximum of 3 release notes for each commit type section to prevent excessive markdown output in large repositories like Synfig's. Future iterations may include options to customize this limit via an external configuration file or through user input or based on the date of the last commit or git tags, etc. </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

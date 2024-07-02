@@ -9,6 +9,7 @@
 #include <fstream>
 #include <string>
 #include <cstring>
+#include <regex>
 #include <curl/curl.h> // Used to make api requests
 #include <json.hpp> // Used to parse json files returned by the GitHub API
 
@@ -21,13 +22,16 @@
 using namespace std;
 using namespace nlohmann;
 
-const int MAX_DISPLAYED_COMMITS_PER_TYPE = 3;
+const int MAX_DISPLAYED_COMMITS_PER_TYPE = 10;
 const int COMMIT_TYPES_COUNT = 10;
 const string MARKDOWN_OUTPUT_FILE_NAME = "release_notes.md";
 /**
- * @brief GitHub API URL to retrieve merge commits' pull request info
+ * @brief GitHub API URL to retrieve commits' pull request info
  */
 const string GITHUB_API_URL = "https://api.github.com/repos/synfig/synfig/pulls/";
+
+const string SYNFIG_ISSUES_URL = "https://github.com/synfig/synfig/issues/";
+const string SYNFIG_COMMITS_URL = "https://github.com/synfig/synfig/commit/";
 
 enum class Commits{
     Normal,
@@ -86,12 +90,16 @@ string commitTypes[COMMIT_TYPES_COUNT][2] = {
 
 void printInputError(InputErrors inputError);
 string indentAllLinesInString(string s);
-string addPullRequestInfoInNotes(json pullRequestInfo, string mergeCommitsNotes, ReleaseNoteModes releaseNotesMode);
+string replaceHashIdsWithLinks(string pullRequestBody);
+string replaceCommitShasWithLinks(string pullRequestBody);
+//string improveLooksOfNewLines(string pullRequestBody);
+string formatPullRequestBody(string pullRequestBody);
+string addPullRequestInfoInNotes(json pullRequestInfo, string releaseNotesFromPullRequests, ReleaseNoteModes releaseNotesMode);
 size_t handleApiCallBack(char* data, size_t size, size_t numOfBytes, string* buffer);
 string getApiResponse(string pullRequestUrl);
 CommitTypeMatchResult checkCommitTypeMatch(string commitMessage, int commitTypeIndex);
-string getMergeCommitsNotes(int commitTypeIndex, ReleaseNoteModes releaseNotesMode = ReleaseNoteModes::Short);
-string getNormalCommitsNotes(int commitTypeIndex);
+string getCommitsNotesFromPullRequests(int commitTypeIndex, ReleaseNoteModes releaseNotesMode = ReleaseNoteModes::Short);
+string getCommitsNotesFromCommitMessages(int commitTypeIndex);
 void generateReleaseNotes(Commits commit, OutputTypes outputType, ReleaseNoteModes releaseNoteMode = ReleaseNoteModes::Short);
 
 int main(int argc, char* argv[]){
@@ -175,13 +183,89 @@ string indentAllLinesInString(string s) {
 }
 
 /**
- * @brief Adds merge commits' pull request information (title, body) in the release notes, based on the release notes mode, using GitHub API
- * @param pullRequestInfo JSON object containing pull request information
- * @param mergeCommitsNotes Existing release notes generated from merge commits
- * @param releaseNotesMode The release notes mode that will decide if the pull request body will be included or not
- * @return The updated release notes generated from merge commits
+ * @brief Replaces all plain text hash ids (issue ids and pull request ids (#2777)) with links to these issues/pull requests on GitHub
+ * @param pullRequestBody The original body/description of the pull request to do the replacements on
+ * @return Pull request body/description after performing the replacements
  */
-string addPullRequestInfoInNotes(json pullRequestInfo, string mergeCommitsNotes, ReleaseNoteModes releaseNotesMode) {
+string replaceHashIdsWithLinks(string pullRequestBody) {
+    // The first brackets are not considered a capture group, they are a must when adding "R" to define this as a *raw string literal*
+    // We add this "R" to write regex patterns easier and increase readability by not needing to escape back slashes
+    regex hashIdPattern(R"(#(\d+))");
+    
+    string result = pullRequestBody;
+    size_t numberOfNewCharactersAdded = 0;
+    sregex_iterator firstHashId(pullRequestBody.begin(), pullRequestBody.end(), hashIdPattern);
+    // This is an end of sequence iterator
+    sregex_iterator lastHashId;
+
+    for (sregex_iterator i = firstHashId; i != lastHashId; i++) {
+        smatch currentHashIdMatch = *i;
+        // I get from my current match the first capture group (brackets) of my pattern (\d+) which only contains the numerical id in the hash id
+        string currentNumericId = currentHashIdMatch.str(1);
+        // I remove the old hash id and create a new markdown link using it and insert the new link in its place
+        result.erase(currentHashIdMatch.position() + numberOfNewCharactersAdded, currentHashIdMatch.length());
+        result.insert(currentHashIdMatch.position() + numberOfNewCharactersAdded, "[#" + currentNumericId + "](" + SYNFIG_ISSUES_URL + currentNumericId + ")");
+        // Regex smatch.position() was assigned before we replaced hash ids with urls
+        // So we must account for that by counting number of new characters we have added, "4" is for the characters "[]()"
+        numberOfNewCharactersAdded += 4 + SYNFIG_ISSUES_URL.length() + currentNumericId.length();
+    }
+
+    return result;
+};
+
+/**
+ * @brief Replaces all plain text commit SHAs (e.g., 219c2149) with links to these commits on GitHub
+ * @param pullRequestBody The original body/description of the pull request to do the replacements on
+ * @return Pull request body/description after performing the replacements
+ */
+string replaceCommitShasWithLinks(string pullRequestBody) {
+    regex commitShaPattern(R"([ (]([0-9a-f]{6,40})[ )])");
+
+    string result = pullRequestBody;
+    size_t numberOfNewCharactersAdded = 0;
+    sregex_iterator firstSha(pullRequestBody.begin(), pullRequestBody.end(), commitShaPattern);
+    sregex_iterator lastSha;
+
+    for (sregex_iterator i = firstSha; i != lastSha; i++)
+    {
+        smatch currentShaMatch = *i;
+        string currentSha = currentShaMatch.str(1);
+        result.erase(currentShaMatch.position() + numberOfNewCharactersAdded, currentShaMatch.length());
+        result.insert(currentShaMatch.position() + numberOfNewCharactersAdded, " [" + currentSha.substr(0, 6) + "](" + SYNFIG_COMMITS_URL + currentSha + ") ");
+        numberOfNewCharactersAdded += 4 + SYNFIG_COMMITS_URL.length() + 6;
+    }
+
+    return result;
+}
+
+/*string improveLooksOfNewLines(string pullRequestBody) {
+    regex pattern("(\\r\\n)");
+    pullRequestBody = regex_replace(pullRequestBody, pattern, "<br>");
+
+    return pullRequestBody;
+}*/
+
+/**
+ * @brief Makes the formatting of the retrieved PR body as close as possible to the PR on GitHub
+ * @param pullRequestBody The original body/description of the retrieved PR
+ * @return PR body/description after formatting it
+ */
+string formatPullRequestBody(string pullRequestBody) {
+    pullRequestBody = replaceHashIdsWithLinks(pullRequestBody);
+    pullRequestBody = replaceCommitShasWithLinks(pullRequestBody);
+    //pullRequestBody = improveLooksOfNewLines(pullRequestBody);
+
+    return pullRequestBody;
+}
+
+/**
+ * @brief Adds given pull request information (title, body) in the release notes, based on the release notes mode, using GitHub REST API
+ * @param pullRequestInfo JSON object containing pull request information
+ * @param releaseNotesFromPullRequests Existing release notes generated from pull requests
+ * @param releaseNotesMode The release notes mode that will decide if the pull request body will be included or not
+ * @return The updated release notes after adding the given pull request info, based on the release notes mode
+ */
+string addPullRequestInfoInNotes(json pullRequestInfo, string releaseNotesFromPullRequests, ReleaseNoteModes releaseNotesMode) {
     if (!pullRequestInfo["title"].is_null()) {
         string title = pullRequestInfo["title"];
 
@@ -190,24 +274,29 @@ string addPullRequestInfoInNotes(json pullRequestInfo, string mergeCommitsNotes,
         title[0] = toupper(title[0]);
 
         if(releaseNotesMode == ReleaseNoteModes::Full)
-            mergeCommitsNotes += "- ### " + title + "\n";
+            releaseNotesFromPullRequests += "- ### " + title + "\n";
         else
-            mergeCommitsNotes += "- " + title + "\n";
+            releaseNotesFromPullRequests += "- " + title + "\n";
     }
 
     if (releaseNotesMode == ReleaseNoteModes::Full && !pullRequestInfo["body"].is_null()) {
+        //cout << "Pull request BODY --------------------------" << endl;
+        //cout << pullRequestInfo["body"] << endl;
+        //cout << "--------------------------------------------" << endl;
         string body = pullRequestInfo["body"];
 
         // Capitalizing the first letter of the body
         body[0] = toupper(body[0]);
-        mergeCommitsNotes += indentAllLinesInString(body) + "\n";
+        body = formatPullRequestBody(body);
+
+        releaseNotesFromPullRequests += indentAllLinesInString(body) + "\n";
     }
 
-    return mergeCommitsNotes;
+    return releaseNotesFromPullRequests;
 }
 
 /**
- * @brief Callback function that is requried to handle API response in libcurl
+ * @brief Callback function that is required to handle API response in libcurl
  * @param data Pointer to the data received
  * @param size Size of each data element
  * @param numOfBytes Number of bytes received
@@ -237,6 +326,7 @@ string getApiResponse(string pullRequestUrl) {
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, handleApiCallBack);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &jsonResponse);
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "Ahmed-Khaled-dev");
+        //curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
         resultCode = curl_easy_perform(curl);
 
@@ -254,7 +344,7 @@ string getApiResponse(string pullRequestUrl) {
             }
         }
         else {
-            throw runtime_error("Unable to make request to the GitHub API");
+            throw runtime_error("Unable to make request to the GitHub API. Additional information: " + jsonResponse);
         }
 
         curl_easy_cleanup(curl);
@@ -285,22 +375,23 @@ CommitTypeMatchResult checkCommitTypeMatch(string commitMessage, int commitTypeI
 }
 
 /**
- * @brief Retrieves release notes from merge commits based on the given conventional commit type and release notes mode
+ * @brief Retrieves release notes from each commit's pull request based on the given conventional commit type and release notes mode
  * @param commitTypeIndex Index of the commit type in the commit types 2d array, to only generate release notes from the given commit type (fix, feat, etc.)
  * @param releaseNotesMode The release notes mode
- * @return The generated release notes from merge commits
+ * @return The generated release notes from each commit's pull request based on the given conventional commit type and release notes mode
  */
-string getMergeCommitsNotes(int commitTypeIndex, ReleaseNoteModes releaseNotesMode) {
+string getCommitsNotesFromPullRequests(int commitTypeIndex, ReleaseNoteModes releaseNotesMode) {
     string commandToRetrieveCommitsMessages = "git log --max-count " + to_string(MAX_DISPLAYED_COMMITS_PER_TYPE) +
-        " --merges --oneline --format=\"%s\" --grep=\"^" + commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName] + "[:(]\"";
+        " --oneline --format=\"%s\" --grep=\"^" + commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName] + "[:(]\"" +
+        " --grep=\"#[0-9]\" --all-match";
 
     FILE* pipe = popen(commandToRetrieveCommitsMessages.c_str(), "r");
     if (!pipe) {
-        throw runtime_error("Unable to open pipe to read git log commmand output");
+        throw runtime_error("Unable to open pipe to read git log command output");
     }
 
     char buffer[150];
-    string commitMessage, commitPullRequestNumber, mergeCommitsNotes = "";
+    string commitMessage, commitPullRequestNumber, releaseNotesFromPullRequests = "";
 
     // Reading commit messages line-by-line from the output of the git log command
     while (fgets(buffer, sizeof(buffer), pipe) != NULL) {
@@ -309,41 +400,48 @@ string getMergeCommitsNotes(int commitTypeIndex, ReleaseNoteModes releaseNotesMo
         CommitTypeMatchResult matchResult = checkCommitTypeMatch(commitMessage, commitTypeIndex);
 
         if (matchResult != CommitTypeMatchResult::NoMatch) {
-            commitPullRequestNumber = commitMessage.substr(commitMessage.find("#") + 1, 4);
+            size_t hashtagPositionInCommitMessage = commitMessage.find("#");
 
-            try
+            // Validating that a hashtag exists
+            if (hashtagPositionInCommitMessage != string::npos)
             {
-                string jsonResponse = getApiResponse(GITHUB_API_URL + commitPullRequestNumber);
-                json pullRequestInfo = json::parse(jsonResponse);
+                // Extracting the PR number associated with the commit
+                commitPullRequestNumber = commitMessage.substr(hashtagPositionInCommitMessage + 1, 4);
 
-                mergeCommitsNotes = addPullRequestInfoInNotes(pullRequestInfo, mergeCommitsNotes, releaseNotesMode) + "\n";
-            }
-            catch (const exception& e)
-            {
-                return e.what();
+                try
+                {
+                    string jsonResponse = getApiResponse(GITHUB_API_URL + commitPullRequestNumber);
+                    json pullRequestInfo = json::parse(jsonResponse);
+
+                    releaseNotesFromPullRequests = addPullRequestInfoInNotes(pullRequestInfo, releaseNotesFromPullRequests, releaseNotesMode) + "\n";
+                }
+                catch (const exception& e)
+                {
+                    return e.what();
+                }
             }
         }
     }
     pclose(pipe);
-    return mergeCommitsNotes;
+    return releaseNotesFromPullRequests;
 }
 
 /**
- * @brief Retrieves release notes from normal commits based on the given conventional commit type
+ * @brief Retrieves release notes from the messages of the commits based on the given conventional commit type
  * @param commitTypeIndex Index of the commit type in the commit types 2d array, to only generate release notes from the given commit type (fix, feat, etc.)
- * @return The generated release notes from normal commits
+ * @return The generated release notes from commit messages for the given commit type
  */
-string getNormalCommitsNotes(int commitTypeIndex) {
+string getCommitsNotesFromCommitMessages(int commitTypeIndex) {
     string commandToRetrieveCommitsMessages = "git log --max-count " + to_string(MAX_DISPLAYED_COMMITS_PER_TYPE) +
-        " --no-merges --oneline --format=\"%s\" --grep=\"^" + commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName] + "[:(]\"";
+        " --oneline --format=\"%s\" --grep=\"^" + commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName] + "[:(]\"";
 
     FILE* pipe = popen(commandToRetrieveCommitsMessages.c_str(), "r");
     if (!pipe) {
-        throw runtime_error("Unable to open pipe to read git log commmand output");
+        throw runtime_error("Unable to open pipe to read git log command output");
     }
 
     char buffer[150];
-    string commitMessage, normalCommitsNotes, subCategoryText;
+    string commitMessage, releaseNotesFromCommitMessages, subCategoryText;
 
     // Reading commit messages line-by-line from the output of the git log command
     while (fgets(buffer, sizeof(buffer), pipe) != NULL) {
@@ -367,12 +465,12 @@ string getNormalCommitsNotes(int commitTypeIndex) {
             // Inserting the commit type subcategory (will be empty if there is no subcategory)
             commitMessage.insert(2, subCategoryText);
 
-            normalCommitsNotes += commitMessage;
+            releaseNotesFromCommitMessages += commitMessage;
         }
     }
 
     pclose(pipe);
-    return normalCommitsNotes;
+    return releaseNotesFromCommitMessages;
 }
 
 /**
@@ -402,7 +500,7 @@ void generateReleaseNotes(Commits commit, OutputTypes outputType, ReleaseNoteMod
 
         if (commit == Commits::Normal) {
             try {
-                outputFile << getNormalCommitsNotes(i);
+                outputFile << getCommitsNotesFromCommitMessages(i);
             }
             catch (const exception& e) {
                 cout << e.what();
@@ -410,7 +508,7 @@ void generateReleaseNotes(Commits commit, OutputTypes outputType, ReleaseNoteMod
         }
         else if (commit == Commits::Merge) {
             try {
-                outputFile << getMergeCommitsNotes(i, releaseNoteMode);
+                outputFile << getCommitsNotesFromPullRequests(i, releaseNoteMode);
             }
             catch (const exception& e) {
                 cout << e.what();

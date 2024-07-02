@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['addpullrequestinfoinnotes_0',['addPullRequestInfoInNotes',['../release__notes__generator_8cpp.html#a4aa86c801c3c97c511c6dc861220e8f9',1,'release_notes_generator.cpp']]]
+  ['1_20clone_20the_20repo_0',['1. Clone the repo',['../md__r_e_a_d_m_e.html#autotoc_md3',1,'']]]
 ];

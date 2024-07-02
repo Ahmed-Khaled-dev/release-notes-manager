@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['printinputerror_0',['printInputError',['../release__notes__generator_8cpp.html#a72aef381e81fc4204922f15f83d354b8',1,'release_notes_generator.cpp']]]
+  ['main_0',['main',['../release__notes__generator_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97',1,'release_notes_generator.cpp']]]
 ];
