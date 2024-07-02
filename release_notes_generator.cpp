@@ -92,7 +92,7 @@ void printInputError(InputErrors inputError);
 string indentAllLinesInString(string s);
 string replaceHashIdsWithLinks(string pullRequestBody);
 string replaceCommitShasWithLinks(string pullRequestBody);
-//string improveLooksOfNewLines(string pullRequestBody);
+string removeExtraNewLines(string pullRequestBody);
 string formatPullRequestBody(string pullRequestBody);
 string addPullRequestInfoInNotes(json pullRequestInfo, string releaseNotesFromPullRequests, ReleaseNoteModes releaseNotesMode);
 size_t handleApiCallBack(char* data, size_t size, size_t numOfBytes, string* buffer);
@@ -238,22 +238,32 @@ string replaceCommitShasWithLinks(string pullRequestBody) {
     return result;
 }
 
-/*string improveLooksOfNewLines(string pullRequestBody) {
-    regex pattern("(\\r\\n)");
-    pullRequestBody = regex_replace(pullRequestBody, pattern, "<br>");
+/**
+ * @brief Remove extra new lines in retrieved PR description to make it look identical to the PR description on GitHub
+ * @param pullRequestBody The original body/description of the retrieved PR
+ * @return PR body/description after removing extra new lines
+ */
+string removeExtraNewLines(string pullRequestBody) {
+    // New lines in the retrieved PR description are represented as "\r\n" and there is no problem with that
+    // BUT after the script writes the retrieved PR description in the markdown file and I observed the contents of the markdown file
+    // using a hexadecimal editor, I found out that for some reason an extra "\r" was added when the markdown was written, so new lines were "\r\r\n"
+    // for some reason that created extra new lines, so when I tried removing this extra "\r" and I added 2 spaces before the new line "  \r\n"
+    // (these 2 spaces in markdown specify that a new line should occur), it worked!
+    regex pattern(R"(\r)");
+    pullRequestBody = regex_replace(pullRequestBody, pattern, "  ");
 
     return pullRequestBody;
-}*/
+}
 
 /**
- * @brief Makes the formatting of the retrieved PR body as close as possible to the PR on GitHub
+ * @brief Makes the formatting of the retrieved PR body look like the PR on GitHub
  * @param pullRequestBody The original body/description of the retrieved PR
  * @return PR body/description after formatting it
  */
 string formatPullRequestBody(string pullRequestBody) {
     pullRequestBody = replaceHashIdsWithLinks(pullRequestBody);
     pullRequestBody = replaceCommitShasWithLinks(pullRequestBody);
-    //pullRequestBody = improveLooksOfNewLines(pullRequestBody);
+    pullRequestBody = removeExtraNewLines(pullRequestBody);
 
     return pullRequestBody;
 }
@@ -280,9 +290,6 @@ string addPullRequestInfoInNotes(json pullRequestInfo, string releaseNotesFromPu
     }
 
     if (releaseNotesMode == ReleaseNoteModes::Full && !pullRequestInfo["body"].is_null()) {
-        //cout << "Pull request BODY --------------------------" << endl;
-        //cout << pullRequestInfo["body"] << endl;
-        //cout << "--------------------------------------------" << endl;
         string body = pullRequestInfo["body"];
 
         // Capitalizing the first letter of the body
