@@ -10,7 +10,7 @@
 #include <string>
 #include <cstring>
 #include <regex>
-#include <curl/curl.h> // Used to make api requests
+#include <curl/curl.h> // Used to make API requests
 #include <json.hpp> // Used to parse json files returned by the GitHub API
 
 // To allow for code compatibility between different compilers/OS (Microsoft's Visual C++ compiler and GCC)
@@ -25,29 +25,38 @@ using namespace nlohmann;
 const int MAX_DISPLAYED_COMMITS_PER_TYPE = 10;
 const int COMMIT_TYPES_COUNT = 10;
 const string MARKDOWN_OUTPUT_FILE_NAME = "release_notes.md";
+const string HTML_OUTPUT_FILE_NAME = "release_notes.html";
+
 /**
- * @brief GitHub API URL to retrieve commits' pull request info
+ * @brief GitHub API URL to retrieve Synfig's commits' pull request info
  */
-const string GITHUB_API_URL = "https://api.github.com/repos/synfig/synfig/pulls/";
+const string GITHUB_PULL_REQUESTS_API_URL = "https://api.github.com/repos/synfig/synfig/pulls/";
+
+/**
+ * @brief GitHub API URL to convert markdown to HTML
+ */
+const string GITHUB_MARKDOWN_API_URL = "https://api.github.com/markdown";
+
+//const string GITHUB_API_TOKEN = "";
 
 const string SYNFIG_ISSUES_URL = "https://github.com/synfig/synfig/issues/";
 const string SYNFIG_COMMITS_URL = "https://github.com/synfig/synfig/commit/";
 
-enum class Commits{
-    Normal,
-    Merge
+enum class ReleaseNoteSources{
+    CommitMessages,
+    PullRequests
 };
 
-// Can later on add HTMl
-enum class OutputTypes{
-    Markdown
+enum class ReleaseNoteModes {
+    Short,
+    Full
 };
 
 enum class InputErrors{
-    IncorrectCommitType,
-    NoCommitType,
+    IncorrectReleaseNotesSource,
+    NoReleaseNotesSource,
+    IncorrectReleaseNotesMode,
     NoReleaseNotesMode,
-    IncorrectReleaseNotesMode
 };
 
 /**
@@ -61,15 +70,10 @@ enum class CommitTypeInfo{
 /**
  * @brief Enumeration for the result of matching a commit type (e.g., fix: or fix(GUI):) against any commit type (fix, feat, etc.)
  */
-enum class CommitTypeMatchResult {
+enum class CommitTypeMatchResults {
     MatchWithoutSubCategory, /**< when for example "fix:" is matched against "fix", they match and "fix:" doesn't have a subcategory "()"*/
     MatchWithSubCategory, /**< when for example "fix(GUI):" is matched against "fix", they match and "fix(GUI):" has a subcategory which is "GUI"*/
     NoMatch /**< when for example "fix:" or "fix(GUI):" is matched against "feat", they don't match*/
-};
-
-enum class ReleaseNoteModes{
-    Short,
-    Full
 };
 
 /**
@@ -78,7 +82,7 @@ enum class ReleaseNoteModes{
  */
 string commitTypes[COMMIT_TYPES_COUNT][2] = {
     {"feat", "## ✨ New Features"},
-    {"fix", "## 🐛 Bug Fixes"},
+    {"fix", "## 🐞 Bug Fixes"},
     {"docs", "## 📚 Documentation"},
     {"style", "## 💎 Styles"},
     {"refactor", "## ♻️ Code Refactoring"},
@@ -96,40 +100,41 @@ string removeExtraNewLines(string pullRequestBody);
 string formatPullRequestBody(string pullRequestBody);
 string addPullRequestInfoInNotes(json pullRequestInfo, string releaseNotesFromPullRequests, ReleaseNoteModes releaseNotesMode);
 size_t handleApiCallBack(char* data, size_t size, size_t numOfBytes, string* buffer);
-string getApiResponse(string pullRequestUrl);
-CommitTypeMatchResult checkCommitTypeMatch(string commitMessage, int commitTypeIndex);
+string getPullRequestInfo(string pullRequestUrl);
+CommitTypeMatchResults checkCommitTypeMatch(string commitMessage, int commitTypeIndex);
 string getCommitsNotesFromPullRequests(int commitTypeIndex, ReleaseNoteModes releaseNotesMode = ReleaseNoteModes::Short);
 string getCommitsNotesFromCommitMessages(int commitTypeIndex);
-void generateReleaseNotes(Commits commit, OutputTypes outputType, ReleaseNoteModes releaseNoteMode = ReleaseNoteModes::Short);
+string convertMarkdownToHtml(string markdownText);
+void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, ReleaseNoteModes releaseNoteMode = ReleaseNoteModes::Short);
 
 int main(int argc, char* argv[]){
     if (argc <= 1) {
-        printInputError(InputErrors::NoCommitType);
+        printInputError(InputErrors::NoReleaseNotesSource);
         return 0;
     }
 
     try {
-        if (strcmp(argv[1], "n") == 0) {
-            generateReleaseNotes(Commits::Normal, OutputTypes::Markdown);
+        if (strcmp(argv[1], "message") == 0) {
+            generateReleaseNotes(ReleaseNoteSources::CommitMessages);
         }
-        else if (strcmp(argv[1], "m") == 0) {
+        else if (strcmp(argv[1], "pr") == 0) {
             if (argc <= 2) {
                 printInputError(InputErrors::NoReleaseNotesMode);
                 return 0;
             }
 
-            if (strcmp(argv[2], "f") == 0) {
-                generateReleaseNotes(Commits::Merge, OutputTypes::Markdown, ReleaseNoteModes::Full);
+            if (strcmp(argv[2], "full") == 0) {
+                generateReleaseNotes(ReleaseNoteSources::PullRequests, ReleaseNoteModes::Full);
             }
-            else if (strcmp(argv[2], "s") == 0) {
-                generateReleaseNotes(Commits::Merge, OutputTypes::Markdown, ReleaseNoteModes::Short);
+            else if (strcmp(argv[2], "short") == 0) {
+                generateReleaseNotes(ReleaseNoteSources::PullRequests, ReleaseNoteModes::Short);
             }
             else {
                 printInputError(InputErrors::IncorrectReleaseNotesMode);
             }
         }
         else {
-            printInputError(InputErrors::IncorrectCommitType);
+            printInputError(InputErrors::IncorrectReleaseNotesSource);
         }
     }
     catch (const exception& e) {
@@ -145,21 +150,21 @@ int main(int argc, char* argv[]){
  * @param inputError The type of input error
  */
 void printInputError(InputErrors inputError) {
-    if (inputError == InputErrors::IncorrectCommitType) {
-        cout << "Incorrect commit type!" << endl;
+    if (inputError == InputErrors::NoReleaseNotesSource) {
+        cout << "Please enter the source you which to use to generate release notes (message or pr)" << endl;
     }
-    else if (inputError == InputErrors::NoCommitType) {
-        cout << "Please enter the type of commits you which to use to generate release notes" << endl;
+    else if (inputError == InputErrors::IncorrectReleaseNotesSource) {
+        cout << "Please enter a valid release notes source" << endl;
     }
     else if (inputError == InputErrors::NoReleaseNotesMode) {
-        cout << "Please enter which release notes mode you want for merge commits (short or full)" << endl;
+        cout << "Please enter which release notes mode you want for PRs (short or full)" << endl;
     }
     else if (inputError == InputErrors::IncorrectReleaseNotesMode) {
         cout << "Please enter a valid release notes mode" << endl;
     }
     cout << "Expected Syntax:" << endl;
-    cout << "1 - release_notes_generator n (Normal Commits)" << endl;
-    cout << "2 - release_notes_generator m [s/f] (Merge Commits) (short or full release notes)" << endl;
+    cout << "1 - release_notes_generator message" << endl;
+    cout << "2 - release_notes_generator pr short/full" << endl;
 }
 
 /**
@@ -269,7 +274,7 @@ string formatPullRequestBody(string pullRequestBody) {
 }
 
 /**
- * @brief Adds given pull request information (title, body) in the release notes, based on the release notes mode, using GitHub REST API
+ * @brief Adds given pull request information (title, body) in the release notes, based on the release notes mode, using the GitHub API
  * @param pullRequestInfo JSON object containing pull request information
  * @param releaseNotesFromPullRequests Existing release notes generated from pull requests
  * @param releaseNotesMode The release notes mode that will decide if the pull request body will be included or not
@@ -317,23 +322,24 @@ size_t handleApiCallBack(char* data, size_t size, size_t numOfBytes, string* buf
 }
 
 /**
- * @brief Retrieves merge commit's Pull request info from the GitHub API using libcurl
- * @param pullRequestUrl The GitHub API URL of the merge commit's pull request
+ * @brief Retrieves pull request info from the GitHub API using libcurl
+ * @param pullRequestUrl The GitHub API URL of the pull request
  * @return The pull request info in JSON
  */
-string getApiResponse(string pullRequestUrl) {
+string getPullRequestInfo(string pullRequestUrl) {
     // Initializing libcurl
-    CURL* curl;
+    CURL* curl = curl_easy_init();
     CURLcode resultCode;
-    curl = curl_easy_init();
     string jsonResponse;
+    struct curl_slist* headers = NULL;
+    //headers = curl_slist_append(headers, ("Authorization: token " + GITHUB_API_TOKEN).c_str());
 
     if (curl) {
         curl_easy_setopt(curl, CURLOPT_URL, pullRequestUrl.c_str());
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, handleApiCallBack);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &jsonResponse);
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "Ahmed-Khaled-dev");
-        //curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
 
         resultCode = curl_easy_perform(curl);
 
@@ -355,6 +361,7 @@ string getApiResponse(string pullRequestUrl) {
         }
 
         curl_easy_cleanup(curl);
+        curl_slist_free_all(headers);
     }
     else {
         throw runtime_error("Error initializing libcurl to make requests to the GitHub API");
@@ -367,22 +374,22 @@ string getApiResponse(string pullRequestUrl) {
  * @param commitTypeIndex Index of the commit type to check against in the commit types 2d array
  * @return The type of match that happened between the two commit types
  */
-CommitTypeMatchResult checkCommitTypeMatch(string commitMessage, int commitTypeIndex) {
+CommitTypeMatchResults checkCommitTypeMatch(string commitMessage, int commitTypeIndex) {
     string correctCommitType = commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName];
 
     if (commitMessage.substr(0, commitMessage.find(":")) == correctCommitType) {
-        return CommitTypeMatchResult::MatchWithoutSubCategory;
+        return CommitTypeMatchResults::MatchWithoutSubCategory;
     }
     else if (commitMessage.substr(0, commitMessage.find("(")) == correctCommitType) {
-        return CommitTypeMatchResult::MatchWithSubCategory;
+        return CommitTypeMatchResults::MatchWithSubCategory;
     }
     else {
-        return CommitTypeMatchResult::NoMatch;
+        return CommitTypeMatchResults::NoMatch;
     }
 }
 
 /**
- * @brief Retrieves release notes from each commit's pull request based on the given conventional commit type and release notes mode
+ * @brief Retrieves release notes from each commit's *pull request* based on the given conventional commit type and release notes mode
  * @param commitTypeIndex Index of the commit type in the commit types 2d array, to only generate release notes from the given commit type (fix, feat, etc.)
  * @param releaseNotesMode The release notes mode
  * @return The generated release notes from each commit's pull request based on the given conventional commit type and release notes mode
@@ -404,9 +411,9 @@ string getCommitsNotesFromPullRequests(int commitTypeIndex, ReleaseNoteModes rel
     while (fgets(buffer, sizeof(buffer), pipe) != NULL) {
         commitMessage = buffer;
 
-        CommitTypeMatchResult matchResult = checkCommitTypeMatch(commitMessage, commitTypeIndex);
+        CommitTypeMatchResults matchResult = checkCommitTypeMatch(commitMessage, commitTypeIndex);
 
-        if (matchResult != CommitTypeMatchResult::NoMatch) {
+        if (matchResult != CommitTypeMatchResults::NoMatch) {
             size_t hashtagPositionInCommitMessage = commitMessage.find("#");
 
             // Validating that a hashtag exists
@@ -417,7 +424,7 @@ string getCommitsNotesFromPullRequests(int commitTypeIndex, ReleaseNoteModes rel
 
                 try
                 {
-                    string jsonResponse = getApiResponse(GITHUB_API_URL + commitPullRequestNumber);
+                    string jsonResponse = getPullRequestInfo(GITHUB_PULL_REQUESTS_API_URL + commitPullRequestNumber);
                     json pullRequestInfo = json::parse(jsonResponse);
 
                     releaseNotesFromPullRequests = addPullRequestInfoInNotes(pullRequestInfo, releaseNotesFromPullRequests, releaseNotesMode) + "\n";
@@ -434,9 +441,9 @@ string getCommitsNotesFromPullRequests(int commitTypeIndex, ReleaseNoteModes rel
 }
 
 /**
- * @brief Retrieves release notes from the messages of the commits based on the given conventional commit type
+ * @brief Retrieves release notes from each commit's *message* based on the given conventional commit type
  * @param commitTypeIndex Index of the commit type in the commit types 2d array, to only generate release notes from the given commit type (fix, feat, etc.)
- * @return The generated release notes from commit messages for the given commit type
+ * @return The generated release notes from each commit's message based on the given conventional commit type
  */
 string getCommitsNotesFromCommitMessages(int commitTypeIndex) {
     string commandToRetrieveCommitsMessages = "git log --max-count " + to_string(MAX_DISPLAYED_COMMITS_PER_TYPE) +
@@ -455,10 +462,10 @@ string getCommitsNotesFromCommitMessages(int commitTypeIndex) {
         commitMessage = buffer;
         subCategoryText = "";
 
-        CommitTypeMatchResult matchResult = checkCommitTypeMatch(commitMessage, commitTypeIndex);
+        CommitTypeMatchResults matchResult = checkCommitTypeMatch(commitMessage, commitTypeIndex);
 
-        if (matchResult != CommitTypeMatchResult::NoMatch) {
-            if (matchResult == CommitTypeMatchResult::MatchWithSubCategory) {
+        if (matchResult != CommitTypeMatchResults::NoMatch) {
+            if (matchResult == CommitTypeMatchResults::MatchWithSubCategory) {
                 size_t startPos = commitMessage.find("(") + 1;
                 // Adding the sub category title
                 subCategoryText = " (" + commitMessage.substr(startPos, commitMessage.find(")") - startPos) + " Related) ";
@@ -481,41 +488,85 @@ string getCommitsNotesFromCommitMessages(int commitTypeIndex) {
 }
 
 /**
- * @brief Generates release notes based on the given commit type, output type, and release notes mode
- * @param commit The type of commits to generate release notes from (Normal, Merge)
- * @param outputType The document/output type that the release notes will be generated in (Markdown, HTMl, etc.)
- * @param releaseNoteMode The release notes mode when the commit type is merge
+ * @brief Converts markdown to HTML using the GitHub API markdown endpoint
+ * @param markdownText The markdown text to be converted to HTML
+ * @return The HTML text containing the exact same content as the given markdown
  */
-void generateReleaseNotes(Commits commit, OutputTypes outputType, ReleaseNoteModes releaseNoteMode) {
-    ofstream outputFile;
-    if (outputType == OutputTypes::Markdown) {
-        outputFile.open(MARKDOWN_OUTPUT_FILE_NAME);
+string convertMarkdownToHtml(string markdownText) {
+    // Initializing libcurl
+    CURL* curl = curl_easy_init();
+    CURLcode resultCode;
+    string htmlText;
+    struct curl_slist* headers = NULL;
+    //headers = curl_slist_append(headers, ("Authorization: token " + GITHUB_API_TOKEN).c_str());
+    headers = curl_slist_append(headers, ((const string) "Accept: application/vnd.github+json").c_str());
 
-        if (!outputFile.is_open()) {
-            throw runtime_error("Unable to open markdown release notes file");
+    if (curl) {
+        curl_easy_setopt(curl, CURLOPT_URL, GITHUB_MARKDOWN_API_URL.c_str());
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, handleApiCallBack);
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &htmlText);
+        curl_easy_setopt(curl, CURLOPT_USERAGENT, "Ahmed-Khaled-dev");
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);
+
+        json postData;
+        postData["text"] = markdownText;
+        string postDataString = postData.dump();
+        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postDataString.c_str());
+
+        resultCode = curl_easy_perform(curl);
+
+        if (resultCode == CURLE_OK) {
+            // Get the HTTP response code
+            long httpCode = 0;
+            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+
+            // Check if the response code indicates rate limit exceeded
+            if (httpCode == 403) {
+                throw runtime_error("Rate limit exceeded. Additional information: " + htmlText);
+            }
+            else {
+                return htmlText;
+            }
         }
-    }
+        else {
+            throw runtime_error("Unable to make request to the GitHub API. Additional information: " + htmlText);
+        }
 
+        curl_easy_cleanup(curl);
+        curl_slist_free_all(headers);
+    }
+    else {
+        throw runtime_error("Error initializing libcurl to make requests to the GitHub API");
+    }
+}
+
+/**
+ * @brief Generates release notes based on the given source and release notes mode
+ * @param releaseNoteSource The source to generate release notes from (commit messages or pull requests)
+ * @param releaseNoteMode The release notes mode when the source is pull requests
+ */
+void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, ReleaseNoteModes releaseNoteMode) {
     cout << "Generating release notes......." << endl;
 
     string commandToRetrieveCommitsMessages;
     string currentCommitMessage;
+    string markdownReleaseNotes = "";
     for (int i = 0; i < COMMIT_TYPES_COUNT; i++)
     {
         // Output the title of this commit type section in the release notes
-        outputFile << "\n" << commitTypes[i][(int)CommitTypeInfo::MarkdownTitle] << "\n";
+        markdownReleaseNotes += "\n" + commitTypes[i][(int)CommitTypeInfo::MarkdownTitle] + "\n";
 
-        if (commit == Commits::Normal) {
+        if (releaseNoteSource == ReleaseNoteSources::CommitMessages) {
             try {
-                outputFile << getCommitsNotesFromCommitMessages(i);
+                markdownReleaseNotes += getCommitsNotesFromCommitMessages(i);
             }
             catch (const exception& e) {
                 cout << e.what();
             }
         }
-        else if (commit == Commits::Merge) {
+        else if (releaseNoteSource == ReleaseNoteSources::PullRequests) {
             try {
-                outputFile << getCommitsNotesFromPullRequests(i, releaseNoteMode);
+                markdownReleaseNotes += getCommitsNotesFromPullRequests(i, releaseNoteMode);
             }
             catch (const exception& e) {
                 cout << e.what();
@@ -523,5 +574,22 @@ void generateReleaseNotes(Commits commit, OutputTypes outputType, ReleaseNoteMod
         }
     }
 
-    cout << "Release notes generated successfully, check " + MARKDOWN_OUTPUT_FILE_NAME + " in the current directory" << endl;
+    ofstream markdownFileOutput(MARKDOWN_OUTPUT_FILE_NAME);
+
+    if (!markdownFileOutput.is_open()) {
+        throw runtime_error("Unable to create/open markdown release notes file");
+    }
+
+    markdownFileOutput << markdownReleaseNotes;
+    markdownFileOutput.close();
+
+    ofstream htmlFileOutput(HTML_OUTPUT_FILE_NAME);
+
+    if (!htmlFileOutput.is_open()) {
+        throw runtime_error("Unable to create/open HTML release notes file");
+    }
+
+    htmlFileOutput << convertMarkdownToHtml(markdownReleaseNotes);
+
+    cout << "Release notes generated successfully, check " + MARKDOWN_OUTPUT_FILE_NAME + " and " + HTML_OUTPUT_FILE_NAME + " in the current directory" << endl;
 }

@@ -26,16 +26,19 @@ during <a href="https://summerofcode.withgoogle.com/" target="_blank">Google Sum
 </p>
 
 <p align="center">
-    <img src="https://i.imgur.com/Wsld5Xz.png" alt="Script Markdown Output">
+    <img src="https://imgur.com/5h7WPjS.png" alt="Script Markdown Output">
 </p>
 
 ## Key Features
-- Generate markdown release notes from **normal commits and group them by type** (Bug fixes, New Features, Code Refactoring, etc.)
-- Generate **2 modes** of markdown release notes from **merge commits** (Short/Full modes)
-  - **Short mode**, release notes are made up from the **Pull request titles** of each merge commit
-  - **Full mode**, release notes are made up from **Pull request title and Pull request body/description** of each merge commit
+- Generate markdown/HTML release notes from **commit messages and group them by type** (New Features, Bug fixes, Code Refactoring, etc.)
+- Generate **2 modes** of markdown/HTML release notes from **pull requests** (Short/Full modes) and group them by type
+  
+  - **Short mode**, release notes are made up from the **pull request title** of each commit
+  - **Full mode**, release notes are made up from **pull request title and pull request description** of each commit
+
+    Example focusing on the "Bug Fixes" type in release notes generated from pull requests full mode
     
-    <img src="https://i.imgur.com/Z8LRRgz.png" alt="Automated release notes generator">
+    <img src="https://imgur.com/pdLnAWx.png" alt="Automated release notes generator">
 
 ## How To Use
 
@@ -55,19 +58,19 @@ during <a href="https://summerofcode.withgoogle.com/" target="_blank">Google Sum
       ```
   4. Run the AppImage from the command line using suitable parameters
       ``` 
-      $ ./release_notes_generator.AppImage commit_type [release_notes_mode]
+      $ ./release_notes_generator.AppImage release_notes_source [release_notes_mode]
       ```
-      1. Generate release notes from **normal commits**
+      1. Generate release notes from **commit messages**
           ``` 
-          $ ./release_notes_generator.AppImage n
+          $ ./release_notes_generator.AppImage message
           ```
-      2. Generate **short** release notes from **merge commits** (Internet connection required)
+      2. Generate **short** release notes from **pull requests**
           ``` 
-          $ ./release_notes_generator.AppImage m s
+          $ ./release_notes_generator.AppImage pr short
           ```
-      3. Generate **full** release notes from **merge commits** (Internet connection required)
+      3. Generate **full** release notes from **pull requests**
           ``` 
-          $ ./release_notes_generator.AppImage m f
+          $ ./release_notes_generator.AppImage pr full
           ```
 </details>
 <details>
@@ -79,19 +82,19 @@ during <a href="https://summerofcode.withgoogle.com/" target="_blank">Google Sum
    
   3. Run the executable from the command line using suitable parameters
       ``` 
-      $ release_notes_generator commit_type [release_notes_mode]
+      $ ./release_notes_generator release_notes_source [release_notes_mode]
       ```
-      1. Generate release notes from **normal commits**
+      1. Generate release notes from **commit messages**
           ``` 
-          $ release_notes_generator n
+          $ ./release_notes_generator message
           ```
-      2. Generate **short** release notes from **merge commits** (Internet connection required)
+      2. Generate **short** release notes from **pull requests**
           ``` 
-          $ release_notes_generator m s
+          $ ./release_notes_generator pr short
           ```
-      3. Generate **full** release notes from **merge commits** (Internet connection required)
-          ```
-          $ release_notes_generator m f
+      3. Generate **full** release notes from **pull requests**
+          ``` 
+          $ ./release_notes_generator pr full
           ```
 </details>
 
@@ -122,6 +125,3 @@ during <a href="https://summerofcode.withgoogle.com/" target="_blank">Google Sum
   ```
   $ make
   ```
-
-## Notes
-- Currently the script displays a maximum of 3 release notes for each commit type section to prevent excessive markdown output in large repositories like Synfig's. Future iterations may include options to customize this limit via an external configuration file or through user input or based on the date of the last commit or git tags, etc.
