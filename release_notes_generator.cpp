@@ -37,8 +37,6 @@ const string GITHUB_PULL_REQUESTS_API_URL = "https://api.github.com/repos/synfig
  */
 const string GITHUB_MARKDOWN_API_URL = "https://api.github.com/markdown";
 
-//const string GITHUB_API_TOKEN = "";
-
 const string SYNFIG_ISSUES_URL = "https://github.com/synfig/synfig/issues/";
 const string SYNFIG_COMMITS_URL = "https://github.com/synfig/synfig/commit/";
 
@@ -57,6 +55,7 @@ enum class InputErrors{
     NoReleaseNotesSource,
     IncorrectReleaseNotesMode,
     NoReleaseNotesMode,
+    NoGithubToken
 };
 
 /**
@@ -100,12 +99,12 @@ string removeExtraNewLines(string pullRequestBody);
 string formatPullRequestBody(string pullRequestBody);
 string addPullRequestInfoInNotes(json pullRequestInfo, string releaseNotesFromPullRequests, ReleaseNoteModes releaseNotesMode);
 size_t handleApiCallBack(char* data, size_t size, size_t numOfBytes, string* buffer);
-string getPullRequestInfo(string pullRequestUrl);
+string getPullRequestInfo(string pullRequestUrl, string githubToken);
 CommitTypeMatchResults checkCommitTypeMatch(string commitMessage, int commitTypeIndex);
-string getCommitsNotesFromPullRequests(int commitTypeIndex, ReleaseNoteModes releaseNotesMode = ReleaseNoteModes::Short);
+string getCommitsNotesFromPullRequests(int commitTypeIndex, ReleaseNoteModes releaseNotesMode, string githubToken);
 string getCommitsNotesFromCommitMessages(int commitTypeIndex);
-string convertMarkdownToHtml(string markdownText);
-void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, ReleaseNoteModes releaseNoteMode = ReleaseNoteModes::Short);
+string convertMarkdownToHtml(string markdownText, string githubToken);
+void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, ReleaseNoteModes releaseNoteMode = ReleaseNoteModes::Short, string githubToken = "");
 
 int main(int argc, char* argv[]){
     if (argc <= 1) {
@@ -122,12 +121,16 @@ int main(int argc, char* argv[]){
                 printInputError(InputErrors::NoReleaseNotesMode);
                 return 0;
             }
+            else if (argc <= 3) {
+                printInputError(InputErrors::NoGithubToken);
+                return 0;
+            }
 
             if (strcmp(argv[2], "full") == 0) {
-                generateReleaseNotes(ReleaseNoteSources::PullRequests, ReleaseNoteModes::Full);
+                generateReleaseNotes(ReleaseNoteSources::PullRequests, ReleaseNoteModes::Full, argv[3]);
             }
             else if (strcmp(argv[2], "short") == 0) {
-                generateReleaseNotes(ReleaseNoteSources::PullRequests, ReleaseNoteModes::Short);
+                generateReleaseNotes(ReleaseNoteSources::PullRequests, ReleaseNoteModes::Short, argv[3]);
             }
             else {
                 printInputError(InputErrors::IncorrectReleaseNotesMode);
@@ -162,9 +165,12 @@ void printInputError(InputErrors inputError) {
     else if (inputError == InputErrors::IncorrectReleaseNotesMode) {
         cout << "Please enter a valid release notes mode" << endl;
     }
+    else if (inputError == InputErrors::NoGithubToken) {
+        cout << "Please enter a GitHub token to be able to make authenticated requests to the GitHub API" << endl;
+    }
     cout << "Expected Syntax:" << endl;
     cout << "1 - release_notes_generator message" << endl;
-    cout << "2 - release_notes_generator pr short/full" << endl;
+    cout << "2 - release_notes_generator pr short/full github_token" << endl;
 }
 
 /**
@@ -324,15 +330,16 @@ size_t handleApiCallBack(char* data, size_t size, size_t numOfBytes, string* buf
 /**
  * @brief Retrieves pull request info from the GitHub API using libcurl
  * @param pullRequestUrl The GitHub API URL of the pull request
+ * @param githubToken The GitHub token used to make authenticated requests to the GitHub API
  * @return The pull request info in JSON
  */
-string getPullRequestInfo(string pullRequestUrl) {
+string getPullRequestInfo(string pullRequestUrl, string githubToken) {
     // Initializing libcurl
     CURL* curl = curl_easy_init();
     CURLcode resultCode;
     string jsonResponse;
     struct curl_slist* headers = NULL;
-    //headers = curl_slist_append(headers, ("Authorization: token " + GITHUB_API_TOKEN).c_str());
+    headers = curl_slist_append(headers, ("Authorization: token " + githubToken).c_str());
 
     if (curl) {
         curl_easy_setopt(curl, CURLOPT_URL, pullRequestUrl.c_str());
@@ -392,9 +399,10 @@ CommitTypeMatchResults checkCommitTypeMatch(string commitMessage, int commitType
  * @brief Retrieves release notes from each commit's *pull request* based on the given conventional commit type and release notes mode
  * @param commitTypeIndex Index of the commit type in the commit types 2d array, to only generate release notes from the given commit type (fix, feat, etc.)
  * @param releaseNotesMode The release notes mode
+ * @param githubToken The GitHub token used to make authenticated requests to the GitHub API
  * @return The generated release notes from each commit's pull request based on the given conventional commit type and release notes mode
  */
-string getCommitsNotesFromPullRequests(int commitTypeIndex, ReleaseNoteModes releaseNotesMode) {
+string getCommitsNotesFromPullRequests(int commitTypeIndex, ReleaseNoteModes releaseNotesMode, string githubToken) {
     string commandToRetrieveCommitsMessages = "git log --max-count " + to_string(MAX_DISPLAYED_COMMITS_PER_TYPE) +
         " --oneline --format=\"%s\" --grep=\"^" + commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName] + "[:(]\"" +
         " --grep=\"#[0-9]\" --all-match";
@@ -424,7 +432,7 @@ string getCommitsNotesFromPullRequests(int commitTypeIndex, ReleaseNoteModes rel
 
                 try
                 {
-                    string jsonResponse = getPullRequestInfo(GITHUB_PULL_REQUESTS_API_URL + commitPullRequestNumber);
+                    string jsonResponse = getPullRequestInfo(GITHUB_PULL_REQUESTS_API_URL + commitPullRequestNumber, githubToken);
                     json pullRequestInfo = json::parse(jsonResponse);
 
                     releaseNotesFromPullRequests = addPullRequestInfoInNotes(pullRequestInfo, releaseNotesFromPullRequests, releaseNotesMode) + "\n";
@@ -490,15 +498,16 @@ string getCommitsNotesFromCommitMessages(int commitTypeIndex) {
 /**
  * @brief Converts markdown to HTML using the GitHub API markdown endpoint
  * @param markdownText The markdown text to be converted to HTML
+ * @param githubToken The GitHub token used to make authenticated requests to the GitHub API
  * @return The HTML text containing the exact same content as the given markdown
  */
-string convertMarkdownToHtml(string markdownText) {
+string convertMarkdownToHtml(string markdownText, string githubToken) {
     // Initializing libcurl
     CURL* curl = curl_easy_init();
     CURLcode resultCode;
     string htmlText;
     struct curl_slist* headers = NULL;
-    //headers = curl_slist_append(headers, ("Authorization: token " + GITHUB_API_TOKEN).c_str());
+    headers = curl_slist_append(headers, ("Authorization: token " + githubToken).c_str());
     headers = curl_slist_append(headers, ((const string) "Accept: application/vnd.github+json").c_str());
 
     if (curl) {
@@ -544,8 +553,9 @@ string convertMarkdownToHtml(string markdownText) {
  * @brief Generates release notes based on the given source and release notes mode
  * @param releaseNoteSource The source to generate release notes from (commit messages or pull requests)
  * @param releaseNoteMode The release notes mode when the source is pull requests
+ * @param githubToken The GitHub token used to make authenticated requests to the GitHub API when source is pull requests
  */
-void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, ReleaseNoteModes releaseNoteMode) {
+void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, ReleaseNoteModes releaseNoteMode, string githubToken) {
     cout << "Generating release notes......." << endl;
 
     string commandToRetrieveCommitsMessages;
@@ -566,7 +576,7 @@ void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, ReleaseNoteModes
         }
         else if (releaseNoteSource == ReleaseNoteSources::PullRequests) {
             try {
-                markdownReleaseNotes += getCommitsNotesFromPullRequests(i, releaseNoteMode);
+                markdownReleaseNotes += getCommitsNotesFromPullRequests(i, releaseNoteMode, githubToken);
             }
             catch (const exception& e) {
                 cout << e.what();
@@ -589,7 +599,7 @@ void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, ReleaseNoteModes
         throw runtime_error("Unable to create/open HTML release notes file");
     }
 
-    htmlFileOutput << convertMarkdownToHtml(markdownReleaseNotes);
+    htmlFileOutput << convertMarkdownToHtml(markdownReleaseNotes, githubToken);
 
     cout << "Release notes generated successfully, check " + MARKDOWN_OUTPUT_FILE_NAME + " and " + HTML_OUTPUT_FILE_NAME + " in the current directory" << endl;
 }
