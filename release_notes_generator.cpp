@@ -22,23 +22,30 @@
 using namespace std;
 using namespace nlohmann;
 
-const int MAX_DISPLAYED_COMMITS_PER_TYPE = 10;
-const int COMMIT_TYPES_COUNT = 10;
-const string MARKDOWN_OUTPUT_FILE_NAME = "release_notes.md";
-const string HTML_OUTPUT_FILE_NAME = "release_notes.html";
+string markdownOutputFileName;
+string htmlOutputFileName;
 
 /**
  * @brief GitHub API URL to retrieve Synfig's commits' pull request info
  */
-const string GITHUB_PULL_REQUESTS_API_URL = "https://api.github.com/repos/synfig/synfig/pulls/";
+string synfigGithubPullRequestsApiUrl;
 
 /**
  * @brief GitHub API URL to convert markdown to HTML
  */
-const string GITHUB_MARKDOWN_API_URL = "https://api.github.com/markdown";
+string githubMarkdownApiUrl;
 
-const string SYNFIG_ISSUES_URL = "https://github.com/synfig/synfig/issues/";
-const string SYNFIG_COMMITS_URL = "https://github.com/synfig/synfig/commit/";
+string synfigIssuesUrl;
+string synfigCommitsUrl;
+
+int maxDisplayedCommitsPerCommitType;
+int commitTypesCount;
+
+/**
+ * @brief 2d array storing conventional commit types and their corresponding markdown titles
+ * The first dimension is 50 to give it enough space to store as many types as the user enters in the config.json
+ */
+string commitTypes[50][2];
 
 enum class ReleaseNoteSources{
     CommitMessages,
@@ -75,22 +82,6 @@ enum class CommitTypeMatchResults {
     NoMatch /**< when for example "fix:" or "fix(GUI):" is matched against "feat", they don't match*/
 };
 
-/**
- * @brief 2d array storing conventional commit types and their corresponding markdown titles
- * mostly retrieved from https://github.com/pvdlg/conventional-changelog-metahub?tab=readme-ov-file#commit-types but I edited some emojis/titles
- */
-string commitTypes[COMMIT_TYPES_COUNT][2] = {
-    {"feat", "## ✨ New Features"},
-    {"fix", "## 🐞 Bug Fixes"},
-    {"docs", "## 📚 Documentation"},
-    {"style", "## 💎 Styles"},
-    {"refactor", "## ♻️ Code Refactoring"},
-    {"perf", "## 🚀 Performance Improvements"},
-    {"test", "## ✔️ Tests"},
-    {"build", "## 📦 Builds"},
-    {"ci", "## ⚙️ Continuous Integrations"},
-    {"chore", "## 🔧 Chores"}};
-
 void printInputError(InputErrors inputError);
 string indentAllLinesInString(string s);
 string replaceHashIdsWithLinks(string pullRequestBody);
@@ -103,10 +94,36 @@ string getPullRequestInfo(string pullRequestUrl, string githubToken);
 CommitTypeMatchResults checkCommitTypeMatch(string commitMessage, int commitTypeIndex);
 string getCommitsNotesFromPullRequests(int commitTypeIndex, ReleaseNoteModes releaseNotesMode, string githubToken);
 string getCommitsNotesFromCommitMessages(int commitTypeIndex);
-string convertMarkdownToHtml(string markdownText, string githubToken);
+string convertMarkdownToHtml(string markdownText);
 void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, ReleaseNoteModes releaseNoteMode = ReleaseNoteModes::Short, string githubToken = "");
 
 int main(int argc, char* argv[]){
+    
+    // Reading values from the external configuration
+    ifstream externalConfigFile("config.json");
+    if (!externalConfigFile.is_open()) {
+        cerr << "Unable to open config.json, please ensure that it exists in the same directory as the script" << endl;
+        return 1;
+    }
+    
+    json externalConfigData;
+    externalConfigFile >> externalConfigData;
+
+    markdownOutputFileName = externalConfigData["markdownOutputFileName"];
+    htmlOutputFileName = externalConfigData["htmlOutputFileName"];
+    synfigGithubPullRequestsApiUrl = externalConfigData["synfigGithubPullRequestsApiUrl"];
+    githubMarkdownApiUrl = externalConfigData["githubMarkdownApiUrl"];
+    synfigIssuesUrl = externalConfigData["synfigIssuesUrl"];
+    synfigCommitsUrl = externalConfigData["synfigCommitsUrl"];
+    maxDisplayedCommitsPerCommitType = externalConfigData["maxDisplayedCommitsPerCommitType"];
+    commitTypesCount = externalConfigData["commitTypesCount"];
+
+    for (int i = 0; i < commitTypesCount; i++)
+    {
+        commitTypes[i][0] = externalConfigData["commitTypes"][i]["conventionalType"];
+        commitTypes[i][1] = externalConfigData["commitTypes"][i]["markdownTitle"];
+    }
+    
     if (argc <= 1) {
         printInputError(InputErrors::NoReleaseNotesSource);
         return 0;
@@ -215,10 +232,10 @@ string replaceHashIdsWithLinks(string pullRequestBody) {
         string currentNumericId = currentHashIdMatch.str(1);
         // I remove the old hash id and create a new markdown link using it and insert the new link in its place
         result.erase(currentHashIdMatch.position() + numberOfNewCharactersAdded, currentHashIdMatch.length());
-        result.insert(currentHashIdMatch.position() + numberOfNewCharactersAdded, "[#" + currentNumericId + "](" + SYNFIG_ISSUES_URL + currentNumericId + ")");
+        result.insert(currentHashIdMatch.position() + numberOfNewCharactersAdded, "[#" + currentNumericId + "](" + synfigIssuesUrl + currentNumericId + ")");
         // Regex smatch.position() was assigned before we replaced hash ids with urls
         // So we must account for that by counting number of new characters we have added, "4" is for the characters "[]()"
-        numberOfNewCharactersAdded += 4 + SYNFIG_ISSUES_URL.length() + currentNumericId.length();
+        numberOfNewCharactersAdded += 4 + synfigIssuesUrl.length() + currentNumericId.length();
     }
 
     return result;
@@ -242,8 +259,8 @@ string replaceCommitShasWithLinks(string pullRequestBody) {
         smatch currentShaMatch = *i;
         string currentSha = currentShaMatch.str(1);
         result.erase(currentShaMatch.position() + numberOfNewCharactersAdded, currentShaMatch.length());
-        result.insert(currentShaMatch.position() + numberOfNewCharactersAdded, " [" + currentSha.substr(0, 6) + "](" + SYNFIG_COMMITS_URL + currentSha + ") ");
-        numberOfNewCharactersAdded += 4 + SYNFIG_COMMITS_URL.length() + 6;
+        result.insert(currentShaMatch.position() + numberOfNewCharactersAdded, " [" + currentSha.substr(0, 6) + "](" + synfigCommitsUrl + currentSha + ") ");
+        numberOfNewCharactersAdded += 4 + synfigCommitsUrl.length() + 6;
     }
 
     return result;
@@ -359,6 +376,12 @@ string getPullRequestInfo(string pullRequestUrl, string githubToken) {
             if (httpCode == 403) {
                 throw runtime_error("Rate limit exceeded. Additional information: " + jsonResponse);
             }
+            else if (httpCode == 401) {
+                throw runtime_error("Unauthorized. Additional information: " + jsonResponse);
+            }
+            else if (httpCode == 400) {
+                throw runtime_error("Bad request. Additional information: " + jsonResponse);
+            }
             else {
                 return jsonResponse;
             }
@@ -403,7 +426,7 @@ CommitTypeMatchResults checkCommitTypeMatch(string commitMessage, int commitType
  * @return The generated release notes from each commit's pull request based on the given conventional commit type and release notes mode
  */
 string getCommitsNotesFromPullRequests(int commitTypeIndex, ReleaseNoteModes releaseNotesMode, string githubToken) {
-    string commandToRetrieveCommitsMessages = "git log --max-count " + to_string(MAX_DISPLAYED_COMMITS_PER_TYPE) +
+    string commandToRetrieveCommitsMessages = "git log --max-count " + to_string(maxDisplayedCommitsPerCommitType) +
         " --oneline --format=\"%s\" --grep=\"^" + commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName] + "[:(]\"" +
         " --grep=\"#[0-9]\" --all-match";
 
@@ -432,7 +455,7 @@ string getCommitsNotesFromPullRequests(int commitTypeIndex, ReleaseNoteModes rel
 
                 try
                 {
-                    string jsonResponse = getPullRequestInfo(GITHUB_PULL_REQUESTS_API_URL + commitPullRequestNumber, githubToken);
+                    string jsonResponse = getPullRequestInfo(synfigGithubPullRequestsApiUrl + commitPullRequestNumber, githubToken);
                     json pullRequestInfo = json::parse(jsonResponse);
 
                     releaseNotesFromPullRequests = addPullRequestInfoInNotes(pullRequestInfo, releaseNotesFromPullRequests, releaseNotesMode) + "\n";
@@ -454,7 +477,7 @@ string getCommitsNotesFromPullRequests(int commitTypeIndex, ReleaseNoteModes rel
  * @return The generated release notes from each commit's message based on the given conventional commit type
  */
 string getCommitsNotesFromCommitMessages(int commitTypeIndex) {
-    string commandToRetrieveCommitsMessages = "git log --max-count " + to_string(MAX_DISPLAYED_COMMITS_PER_TYPE) +
+    string commandToRetrieveCommitsMessages = "git log --max-count " + to_string(maxDisplayedCommitsPerCommitType) +
         " --oneline --format=\"%s\" --grep=\"^" + commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName] + "[:(]\"";
 
     FILE* pipe = popen(commandToRetrieveCommitsMessages.c_str(), "r");
@@ -498,20 +521,18 @@ string getCommitsNotesFromCommitMessages(int commitTypeIndex) {
 /**
  * @brief Converts markdown to HTML using the GitHub API markdown endpoint
  * @param markdownText The markdown text to be converted to HTML
- * @param githubToken The GitHub token used to make authenticated requests to the GitHub API
  * @return The HTML text containing the exact same content as the given markdown
  */
-string convertMarkdownToHtml(string markdownText, string githubToken) {
+string convertMarkdownToHtml(string markdownText) {
     // Initializing libcurl
     CURL* curl = curl_easy_init();
     CURLcode resultCode;
     string htmlText;
     struct curl_slist* headers = NULL;
-    headers = curl_slist_append(headers, ("Authorization: token " + githubToken).c_str());
     headers = curl_slist_append(headers, ((const string) "Accept: application/vnd.github+json").c_str());
 
     if (curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, GITHUB_MARKDOWN_API_URL.c_str());
+        curl_easy_setopt(curl, CURLOPT_URL, githubMarkdownApiUrl.c_str());
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, handleApiCallBack);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &htmlText);
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "Ahmed-Khaled-dev");
@@ -561,7 +582,7 @@ void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, ReleaseNoteModes
     string commandToRetrieveCommitsMessages;
     string currentCommitMessage;
     string markdownReleaseNotes = "";
-    for (int i = 0; i < COMMIT_TYPES_COUNT; i++)
+    for (int i = 0; i < commitTypesCount; i++)
     {
         // Output the title of this commit type section in the release notes
         markdownReleaseNotes += "\n" + commitTypes[i][(int)CommitTypeInfo::MarkdownTitle] + "\n";
@@ -584,7 +605,7 @@ void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, ReleaseNoteModes
         }
     }
 
-    ofstream markdownFileOutput(MARKDOWN_OUTPUT_FILE_NAME);
+    ofstream markdownFileOutput(markdownOutputFileName);
 
     if (!markdownFileOutput.is_open()) {
         throw runtime_error("Unable to create/open markdown release notes file");
@@ -593,13 +614,13 @@ void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, ReleaseNoteModes
     markdownFileOutput << markdownReleaseNotes;
     markdownFileOutput.close();
 
-    ofstream htmlFileOutput(HTML_OUTPUT_FILE_NAME);
+    ofstream htmlFileOutput(htmlOutputFileName);
 
     if (!htmlFileOutput.is_open()) {
         throw runtime_error("Unable to create/open HTML release notes file");
     }
 
-    htmlFileOutput << convertMarkdownToHtml(markdownReleaseNotes, githubToken);
+    htmlFileOutput << convertMarkdownToHtml(markdownReleaseNotes);
 
-    cout << "Release notes generated successfully, check " + MARKDOWN_OUTPUT_FILE_NAME + " and " + HTML_OUTPUT_FILE_NAME + " in the current directory" << endl;
+    cout << "Release notes generated successfully, check " + markdownOutputFileName + " and " + htmlOutputFileName + " in the current directory" << endl;
 }
