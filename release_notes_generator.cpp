@@ -438,8 +438,14 @@ string getCommitsNotesFromPullRequests(int commitTypeIndex, ReleaseNoteModes rel
     char buffer[150];
     string commitMessage, commitPullRequestNumber, releaseNotesFromPullRequests = "";
 
+    // Add the title of this commit type section in the release notes
+    releaseNotesFromPullRequests += "\n" + commitTypes[commitTypeIndex][(int)CommitTypeInfo::MarkdownTitle] + "\n";
+
+    bool commitTypeContainsReleaseNotes = 0;
+
     // Reading commit messages line-by-line from the output of the git log command
     while (fgets(buffer, sizeof(buffer), pipe) != NULL) {
+        commitTypeContainsReleaseNotes = 1;
         commitMessage = buffer;
 
         CommitTypeMatchResults matchResult = checkCommitTypeMatch(commitMessage, commitTypeIndex);
@@ -467,6 +473,12 @@ string getCommitsNotesFromPullRequests(int commitTypeIndex, ReleaseNoteModes rel
             }
         }
     }
+
+    // Remove the title of this commit type section if it doesn't contain any release notes
+    if (!commitTypeContainsReleaseNotes) {
+        releaseNotesFromPullRequests = "";
+    }
+
     pclose(pipe);
     return releaseNotesFromPullRequests;
 }
@@ -488,8 +500,14 @@ string getCommitsNotesFromCommitMessages(int commitTypeIndex) {
     char buffer[150];
     string commitMessage, releaseNotesFromCommitMessages, subCategoryText;
 
+    // Add the title of this commit type section in the release notes
+    releaseNotesFromCommitMessages += "\n" + commitTypes[commitTypeIndex][(int)CommitTypeInfo::MarkdownTitle] + "\n";
+
+    bool commitTypeContainsReleaseNotes = 0;
+
     // Reading commit messages line-by-line from the output of the git log command
     while (fgets(buffer, sizeof(buffer), pipe) != NULL) {
+        commitTypeContainsReleaseNotes = 1;
         commitMessage = buffer;
         subCategoryText = "";
 
@@ -512,6 +530,11 @@ string getCommitsNotesFromCommitMessages(int commitTypeIndex) {
 
             releaseNotesFromCommitMessages += commitMessage;
         }
+    }
+
+    // Remove the title of this commit type section if it doesn't contain any release notes
+    if (!commitTypeContainsReleaseNotes) {
+        releaseNotesFromCommitMessages = "";
     }
 
     pclose(pipe);
@@ -584,9 +607,6 @@ void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, ReleaseNoteModes
     string markdownReleaseNotes = "";
     for (int i = 0; i < commitTypesCount; i++)
     {
-        // Output the title of this commit type section in the release notes
-        markdownReleaseNotes += "\n" + commitTypes[i][(int)CommitTypeInfo::MarkdownTitle] + "\n";
-
         if (releaseNoteSource == ReleaseNoteSources::CommitMessages) {
             try {
                 markdownReleaseNotes += getCommitsNotesFromCommitMessages(i);
