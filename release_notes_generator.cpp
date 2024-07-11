@@ -99,10 +99,11 @@ void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, ReleaseNoteModes
 
 int main(int argc, char* argv[]){
     
-    // Reading values from the external configuration
-    ifstream externalConfigFile("config.json");
+    // Reading values from the external configuration file
+    const string configFileName = "release_config.json";
+    ifstream externalConfigFile(configFileName);
     if (!externalConfigFile.is_open()) {
-        cerr << "Unable to open config.json, please ensure that it exists in the same directory as the script" << endl;
+        cerr << "Unable to open " << configFileName << ", please ensure that it exists in the same directory as the script" << endl;
         return 1;
     }
     
