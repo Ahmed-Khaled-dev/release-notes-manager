@@ -141,10 +141,10 @@ int main(int argc, char* argv[]){
     }
 
     try {
-        if (strcmp(argv[1], "message") == 0) {
+        if (strcmp(argv[1], "message") == 0 || strcmp(argv[1], "Commit Messages") == 0) {
             generateReleaseNotes(ReleaseNoteSources::CommitMessages, argv[2], argv[3]);
         }
-        else if (strcmp(argv[1], "pr") == 0) {
+        else if (strcmp(argv[1], "pr") == 0 || strcmp(argv[1], "Pull Requests") == 0) {
             if (argc <= 4) {
                 printInputError(InputErrors::NoReleaseNotesMode);
                 return 0;
@@ -154,10 +154,10 @@ int main(int argc, char* argv[]){
                 return 0;
             }
 
-            if (strcmp(argv[4], "full") == 0) {
+            if (strcmp(argv[4], "full") == 0 || strcmp(argv[4], "Full") == 0) {
                 generateReleaseNotes(ReleaseNoteSources::PullRequests, argv[2], argv[3], ReleaseNoteModes::Full, argv[5]);
             }
-            else if (strcmp(argv[4], "short") == 0) {
+            else if (strcmp(argv[4], "short") == 0 || strcmp(argv[4], "Short") == 0) {
                 generateReleaseNotes(ReleaseNoteSources::PullRequests, argv[2], argv[3], ReleaseNoteModes::Short, argv[5]);
             }
             else {
@@ -604,9 +604,6 @@ string convertMarkdownToHtml(string markdownText) {
             if (httpCode == 403) {
                 throw runtime_error("Rate limit exceeded. Additional information: " + htmlText);
             }
-            else {
-                return htmlText;
-            }
         }
         else {
             throw runtime_error("Unable to make request to the GitHub API. Additional information: " + htmlText);
@@ -618,6 +615,8 @@ string convertMarkdownToHtml(string markdownText) {
     else {
         throw runtime_error("Error initializing libcurl to make requests to the GitHub API");
     }
+
+    return htmlText;
 }
 
 /**
