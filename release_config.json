@@ -7,7 +7,6 @@
     "synfigIssuesUrl":"https://github.com/synfig/synfig/issues/",
     "synfigCommitsUrl":"https://github.com/synfig/synfig/commit/",
     
-    "maxDisplayedCommitsPerCommitType":10,
     "commitTypesCount":10,
     
     "commitTypes":[

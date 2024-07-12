@@ -38,7 +38,6 @@ string githubMarkdownApiUrl;
 string synfigIssuesUrl;
 string synfigCommitsUrl;
 
-int maxDisplayedCommitsPerCommitType;
 int commitTypesCount;
 
 /**
@@ -52,7 +51,7 @@ enum class ReleaseNoteSources{
     PullRequests
 };
 
-enum class ReleaseNoteModes {
+enum class ReleaseNoteModes{
     Short,
     Full
 };
@@ -62,7 +61,9 @@ enum class InputErrors{
     NoReleaseNotesSource,
     IncorrectReleaseNotesMode,
     NoReleaseNotesMode,
-    NoGithubToken
+    NoGithubToken,
+    NoReleaseStartReference,
+    NoReleaseEndReference
 };
 
 /**
@@ -76,7 +77,7 @@ enum class CommitTypeInfo{
 /**
  * @brief Enumeration for the result of matching a commit type (e.g., fix: or fix(GUI):) against any commit type (fix, feat, etc.)
  */
-enum class CommitTypeMatchResults {
+enum class CommitTypeMatchResults{
     MatchWithoutSubCategory, /**< when for example "fix:" is matched against "fix", they match and "fix:" doesn't have a subcategory "()"*/
     MatchWithSubCategory, /**< when for example "fix(GUI):" is matched against "fix", they match and "fix(GUI):" has a subcategory which is "GUI"*/
     NoMatch /**< when for example "fix:" or "fix(GUI):" is matched against "feat", they don't match*/
@@ -92,10 +93,12 @@ string addPullRequestInfoInNotes(json pullRequestInfo, string releaseNotesFromPu
 size_t handleApiCallBack(char* data, size_t size, size_t numOfBytes, string* buffer);
 string getPullRequestInfo(string pullRequestUrl, string githubToken);
 CommitTypeMatchResults checkCommitTypeMatch(string commitMessage, int commitTypeIndex);
-string getCommitsNotesFromPullRequests(int commitTypeIndex, ReleaseNoteModes releaseNotesMode, string githubToken);
-string getCommitsNotesFromCommitMessages(int commitTypeIndex);
+string getCommitsNotesFromPullRequests(int commitTypeIndex, string releaseStartRef, string releaseEndRef,
+                                       ReleaseNoteModes releaseNotesMode, string githubToken);
+string getCommitsNotesFromCommitMessages(int commitTypeIndex, string releaseStartRef, string releaseEndRef);
 string convertMarkdownToHtml(string markdownText);
-void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, ReleaseNoteModes releaseNoteMode = ReleaseNoteModes::Short, string githubToken = "");
+void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, string releaseStartRef, string releaseEndRef, 
+                          ReleaseNoteModes releaseNoteMode = ReleaseNoteModes::Short, string githubToken = "");
 
 int main(int argc, char* argv[]){
     
@@ -116,7 +119,6 @@ int main(int argc, char* argv[]){
     githubMarkdownApiUrl = externalConfigData["githubMarkdownApiUrl"];
     synfigIssuesUrl = externalConfigData["synfigIssuesUrl"];
     synfigCommitsUrl = externalConfigData["synfigCommitsUrl"];
-    maxDisplayedCommitsPerCommitType = externalConfigData["maxDisplayedCommitsPerCommitType"];
     commitTypesCount = externalConfigData["commitTypesCount"];
 
     for (int i = 0; i < commitTypesCount; i++)
@@ -129,26 +131,34 @@ int main(int argc, char* argv[]){
         printInputError(InputErrors::NoReleaseNotesSource);
         return 0;
     }
+    else if (argc <= 2) {
+        printInputError(InputErrors::NoReleaseStartReference);
+        return 0;
+    }
+    else if (argc <= 3) {
+        printInputError(InputErrors::NoReleaseEndReference);
+        return 0;
+    }
 
     try {
         if (strcmp(argv[1], "message") == 0) {
-            generateReleaseNotes(ReleaseNoteSources::CommitMessages);
+            generateReleaseNotes(ReleaseNoteSources::CommitMessages, argv[2], argv[3]);
         }
         else if (strcmp(argv[1], "pr") == 0) {
-            if (argc <= 2) {
+            if (argc <= 4) {
                 printInputError(InputErrors::NoReleaseNotesMode);
                 return 0;
             }
-            else if (argc <= 3) {
+            else if (argc <= 5) {
                 printInputError(InputErrors::NoGithubToken);
                 return 0;
             }
 
-            if (strcmp(argv[2], "full") == 0) {
-                generateReleaseNotes(ReleaseNoteSources::PullRequests, ReleaseNoteModes::Full, argv[3]);
+            if (strcmp(argv[4], "full") == 0) {
+                generateReleaseNotes(ReleaseNoteSources::PullRequests, argv[2], argv[3], ReleaseNoteModes::Full, argv[5]);
             }
-            else if (strcmp(argv[2], "short") == 0) {
-                generateReleaseNotes(ReleaseNoteSources::PullRequests, ReleaseNoteModes::Short, argv[3]);
+            else if (strcmp(argv[4], "short") == 0) {
+                generateReleaseNotes(ReleaseNoteSources::PullRequests, argv[2], argv[3], ReleaseNoteModes::Short, argv[5]);
             }
             else {
                 printInputError(InputErrors::IncorrectReleaseNotesMode);
@@ -186,9 +196,16 @@ void printInputError(InputErrors inputError) {
     else if (inputError == InputErrors::NoGithubToken) {
         cout << "Please enter a GitHub token to be able to make authenticated requests to the GitHub API" << endl;
     }
+    else if (inputError == InputErrors::NoReleaseStartReference) {
+        cout << "Please enter a git reference (commit SHA or tag name) that references the commit directly before the commit that *starts* " 
+             << "this release's commit messages, for example, the tag name of the previous release" << endl;
+    }
+    else if (inputError == InputErrors::NoReleaseEndReference) {
+        cout << "Please enter a git reference (commit SHA or tag name) that references the commit that *ends* this release's commit messages" << endl;
+    }
     cout << "Expected Syntax:" << endl;
-    cout << "1 - release_notes_generator message" << endl;
-    cout << "2 - release_notes_generator pr short/full github_token" << endl;
+    cout << "1 - release_notes_generator message release_start_reference release_end_reference" << endl;
+    cout << "2 - release_notes_generator pr release_start_reference release_end_reference short/full github_token" << endl;
 }
 
 /**
@@ -420,14 +437,19 @@ CommitTypeMatchResults checkCommitTypeMatch(string commitMessage, int commitType
 }
 
 /**
- * @brief Retrieves release notes from each commit's *pull request* based on the given conventional commit type and release notes mode
+ * @brief Retrieves release notes from each commit's *pull request* between the start reference and the end reference
+ * based on the given conventional commit type, release notes mode, and using the given GitHub token
  * @param commitTypeIndex Index of the commit type in the commit types 2d array, to only generate release notes from the given commit type (fix, feat, etc.)
+ * @param releaseStartRef The git reference (commit SHA or tag name) that references the commit directly before the 
+ * commit that starts the commit messages of the release, for example, the tag name of the previous release
+ * @param releaseEndRef The git reference (commit SHA or tag name) that references the end of the commit messages of the release
  * @param releaseNotesMode The release notes mode
  * @param githubToken The GitHub token used to make authenticated requests to the GitHub API
- * @return The generated release notes from each commit's pull request based on the given conventional commit type and release notes mode
+ * @return The generated release notes
  */
-string getCommitsNotesFromPullRequests(int commitTypeIndex, ReleaseNoteModes releaseNotesMode, string githubToken) {
-    string commandToRetrieveCommitsMessages = "git log --max-count " + to_string(maxDisplayedCommitsPerCommitType) +
+string getCommitsNotesFromPullRequests(int commitTypeIndex, string releaseStartRef, string releaseEndRef, 
+                                       ReleaseNoteModes releaseNotesMode, string githubToken) {
+    string commandToRetrieveCommitsMessages = "git log " + releaseStartRef + ".." + releaseEndRef +
         " --oneline --format=\"%s\" --grep=\"^" + commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName] + "[:(]\"" +
         " --grep=\"#[0-9]\" --all-match";
 
@@ -485,12 +507,16 @@ string getCommitsNotesFromPullRequests(int commitTypeIndex, ReleaseNoteModes rel
 }
 
 /**
- * @brief Retrieves release notes from each commit's *message* based on the given conventional commit type
+ * @brief Retrieves release notes from each commit's *message* between the start reference and the end reference
+ * based on the given conventional commit type
  * @param commitTypeIndex Index of the commit type in the commit types 2d array, to only generate release notes from the given commit type (fix, feat, etc.)
- * @return The generated release notes from each commit's message based on the given conventional commit type
+ * @param releaseStartRef The git reference (commit SHA or tag name) that references the commit directly before the 
+ * commit that starts the commit messages of the release, for example, the tag name of the previous release
+ * @param releaseEndRef The git reference (commit SHA or tag name) that references the end of the commit messages of the release
+ * @return The generated release notes
  */
-string getCommitsNotesFromCommitMessages(int commitTypeIndex) {
-    string commandToRetrieveCommitsMessages = "git log --max-count " + to_string(maxDisplayedCommitsPerCommitType) +
+string getCommitsNotesFromCommitMessages(int commitTypeIndex, string releaseStartRef, string releaseEndRef) {
+    string commandToRetrieveCommitsMessages = "git log " + releaseStartRef + ".." + releaseEndRef +
         " --oneline --format=\"%s\" --grep=\"^" + commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName] + "[:(]\"";
 
     FILE* pipe = popen(commandToRetrieveCommitsMessages.c_str(), "r");
@@ -595,12 +621,18 @@ string convertMarkdownToHtml(string markdownText) {
 }
 
 /**
- * @brief Generates release notes based on the given source and release notes mode
+ * @brief Generates release notes using commit messages between the start reference and the end reference
+ * using the given release notes source and if the source is pull requests then generates them based on the release note mode 
+ * and using the given GitHub token
  * @param releaseNoteSource The source to generate release notes from (commit messages or pull requests)
+ * @param releaseStartRef The git reference (commit SHA or tag name) that references the commit directly before the 
+ * commit that starts the commit messages of the release, for example, the tag name of the previous release
+ * @param releaseEndRef The git reference (commit SHA or tag name) that references the end of the commit messages of the release
  * @param releaseNoteMode The release notes mode when the source is pull requests
  * @param githubToken The GitHub token used to make authenticated requests to the GitHub API when source is pull requests
  */
-void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, ReleaseNoteModes releaseNoteMode, string githubToken) {
+void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, string releaseStartRef, string releaseEndRef, 
+                          ReleaseNoteModes releaseNoteMode, string githubToken) {
     cout << "Generating release notes......." << endl;
 
     string commandToRetrieveCommitsMessages;
@@ -610,7 +642,7 @@ void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, ReleaseNoteModes
     {
         if (releaseNoteSource == ReleaseNoteSources::CommitMessages) {
             try {
-                markdownReleaseNotes += getCommitsNotesFromCommitMessages(i);
+                markdownReleaseNotes += getCommitsNotesFromCommitMessages(i, releaseStartRef, releaseEndRef);
             }
             catch (const exception& e) {
                 cout << e.what();
@@ -618,7 +650,7 @@ void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, ReleaseNoteModes
         }
         else if (releaseNoteSource == ReleaseNoteSources::PullRequests) {
             try {
-                markdownReleaseNotes += getCommitsNotesFromPullRequests(i, releaseNoteMode, githubToken);
+                markdownReleaseNotes += getCommitsNotesFromPullRequests(i, releaseStartRef, releaseEndRef, releaseNoteMode, githubToken);
             }
             catch (const exception& e) {
                 cout << e.what();
