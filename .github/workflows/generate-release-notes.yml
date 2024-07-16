@@ -62,21 +62,48 @@ jobs:
       
       # I am doing this extra step to make the workflow work with draft releases
       # since a draft release's tag hasn't yet been created in the git history
-      # I can't use it's tag in the release notes script as a reference to the last commit in the release
-      - name: Get the commit SHA that the new release tag will be added on
-        id: get-new-release-commit-sha
+      # I can't use its tag in the release notes script as a reference to the last commit in the release
+      - name: Get the git reference (commit SHA/branch name) that the new release tag is on
+        id: get-new-release-git-reference
+        # I check if the tag exists in the git history, >/dev/null is used to not show the output generated from the command
+        # if the tag exists then I get the commit SHA it's on, if not, then the release being created is a draft release
+        # with a new tag, so I get the commit SHA of the location the new tag will be added to, using the GitHub API
         run: |
-          NEW_RELEASE_COMMIT_SHA=$(gh release view "$NEW_RELEASE_TAG" --json targetCommitish --jq .targetCommitish)
-          echo "NEW_RELEASE_COMMIT_SHA=$NEW_RELEASE_COMMIT_SHA" >> "$GITHUB_OUTPUT"
+          if git rev-parse --quiet --verify "$NEW_RELEASE_TAG" > /dev/null; then
+            NEW_RELEASE_REFERENCE=$(git rev-parse "$NEW_RELEASE_TAG")
+          else
+            NEW_RELEASE_REFERENCE=$(gh release view "$NEW_RELEASE_TAG" --json targetCommitish --jq .targetCommitish)
+          fi
+          echo "NEW_RELEASE_REFERENCE=$NEW_RELEASE_REFERENCE" >> "$GITHUB_OUTPUT"
+        
+      # I am using checkout here so that it also works if the new release reference is a commit
+      - name: If the new release reference is a branch (e.g. v1.4.x) ensure that I have a local branch tracking the remote branch
+        env:
+          NEW_RELEASE_REFERENCE: ${{ steps.get-new-release-git-reference.outputs.NEW_RELEASE_REFERENCE }}
+        run: |
+          git checkout "$NEW_RELEASE_REFERENCE" > /dev/null 2>&1
+          git checkout master > /dev/null 2>&1
 
       - name: Run the release notes script with the needed parameters
         env:
-          NEW_RELEASE_COMMIT_SHA: ${{ steps.get-new-release-commit-sha.outputs.NEW_RELEASE_COMMIT_SHA }}
-        run: |
-          ./release_notes_generator "$RELEASE_NOTES_SOURCE" "$PREVIOUS_RELEASE_REFERENCE" "$NEW_RELEASE_COMMIT_SHA" "$RELEASE_NOTES_MODE" "$GH_TOKEN"
+          NEW_RELEASE_REFERENCE: ${{ steps.get-new-release-git-reference.outputs.NEW_RELEASE_REFERENCE }}
+        run: ./release_notes_generator "$RELEASE_NOTES_SOURCE" "$PREVIOUS_RELEASE_REFERENCE" "$NEW_RELEASE_REFERENCE" "$RELEASE_NOTES_MODE" "$GH_TOKEN"
       
-      - name: Update the new GitHub release description with the generated release notes
-        # GitHub's cli tool "gh" automatically uses the GH_TOKEN environment variable
+      # GitHub's cli tool "gh" automatically uses the GH_TOKEN environment variable
+      - name: Update the new GitHub release description with the generated markdown release notes
+        run: gh release edit "$NEW_RELEASE_TAG" --notes-file release_notes.md
+      
+      - name: Upload to the new GitHub release assets the generated HTML release notes
+        # If HTML release notes are already added as an asset to the release, then uploading release_notes.html will give an error
+        # this means that the workflow is used to update release notes for an already existing release
+        # I check if the upload failed, and if yes, I delete the existing HTML file and upload the newly generated one
+        # I use "set +e" to disable the GitHub workflow to exit if any command fails, then I renable it with "set -e"
         run: |
-          gh release edit "$NEW_RELEASE_TAG" --notes-file release_notes.md
-          gh release upload "$NEW_RELEASE_TAG" release_notes.html
+          set +e
+          gh release upload "$NEW_RELEASE_TAG" release_notes.html > /dev/null 2>&1
+          html_upload_status=$?
+          set -e
+          if [ $html_upload_status -ne 0 ]; then
+            gh release delete-asset "$NEW_RELEASE_TAG" release_notes.html
+            gh release upload "$NEW_RELEASE_TAG" release_notes.html
+          fi
