@@ -94,11 +94,11 @@ size_t handleApiCallBack(char* data, size_t size, size_t numOfBytes, string* buf
 string getPullRequestInfo(string pullRequestUrl, string githubToken);
 CommitTypeMatchResults checkCommitTypeMatch(string commitMessage, int commitTypeIndex);
 string getCommitsNotesFromPullRequests(int commitTypeIndex, string releaseStartRef, string releaseEndRef,
-                                       ReleaseNoteModes releaseNotesMode, string githubToken);
+                                       string githubToken, ReleaseNoteModes releaseNotesMode);
 string getCommitsNotesFromCommitMessages(int commitTypeIndex, string releaseStartRef, string releaseEndRef);
-string convertMarkdownToHtml(string markdownText);
+string convertMarkdownToHtml(string markdownText, string githubToken);
 void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, string releaseStartRef, string releaseEndRef, 
-                          ReleaseNoteModes releaseNoteMode = ReleaseNoteModes::Short, string githubToken = "");
+                          string githubToken, ReleaseNoteModes releaseNoteMode = ReleaseNoteModes::Short);
 
 int main(int argc, char* argv[]){
     
@@ -129,48 +129,50 @@ int main(int argc, char* argv[]){
     
     if (argc <= 1) {
         printInputError(InputErrors::NoReleaseNotesSource);
-        return 0;
+        return 1;
     }
     else if (argc <= 2) {
         printInputError(InputErrors::NoReleaseStartReference);
-        return 0;
+        return 1;
     }
     else if (argc <= 3) {
         printInputError(InputErrors::NoReleaseEndReference);
-        return 0;
+        return 1;
+    }
+    else if(argc <= 4){
+        printInputError(InputErrors::NoGithubToken);
+        return 1;
     }
 
     try {
         if (strcmp(argv[1], "message") == 0 || strcmp(argv[1], "Commit Messages") == 0) {
-            generateReleaseNotes(ReleaseNoteSources::CommitMessages, argv[2], argv[3]);
+            generateReleaseNotes(ReleaseNoteSources::CommitMessages, argv[2], argv[3], argv[4]);
         }
         else if (strcmp(argv[1], "pr") == 0 || strcmp(argv[1], "Pull Requests") == 0) {
-            if (argc <= 4) {
+            if (argc <= 5) {
                 printInputError(InputErrors::NoReleaseNotesMode);
-                return 0;
-            }
-            else if (argc <= 5) {
-                printInputError(InputErrors::NoGithubToken);
-                return 0;
+                return 1;
             }
 
-            if (strcmp(argv[4], "full") == 0 || strcmp(argv[4], "Full") == 0) {
-                generateReleaseNotes(ReleaseNoteSources::PullRequests, argv[2], argv[3], ReleaseNoteModes::Full, argv[5]);
+            if (strcmp(argv[5], "full") == 0 || strcmp(argv[5], "Full") == 0) {
+                generateReleaseNotes(ReleaseNoteSources::PullRequests, argv[2], argv[3], argv[4], ReleaseNoteModes::Full);
             }
-            else if (strcmp(argv[4], "short") == 0 || strcmp(argv[4], "Short") == 0) {
-                generateReleaseNotes(ReleaseNoteSources::PullRequests, argv[2], argv[3], ReleaseNoteModes::Short, argv[5]);
+            else if (strcmp(argv[5], "short") == 0 || strcmp(argv[5], "Short") == 0) {
+                generateReleaseNotes(ReleaseNoteSources::PullRequests, argv[2], argv[3], argv[4], ReleaseNoteModes::Short);
             }
             else {
                 printInputError(InputErrors::IncorrectReleaseNotesMode);
+                return 1;
             }
         }
         else {
             printInputError(InputErrors::IncorrectReleaseNotesSource);
+            return 1;
         }
     }
     catch (const exception& e) {
         cout << e.what() << endl;
-        return 0;
+        return 1;
     }
 
     return 0;
@@ -204,8 +206,8 @@ void printInputError(InputErrors inputError) {
         cout << "Please enter a git reference (commit SHA or tag name) that references the commit that *ends* this release's commit messages" << endl;
     }
     cout << "Expected Syntax:" << endl;
-    cout << "1 - release_notes_generator message release_start_reference release_end_reference" << endl;
-    cout << "2 - release_notes_generator pr release_start_reference release_end_reference short/full github_token" << endl;
+    cout << "1 - release_notes_generator message release_start_reference release_end_reference github_token" << endl;
+    cout << "2 - release_notes_generator pr release_start_reference release_end_reference github_token short/full" << endl;
 }
 
 /**
@@ -448,7 +450,7 @@ CommitTypeMatchResults checkCommitTypeMatch(string commitMessage, int commitType
  * @return The generated release notes
  */
 string getCommitsNotesFromPullRequests(int commitTypeIndex, string releaseStartRef, string releaseEndRef, 
-                                       ReleaseNoteModes releaseNotesMode, string githubToken) {
+                                       string githubToken, ReleaseNoteModes releaseNotesMode) {
     string commandToRetrieveCommitsMessages = "git log " + releaseStartRef + ".." + releaseEndRef +
         " --oneline --format=\"%s\" --grep=\"^" + commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName] + "[:(]\"" +
         " --grep=\"#[0-9]\" --all-match";
@@ -573,13 +575,14 @@ string getCommitsNotesFromCommitMessages(int commitTypeIndex, string releaseStar
  * @param markdownText The markdown text to be converted to HTML
  * @return The HTML text containing the exact same content as the given markdown
  */
-string convertMarkdownToHtml(string markdownText) {
+string convertMarkdownToHtml(string markdownText, string githubToken) {
     // Initializing libcurl
     CURL* curl = curl_easy_init();
     CURLcode resultCode;
     string htmlText;
     struct curl_slist* headers = NULL;
     headers = curl_slist_append(headers, ((const string) "Accept: application/vnd.github+json").c_str());
+    headers = curl_slist_append(headers, ("Authorization: token " + githubToken).c_str());
 
     if (curl) {
         curl_easy_setopt(curl, CURLOPT_URL, githubMarkdownApiUrl.c_str());
@@ -631,7 +634,7 @@ string convertMarkdownToHtml(string markdownText) {
  * @param githubToken The GitHub token used to make authenticated requests to the GitHub API when source is pull requests
  */
 void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, string releaseStartRef, string releaseEndRef, 
-                          ReleaseNoteModes releaseNoteMode, string githubToken) {
+                          string githubToken, ReleaseNoteModes releaseNoteMode) {
     cout << "Generating release notes......." << endl;
 
     string commandToRetrieveCommitsMessages;
@@ -649,7 +652,7 @@ void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, string releaseSt
         }
         else if (releaseNoteSource == ReleaseNoteSources::PullRequests) {
             try {
-                markdownReleaseNotes += getCommitsNotesFromPullRequests(i, releaseStartRef, releaseEndRef, releaseNoteMode, githubToken);
+                markdownReleaseNotes += getCommitsNotesFromPullRequests(i, releaseStartRef, releaseEndRef, githubToken, releaseNoteMode);
             }
             catch (const exception& e) {
                 cout << e.what();
@@ -672,7 +675,7 @@ void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, string releaseSt
         throw runtime_error("Unable to create/open HTML release notes file");
     }
 
-    htmlFileOutput << convertMarkdownToHtml(markdownReleaseNotes);
+    htmlFileOutput << convertMarkdownToHtml(markdownReleaseNotes, githubToken);
 
     cout << "Release notes generated successfully, check " + markdownOutputFileName + " and " + htmlOutputFileName + " in the current directory" << endl;
 }
