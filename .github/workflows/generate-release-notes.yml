@@ -77,12 +77,13 @@ jobs:
           echo "NEW_RELEASE_REFERENCE=$NEW_RELEASE_REFERENCE" >> "$GITHUB_OUTPUT"
         
       # I am using checkout here so that it also works if the new release reference is a commit
+      # In the second checkout, I checkout back to the original branch that triggered the GitHub workflow
       - name: If the new release reference is a branch (e.g. v1.4.x) ensure that I have a local branch tracking the remote branch
         env:
           NEW_RELEASE_REFERENCE: ${{ steps.get-new-release-git-reference.outputs.NEW_RELEASE_REFERENCE }}
         run: |
           git checkout "$NEW_RELEASE_REFERENCE" > /dev/null 2>&1
-          git checkout master > /dev/null 2>&1
+          git checkout ${{ github.ref_name }} > /dev/null 2>&1
 
       - name: Run the release notes script with the needed parameters
         env:
