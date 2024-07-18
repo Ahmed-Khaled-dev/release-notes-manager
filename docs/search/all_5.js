@@ -10,5 +10,5 @@ var searchData=
   ['committypescount_7',['commitTypesCount',['../release__notes__generator_8cpp.html#a507d248a0eaa321cabcfd1e8a3616af5',1,'release_notes_generator.cpp']]],
   ['continuous_20integrations_8',['⚙️ Continuous Integrations',['../md_release__notes.html#autotoc_md10',1,'']]],
   ['conventionalname_9',['ConventionalName',['../release__notes__generator_8cpp.html#a809e24401d7a251436455596cc8395aaad8c5ccda9a7b4018b85bbfadcc0d233a',1,'release_notes_generator.cpp']]],
-  ['convertmarkdowntohtml_10',['convertMarkdownToHtml',['../release__notes__generator_8cpp.html#aee7a364f90707d15953aab22b2aca122',1,'release_notes_generator.cpp']]]
+  ['convertmarkdowntohtml_10',['convertMarkdownToHtml',['../release__notes__generator_8cpp.html#a94240233bd03f43638fe7d5d3a3265ca',1,'release_notes_generator.cpp']]]
 ];

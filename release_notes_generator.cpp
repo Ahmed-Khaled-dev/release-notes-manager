@@ -91,6 +91,7 @@ string removeExtraNewLines(string pullRequestBody);
 string formatPullRequestBody(string pullRequestBody);
 string addPullRequestInfoInNotes(json pullRequestInfo, string releaseNotesFromPullRequests, ReleaseNoteModes releaseNotesMode);
 size_t handleApiCallBack(char* data, size_t size, size_t numOfBytes, string* buffer);
+void handleGithubApiErrorCodes(long errorCode, string apiResponse);
 string getPullRequestInfo(string pullRequestUrl, string githubToken);
 CommitTypeMatchResults checkCommitTypeMatch(string commitMessage, int commitTypeIndex);
 string getCommitsNotesFromPullRequests(int commitTypeIndex, string releaseStartRef, string releaseEndRef,
@@ -171,7 +172,8 @@ int main(int argc, char* argv[]){
         }
     }
     catch (const exception& e) {
-        cout << e.what() << endl;
+        cerr << "Failed to generate release notes" << endl;
+        cerr << e.what() << endl;
         return 1;
     }
 
@@ -184,30 +186,30 @@ int main(int argc, char* argv[]){
  */
 void printInputError(InputErrors inputError) {
     if (inputError == InputErrors::NoReleaseNotesSource) {
-        cout << "Please enter the source you which to use to generate release notes (message or pr)" << endl;
+        cerr << "Please enter the source you which to use to generate release notes (message or pr)" << endl;
     }
     else if (inputError == InputErrors::IncorrectReleaseNotesSource) {
-        cout << "Please enter a valid release notes source" << endl;
+        cerr << "Please enter a valid release notes source (message or pr)" << endl;
     }
     else if (inputError == InputErrors::NoReleaseNotesMode) {
-        cout << "Please enter which release notes mode you want for PRs (short or full)" << endl;
+        cerr << "Please enter which release notes mode you want for PRs (short or full)" << endl;
     }
     else if (inputError == InputErrors::IncorrectReleaseNotesMode) {
-        cout << "Please enter a valid release notes mode" << endl;
+        cerr << "Please enter a valid release notes mode (short or full)" << endl;
     }
     else if (inputError == InputErrors::NoGithubToken) {
-        cout << "Please enter a GitHub token to be able to make authenticated requests to the GitHub API" << endl;
+        cerr << "Please enter a GitHub token to be able to make authenticated requests to the GitHub API" << endl;
     }
     else if (inputError == InputErrors::NoReleaseStartReference) {
-        cout << "Please enter a git reference (commit SHA or tag name) that references the commit directly before the commit that *starts* " 
-             << "this release's commit messages, for example, the tag name of the previous release" << endl;
+        cerr << "Please enter a git reference (commit SHA or tag name) that references the commit directly before the first commit in the new release, "
+             << "for example, the tag name of the previous release" << endl;
     }
     else if (inputError == InputErrors::NoReleaseEndReference) {
-        cout << "Please enter a git reference (commit SHA or tag name) that references the commit that *ends* this release's commit messages" << endl;
+        cerr << "Please enter a git reference (commit SHA or tag name) that references the commit that *ends* this release's commit messages" << endl;
     }
-    cout << "Expected Syntax:" << endl;
-    cout << "1 - release_notes_generator message release_start_reference release_end_reference github_token" << endl;
-    cout << "2 - release_notes_generator pr release_start_reference release_end_reference github_token short/full" << endl;
+    cerr << "Expected Syntax:" << endl;
+    cerr << "1 - release_notes_generator message release_start_reference release_end_reference github_token" << endl;
+    cerr << "2 - release_notes_generator pr release_start_reference release_end_reference github_token short/full" << endl;
 }
 
 /**
@@ -365,6 +367,24 @@ size_t handleApiCallBack(char* data, size_t size, size_t numOfBytes, string* buf
 }
 
 /**
+ * @brief Throws runtime exceptions with appropriate messages that describe the given GitHub API error code
+ * All info obtained from https://docs.github.com/en/rest/using-the-rest-api/troubleshooting-the-rest-api?apiVersion=2022-11-28
+ * @param errorCode The GitHub API error code that occurred
+ * @param apiResponse The GitHub API response
+ */
+void handleGithubApiErrorCodes(long errorCode, string apiResponse) {
+    if (errorCode == 429 || errorCode == 403) {
+        throw runtime_error("Rate limit exceeded while making requests to the GitHub API. Additional information: " + apiResponse);
+    }
+    else if (errorCode == 401) {
+        throw runtime_error("Unauthorized access to the GitHub API, usually due to an incorrect GitHub token. Additional information: " + apiResponse);
+    }
+    else if (errorCode == 400) {
+        throw runtime_error("Bad request to the GitHub API. Additional information: " + apiResponse);
+    }
+}
+
+/**
  * @brief Retrieves pull request info from the GitHub API using libcurl
  * @param pullRequestUrl The GitHub API URL of the pull request
  * @param githubToken The GitHub token used to make authenticated requests to the GitHub API
@@ -389,25 +409,29 @@ string getPullRequestInfo(string pullRequestUrl, string githubToken) {
 
         if (resultCode == CURLE_OK) {
             // Get the HTTP response code
-            long httpCode = 0;
+            long httpCode;
             curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
 
-            // Check if the response code indicates rate limit exceeded
-            if (httpCode == 403) {
-                throw runtime_error("Rate limit exceeded. Additional information: " + jsonResponse);
+            // All info obtained from https://docs.github.com/en/rest/using-the-rest-api/troubleshooting-the-rest-api?apiVersion=2022-11-28
+            // and https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#get-a-pull-request
+            if (httpCode == 200) {
+                return jsonResponse;
             }
-            else if (httpCode == 401) {
-                throw runtime_error("Unauthorized. Additional information: " + jsonResponse);
+            else if (httpCode == 503 || httpCode == 500 || httpCode == 422 || httpCode == 406) {
+                throw runtime_error("GitHub API request could not be processed to retrieve pull request " + pullRequestUrl
+                    + " Additional information : " + jsonResponse);
             }
-            else if (httpCode == 400) {
-                throw runtime_error("Bad request. Additional information: " + jsonResponse);
+            else if (httpCode == 404) {
+                throw runtime_error("Pull request " + pullRequestUrl + " not found "
+                    + "or you are accessing a private repository and the GitHub token used doesn't have permissions to access pull requests info. "
+                    +  "Additional information : " + jsonResponse);
             }
             else {
-                return jsonResponse;
+                handleGithubApiErrorCodes(httpCode, jsonResponse);
             }
         }
         else {
-            throw runtime_error("Unable to make request to the GitHub API. Additional information: " + jsonResponse);
+            throw runtime_error("Unable to make request to the GitHub API, check internet connection");
         }
 
         curl_easy_cleanup(curl);
@@ -416,6 +440,8 @@ string getPullRequestInfo(string pullRequestUrl, string githubToken) {
     else {
         throw runtime_error("Error initializing libcurl to make requests to the GitHub API");
     }
+
+    return jsonResponse;
 }
 
 /**
@@ -457,7 +483,7 @@ string getCommitsNotesFromPullRequests(int commitTypeIndex, string releaseStartR
 
     FILE* pipe = popen(commandToRetrieveCommitsMessages.c_str(), "r");
     if (!pipe) {
-        throw runtime_error("Unable to open pipe to read git log command output");
+        throw runtime_error("Unable to run and read the git log command output");
     }
 
     char buffer[150];
@@ -484,17 +510,10 @@ string getCommitsNotesFromPullRequests(int commitTypeIndex, string releaseStartR
                 // Extracting the PR number associated with the commit
                 commitPullRequestNumber = commitMessage.substr(hashtagPositionInCommitMessage + 1, 4);
 
-                try
-                {
-                    string jsonResponse = getPullRequestInfo(synfigGithubPullRequestsApiUrl + commitPullRequestNumber, githubToken);
-                    json pullRequestInfo = json::parse(jsonResponse);
+                string jsonResponse = getPullRequestInfo(synfigGithubPullRequestsApiUrl + commitPullRequestNumber, githubToken);
+                json pullRequestInfo = json::parse(jsonResponse);
 
-                    releaseNotesFromPullRequests = addPullRequestInfoInNotes(pullRequestInfo, releaseNotesFromPullRequests, releaseNotesMode) + "\n";
-                }
-                catch (const exception& e)
-                {
-                    return e.what();
-                }
+                releaseNotesFromPullRequests = addPullRequestInfoInNotes(pullRequestInfo, releaseNotesFromPullRequests, releaseNotesMode) + "\n";
             }
         }
     }
@@ -523,7 +542,7 @@ string getCommitsNotesFromCommitMessages(int commitTypeIndex, string releaseStar
 
     FILE* pipe = popen(commandToRetrieveCommitsMessages.c_str(), "r");
     if (!pipe) {
-        throw runtime_error("Unable to open pipe to read git log command output");
+        throw runtime_error("Unable to run and read the git log command output");
     }
 
     char buffer[150];
@@ -573,6 +592,7 @@ string getCommitsNotesFromCommitMessages(int commitTypeIndex, string releaseStar
 /**
  * @brief Converts markdown to HTML using the GitHub API markdown endpoint
  * @param markdownText The markdown text to be converted to HTML
+ * @param githubToken The GitHub token used to make authenticated requests to the GitHub API
  * @return The HTML text containing the exact same content as the given markdown
  */
 string convertMarkdownToHtml(string markdownText, string githubToken) {
@@ -600,16 +620,21 @@ string convertMarkdownToHtml(string markdownText, string githubToken) {
 
         if (resultCode == CURLE_OK) {
             // Get the HTTP response code
-            long httpCode = 0;
+            long httpCode;
             curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
-
-            // Check if the response code indicates rate limit exceeded
-            if (httpCode == 403) {
-                throw runtime_error("Rate limit exceeded. Additional information: " + htmlText);
+            
+            if (httpCode == 200) {
+                return htmlText;
+            }
+            else if (httpCode == 404) {
+                throw runtime_error("Markdown API url not found");
+            }
+            else {
+                handleGithubApiErrorCodes(httpCode, htmlText);
             }
         }
         else {
-            throw runtime_error("Unable to make request to the GitHub API. Additional information: " + htmlText);
+            throw runtime_error("Unable to make request to the GitHub API, check internet connection");
         }
 
         curl_easy_cleanup(curl);
@@ -643,20 +668,10 @@ void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, string releaseSt
     for (int i = 0; i < commitTypesCount; i++)
     {
         if (releaseNoteSource == ReleaseNoteSources::CommitMessages) {
-            try {
-                markdownReleaseNotes += getCommitsNotesFromCommitMessages(i, releaseStartRef, releaseEndRef);
-            }
-            catch (const exception& e) {
-                cout << e.what();
-            }
+            markdownReleaseNotes += getCommitsNotesFromCommitMessages(i, releaseStartRef, releaseEndRef);
         }
         else if (releaseNoteSource == ReleaseNoteSources::PullRequests) {
-            try {
-                markdownReleaseNotes += getCommitsNotesFromPullRequests(i, releaseStartRef, releaseEndRef, githubToken, releaseNoteMode);
-            }
-            catch (const exception& e) {
-                cout << e.what();
-            }
+            markdownReleaseNotes += getCommitsNotesFromPullRequests(i, releaseStartRef, releaseEndRef, githubToken, releaseNoteMode);
         }
     }
 
