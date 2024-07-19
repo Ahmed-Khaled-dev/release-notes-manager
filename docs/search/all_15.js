@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['⚙️_20continuous_20integrations_0',['⚙️ Continuous Integrations',['../md_release__notes.html#autotoc_md10',1,'']]]
+  ['♻️_20code_20refactoring_0',['♻️ Code Refactoring',['../md_release__notes.html#autotoc_md9',1,'']]]
 ];

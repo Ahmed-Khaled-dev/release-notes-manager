@@ -1,10 +1,12 @@
 var searchData=
 [
-  ['new_20features_0',['✨ New Features',['../md_release__notes.html',1,'']]],
-  ['nogithubtoken_1',['NoGithubToken',['../release__notes__generator_8cpp.html#aa9ba5cd8e97388b6ebdef4ae7816fa42af949897f6ed18f13ebde7435a913555e',1,'release_notes_generator.cpp']]],
-  ['nomatch_2',['NoMatch',['../release__notes__generator_8cpp.html#a641234c56fda12244c51e53c78788aadac8b77721c677e0429241a9250972122d',1,'release_notes_generator.cpp']]],
-  ['noreleaseendreference_3',['NoReleaseEndReference',['../release__notes__generator_8cpp.html#aa9ba5cd8e97388b6ebdef4ae7816fa42acad21a6432b04897748c0d79a5f90821',1,'release_notes_generator.cpp']]],
-  ['noreleasenotesmode_4',['NoReleaseNotesMode',['../release__notes__generator_8cpp.html#aa9ba5cd8e97388b6ebdef4ae7816fa42aeffe3f9641a2174350b3e89175e217d4',1,'release_notes_generator.cpp']]],
-  ['noreleasenotessource_5',['NoReleaseNotesSource',['../release__notes__generator_8cpp.html#aa9ba5cd8e97388b6ebdef4ae7816fa42a389539cf4f36e93d111c1c69b825967d',1,'release_notes_generator.cpp']]],
-  ['noreleasestartreference_6',['NoReleaseStartReference',['../release__notes__generator_8cpp.html#aa9ba5cd8e97388b6ebdef4ae7816fa42a347b2aacea1efd3b947c49307468b7c5',1,'release_notes_generator.cpp']]]
+  ['main_0',['main',['../release__notes__generator_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97',1,'release_notes_generator.cpp']]],
+  ['makefile_1',['3. Execute the Makefile',['../md__r_e_a_d_m_e.html#autotoc_md5',1,'']]],
+  ['markdownfileerror_2',['markdownFileError',['../class_config.html#afb267a1753c93822a4ec7f85df994cfb',1,'Config']]],
+  ['markdownfullmodereleasenoteprefix_3',['markdownFullModeReleaseNotePrefix',['../class_config.html#a0210b8f15df7c720bde06d84213d9979',1,'Config']]],
+  ['markdownoutputfilename_4',['markdownOutputFileName',['../class_config.html#a62759f6a398e2c56465891b146255c84',1,'Config']]],
+  ['markdownreleasenoteprefix_5',['markdownReleaseNotePrefix',['../class_config.html#aefe42f8720b89b550f0d6e6dbe140b6f',1,'Config']]],
+  ['markdowntitle_6',['MarkdownTitle',['../release__notes__generator_8cpp.html#a809e24401d7a251436455596cc8395aaa5103c3e690bcd58c65cfc8865a4c6f60',1,'release_notes_generator.cpp']]],
+  ['matchwithoutsubcategory_7',['MatchWithoutSubCategory',['../release__notes__generator_8cpp.html#a641234c56fda12244c51e53c78788aada7af92024b251a220df5d44e21a6c7b21',1,'release_notes_generator.cpp']]],
+  ['matchwithsubcategory_8',['MatchWithSubCategory',['../release__notes__generator_8cpp.html#a641234c56fda12244c51e53c78788aadab4338cb657712ded12e542d8b416f676',1,'release_notes_generator.cpp']]]
 ];

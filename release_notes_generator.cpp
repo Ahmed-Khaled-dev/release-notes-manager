@@ -22,29 +22,367 @@
 using namespace std;
 using namespace nlohmann;
 
-string markdownOutputFileName;
-string htmlOutputFileName;
-
 /**
- * @brief GitHub API URL to retrieve Synfig's commits' pull request info
+ * @brief A class for loading and validating the JSON external configuration values
+ * This class allows the script to be easily customizable without opening any source code files
  */
-string synfigGithubPullRequestsApiUrl;
+class Config {
+public:
+    string markdownOutputFileName;
+    string htmlOutputFileName;
+    string githubRepoPullRequestsApiUrl;
+    string githubMarkdownApiUrl;
+    string repoIssuesUrl;
+    string repoCommitsUrl;
+    int commitTypesCount;
+    /**
+     * @brief 2d array storing conventional commit types and their corresponding markdown titles
+     * The first dimension is 50 to give it enough space to store as many types as the user enters in the release_config.json
+     */
+    string commitTypes[50][2];
+    // Variables that determine the syntax of running the script
+    // To generate release notes directly from the CLI using commit messages as source
+    // ./release_notes_generator commitMessagesSourceCliInputName release_start_reference release_end_reference github_token
+    // To generate release notes from the inputs of the GitHub Actions workflow using commit messages as source
+    // ./release_notes_generator commitMessagesSourceGithubActionsInputName release_start_reference release_end_reference github_token
+    // Same thing with editing the syntax of running the script with pull requests as source and the syntax of the 2 modes related to it (short/full)
+    string commitMessagesSourceCliInputName;
+    string commitMessagesSourceGithubActionsInputName;
+    string pullRequestsSourceCliInputName;
+    string pullRequestsSourceGithubActionsInputName;
+    string shortModeCliInputName;
+    string shortModeGithubActionsInputName;
+    string fullModeCliInputName;
+    string fullModeGithubActionsInputName;
 
-/**
- * @brief GitHub API URL to convert markdown to HTML
- */
-string githubMarkdownApiUrl;
+    // Variables that determine the looks of the release notes
+    string markdownReleaseNotePrefix;
+    string markdownFullModeReleaseNotePrefix;
 
-string synfigIssuesUrl;
-string synfigCommitsUrl;
+    // Variables that control the output messages that are shown to the user
+    string noReleaseNotesSourceError;
+    string incorrectReleaseNotesSourceError;
+    string noReleaseNotesModeError;
+    string incorrectReleaseNotesModeError;
+    string noGithubTokenError;
+    string noReleaseStartReferenceError;
+    string noReleaseEndReferenceError;
+    string githubApiRateLimitExceededError;
+    string githubApiUnauthorizedAccessError;
+    string githubApiBadRequestError;
+    string githubApiUnableToMakeRequestError;
+    string githubApiLibcurlError;
+    string gitLogError;
+    string markdownFileError;
+    string htmlFileError;
+    string expectedSyntaxMessage;
+    string generatingReleaseNotesMessage;
+    string failedToGenerateReleaseNotesMessage;
 
-int commitTypesCount;
+    void load(const string& configFileName) {
+        ifstream externalConfigFile(configFileName);
+        if (!externalConfigFile.is_open()) {
+            throw runtime_error("Unable to open " + configFileName + ", please ensure that it exists in the same directory as the script");
+        }
 
-/**
- * @brief 2d array storing conventional commit types and their corresponding markdown titles
- * The first dimension is 50 to give it enough space to store as many types as the user enters in the config.json
- */
-string commitTypes[50][2];
+        json externalConfigData;
+        try {
+            externalConfigFile >> externalConfigData;
+        }
+        catch (json::parse_error& e) {
+            throw runtime_error("JSON parsing error: " + string(e.what()));
+        }
+
+        if (externalConfigData.contains("markdownOutputFileName")) {
+            markdownOutputFileName = externalConfigData["markdownOutputFileName"];
+            
+            if (markdownOutputFileName.find(".md") == string::npos) {
+                throw invalid_argument("Key 'markdownOutputFileName' doesn't contain a correct value, enter a correct file name that ends in .md in "
+                    + configFileName);
+            }
+        }
+        else {
+            throw runtime_error("Key 'markdownOutputFileName' not found in " + configFileName);
+        }
+
+        if (externalConfigData.contains("htmlOutputFileName")) {
+            htmlOutputFileName = externalConfigData["htmlOutputFileName"];
+
+            if (htmlOutputFileName.find(".html") == string::npos) {
+                throw invalid_argument("Key 'htmlOutputFileName' doesn't contain a correct value, enter a correct file name that ends in .html in " 
+                + configFileName);
+            }
+        }
+        else {
+            throw runtime_error("Key 'htmlOutputFileName' not found in " + configFileName);
+        }
+
+        if (externalConfigData.contains("githubRepoPullRequestsApiUrl")) {
+            githubRepoPullRequestsApiUrl = externalConfigData["githubRepoPullRequestsApiUrl"];
+        }
+        else {
+            throw runtime_error("Key 'githubRepoPullRequestsApiUrl' not found in " + configFileName);
+        }
+
+        if (externalConfigData.contains("githubMarkdownApiUrl")) {
+            githubMarkdownApiUrl = externalConfigData["githubMarkdownApiUrl"];
+        }
+        else {
+            throw runtime_error("Key 'githubMarkdownApiUrl' not found in " + configFileName);
+        }
+
+        if (externalConfigData.contains("repoIssuesUrl")) {
+            repoIssuesUrl = externalConfigData["repoIssuesUrl"];
+        }
+        else {
+            throw runtime_error("Key 'repoIssuesUrl' not found in " + configFileName);
+        }
+
+        if (externalConfigData.contains("repoCommitsUrl")) {
+            repoCommitsUrl = externalConfigData["repoCommitsUrl"];
+        }
+        else {
+            throw runtime_error("Key 'repoCommitsUrl' not found in " + configFileName);
+        }
+
+        if (externalConfigData.contains("commitTypesCount")) {
+            commitTypesCount = externalConfigData["commitTypesCount"];
+
+            if (commitTypesCount < 1) {
+                throw invalid_argument("Key 'commitTypesCount' must contain a value bigger than 0 in " + configFileName);
+            }
+        }
+        else {
+            throw runtime_error("Key 'commitTypesCount' not found in " + configFileName);
+        }
+
+        if (externalConfigData.contains("commitMessagesSourceCliInputName")) {
+            commitMessagesSourceCliInputName = externalConfigData["commitMessagesSourceCliInputName"];
+        }
+        else {
+            throw runtime_error("Key 'commitMessagesSourceCliInputName' not found in " + configFileName);
+        }
+
+        if (externalConfigData.contains("commitMessagesSourceGithubActionsInputName")) {
+            commitMessagesSourceGithubActionsInputName = externalConfigData["commitMessagesSourceGithubActionsInputName"];
+        }
+        else {
+            throw runtime_error("Key 'commitMessagesSourceGithubActionsInputName' not found in " + configFileName);
+        }
+
+        if (externalConfigData.contains("pullRequestsSourceCliInputName")) {
+            pullRequestsSourceCliInputName = externalConfigData["pullRequestsSourceCliInputName"];
+        }
+        else {
+            throw runtime_error("Key 'pullRequestsSourceCliInputName' not found in " + configFileName);
+        }
+
+        if (externalConfigData.contains("pullRequestsSourceGithubActionsInputName")) {
+            pullRequestsSourceGithubActionsInputName = externalConfigData["pullRequestsSourceGithubActionsInputName"];
+        }
+        else {
+            throw runtime_error("Key 'pullRequestsSourceGithubActionsInputName' not found in " + configFileName);
+        }
+
+        if (externalConfigData.contains("shortModeCliInputName")) {
+            shortModeCliInputName = externalConfigData["shortModeCliInputName"];
+        }
+        else {
+            throw runtime_error("Key 'shortModeCliInputName' not found in " + configFileName);
+        }
+
+        if (externalConfigData.contains("shortModeGithubActionsInputName")) {
+            shortModeGithubActionsInputName = externalConfigData["shortModeGithubActionsInputName"];
+        }
+        else {
+            throw runtime_error("Key 'shortModeGithubActionsInputName' not found in " + configFileName);
+        }
+
+        if (externalConfigData.contains("fullModeCliInputName")) {
+            fullModeCliInputName = externalConfigData["fullModeCliInputName"];
+        }
+        else {
+            throw runtime_error("Key 'fullModeCliInputName' not found in " + configFileName);
+        }
+
+        if (externalConfigData.contains("fullModeGithubActionsInputName")) {
+            fullModeGithubActionsInputName = externalConfigData["fullModeGithubActionsInputName"];
+        }
+        else {
+            throw runtime_error("Key 'fullModeGithubActionsInputName' not found in " + configFileName);
+        }
+
+        if (!externalConfigData.contains("commitTypes") || !externalConfigData["commitTypes"].is_array()) {
+            throw runtime_error("Key 'commitTypes' not found or is not an array in " + configFileName);
+        }
+
+        auto& commitTypesArray = externalConfigData["commitTypes"];
+
+        if (commitTypesCount != commitTypesArray.size()) {
+            throw runtime_error("'commitTypesCount' does not match the size of the 'commitTypes' array in " + configFileName);
+        }
+
+        for (int i = 0; i < commitTypesCount; i++)
+        {
+            if (!commitTypesArray[i].contains("conventionalType")) {
+                throw runtime_error("Missing 'conventionalType' in commitTypes array at index " + to_string(i) + " (0-based) in " + configFileName);
+            }
+            else if (!commitTypesArray[i].contains("markdownTitle")) {
+                throw runtime_error("Missing 'markdownTitle' in commitTypes array at index " + to_string(i) + " (0-based) in " + configFileName);
+            }
+
+            commitTypes[i][0] = commitTypesArray[i]["conventionalType"];
+            commitTypes[i][1] = commitTypesArray[i]["markdownTitle"];
+        }
+
+        if (externalConfigData.contains("markdownReleaseNotePrefix")) {
+            markdownReleaseNotePrefix = externalConfigData["markdownReleaseNotePrefix"];
+        }
+        else {
+            throw runtime_error("Key 'markdownReleaseNotePrefix' not found in " + configFileName);
+        }
+
+        if (externalConfigData.contains("markdownFullModeReleaseNotePrefix")) {
+            markdownFullModeReleaseNotePrefix = externalConfigData["markdownFullModeReleaseNotePrefix"];
+        }
+        else {
+            throw runtime_error("Key 'markdownFullModeReleaseNotePrefix' not found in " + configFileName);
+        }
+
+        if (externalConfigData.contains("outputMessages")) {
+            auto& outputMessages = externalConfigData["outputMessages"];
+
+            if (outputMessages.contains("noReleaseNotesSourceError")) {
+                noReleaseNotesSourceError = outputMessages["noReleaseNotesSourceError"];
+            }
+            else {
+                throw runtime_error("Key 'noReleaseNotesSourceError' not found in the 'outputMessages' category in " + configFileName);
+            }
+
+            if (outputMessages.contains("incorrectReleaseNotesSourceError")) {
+                incorrectReleaseNotesSourceError = outputMessages["incorrectReleaseNotesSourceError"];
+            }
+            else {
+                throw runtime_error("Key 'incorrectReleaseNotesSourceError' not found in the 'outputMessages' category in " + configFileName);
+            }
+
+            if (outputMessages.contains("noReleaseNotesModeError")) {
+                noReleaseNotesModeError = outputMessages["noReleaseNotesModeError"];
+            }
+            else {
+                throw runtime_error("Key 'noReleaseNotesModeError' not found in the 'outputMessages' category in " + configFileName);
+            }
+
+            if (outputMessages.contains("incorrectReleaseNotesModeError")) {
+                incorrectReleaseNotesModeError = outputMessages["incorrectReleaseNotesModeError"];
+            }
+            else {
+                throw runtime_error("Key 'incorrectReleaseNotesModeError' not found in the 'outputMessages' category in " + configFileName);
+            }
+
+            if (outputMessages.contains("noGithubTokenError")) {
+                noGithubTokenError = outputMessages["noGithubTokenError"];
+            }
+            else {
+                throw runtime_error("Key 'noGithubTokenError' not found in the 'outputMessages' category in " + configFileName);
+            }
+
+            if (outputMessages.contains("noReleaseStartReferenceError")) {
+                noReleaseStartReferenceError = outputMessages["noReleaseStartReferenceError"];
+            }
+            else {
+                throw runtime_error("Key 'noReleaseStartReferenceError' not found in the 'outputMessages' category in " + configFileName);
+            }
+
+            if (outputMessages.contains("noReleaseEndReferenceError")) {
+                noReleaseEndReferenceError = outputMessages["noReleaseEndReferenceError"];
+            }
+            else {
+                throw runtime_error("Key 'noReleaseEndReferenceError' not found in the 'outputMessages' category in " + configFileName);
+            }
+
+            if (outputMessages.contains("expectedSyntaxMessage")) {
+                expectedSyntaxMessage = outputMessages["expectedSyntaxMessage"];
+            }
+            else {
+                throw runtime_error("Key 'expectedSyntaxMessage' not found in the 'outputMessages' category in " + configFileName);
+            }
+
+            if (outputMessages.contains("githubApiRateLimitExceededError")) {
+                githubApiRateLimitExceededError = outputMessages["githubApiRateLimitExceededError"];
+            }
+            else {
+                throw runtime_error("Key 'githubApiRateLimitExceededError' not found in the 'outputMessages' category in " + configFileName);
+            }
+
+            if (outputMessages.contains("githubApiUnauthorizedAccessError")) {
+                githubApiUnauthorizedAccessError = outputMessages["githubApiUnauthorizedAccessError"];
+            }
+            else {
+                throw runtime_error("Key 'githubApiUnauthorizedAccessError' not found in the 'outputMessages' category in " + configFileName);
+            }
+
+            if (outputMessages.contains("githubApiBadRequestError")) {
+                githubApiBadRequestError = outputMessages["githubApiBadRequestError"];
+            }
+            else {
+                throw runtime_error("Key 'githubApiBadRequestError' not found in the 'outputMessages' category in " + configFileName);
+            }
+
+            if (outputMessages.contains("githubApiUnableToMakeRequestError")) {
+                githubApiUnableToMakeRequestError = outputMessages["githubApiUnableToMakeRequestError"];
+            }
+            else {
+                throw runtime_error("Key 'githubApiUnableToMakeRequestError' not found in the 'outputMessages' category in " + configFileName);
+            }
+
+            if (outputMessages.contains("githubApiLibcurlError")) {
+                githubApiLibcurlError = outputMessages["githubApiLibcurlError"];
+            }
+            else {
+                throw runtime_error("Key 'githubApiLibcurlError' not found in the 'outputMessages' category in " + configFileName);
+            }
+
+            if (outputMessages.contains("gitLogError")) {
+                gitLogError = outputMessages["gitLogError"];
+            }
+            else {
+                throw runtime_error("Key 'gitLogError' not found in the 'outputMessages' category in " + configFileName);
+            }
+
+            if (outputMessages.contains("generatingReleaseNotesMessage")) {
+                generatingReleaseNotesMessage = outputMessages["generatingReleaseNotesMessage"];
+            }
+            else {
+                throw runtime_error("Key 'generatingReleaseNotesMessage' not found in the 'outputMessages' category in " + configFileName);
+            }
+
+            if (outputMessages.contains("failedToGenerateReleaseNotesMessage")) {
+                failedToGenerateReleaseNotesMessage = outputMessages["failedToGenerateReleaseNotesMessage"];
+            }
+            else {
+                throw runtime_error("Key 'failedToGenerateReleaseNotesMessage' not found in the 'outputMessages' category in " + configFileName);
+            }
+
+            if (outputMessages.contains("markdownFileError")) {
+                markdownFileError = outputMessages["markdownFileError"];
+            }
+            else {
+                throw runtime_error("Key 'markdownFileError' not found in the 'outputMessages' category in " + configFileName);
+            }
+
+            if (outputMessages.contains("htmlFileError")) {
+                htmlFileError = outputMessages["htmlFileError"];
+            }
+            else {
+                throw runtime_error("Key 'htmlFileError' not found in the 'outputMessages' category in " + configFileName);
+            }
+        }
+        else {
+            throw runtime_error("Category 'outputMessages' not found in " + configFileName);
+        }
+    }
+};
 
 enum class ReleaseNoteSources{
     CommitMessages,
@@ -101,33 +439,20 @@ string convertMarkdownToHtml(string markdownText, string githubToken);
 void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, string releaseStartRef, string releaseEndRef, 
                           string githubToken, ReleaseNoteModes releaseNoteMode = ReleaseNoteModes::Short);
 
+Config config;
+
 int main(int argc, char* argv[]){
     
     // Reading values from the external configuration file
-    const string configFileName = "release_config.json";
-    ifstream externalConfigFile(configFileName);
-    if (!externalConfigFile.is_open()) {
-        cerr << "Unable to open " << configFileName << ", please ensure that it exists in the same directory as the script" << endl;
+    const string releaseNotesConfigFileName = "release_notes_config.json";
+    try {
+        config.load(releaseNotesConfigFileName);
+    }
+    catch (const exception& e) {
+        cerr << e.what() << endl;
         return 1;
     }
-    
-    json externalConfigData;
-    externalConfigFile >> externalConfigData;
 
-    markdownOutputFileName = externalConfigData["markdownOutputFileName"];
-    htmlOutputFileName = externalConfigData["htmlOutputFileName"];
-    synfigGithubPullRequestsApiUrl = externalConfigData["synfigGithubPullRequestsApiUrl"];
-    githubMarkdownApiUrl = externalConfigData["githubMarkdownApiUrl"];
-    synfigIssuesUrl = externalConfigData["synfigIssuesUrl"];
-    synfigCommitsUrl = externalConfigData["synfigCommitsUrl"];
-    commitTypesCount = externalConfigData["commitTypesCount"];
-
-    for (int i = 0; i < commitTypesCount; i++)
-    {
-        commitTypes[i][0] = externalConfigData["commitTypes"][i]["conventionalType"];
-        commitTypes[i][1] = externalConfigData["commitTypes"][i]["markdownTitle"];
-    }
-    
     if (argc <= 1) {
         printInputError(InputErrors::NoReleaseNotesSource);
         return 1;
@@ -146,19 +471,23 @@ int main(int argc, char* argv[]){
     }
 
     try {
-        if (strcmp(argv[1], "message") == 0 || strcmp(argv[1], "Commit Messages") == 0) {
+        if (strcmp(argv[1], config.commitMessagesSourceCliInputName.c_str()) == 0 
+            || strcmp(argv[1], config.commitMessagesSourceGithubActionsInputName.c_str()) == 0) {
             generateReleaseNotes(ReleaseNoteSources::CommitMessages, argv[2], argv[3], argv[4]);
         }
-        else if (strcmp(argv[1], "pr") == 0 || strcmp(argv[1], "Pull Requests") == 0) {
+        else if (strcmp(argv[1], config.pullRequestsSourceCliInputName.c_str()) == 0
+                 || strcmp(argv[1], config.pullRequestsSourceGithubActionsInputName.c_str()) == 0) {
             if (argc <= 5) {
                 printInputError(InputErrors::NoReleaseNotesMode);
                 return 1;
             }
 
-            if (strcmp(argv[5], "full") == 0 || strcmp(argv[5], "Full") == 0) {
+            if (strcmp(argv[5], config.fullModeCliInputName.c_str()) == 0 
+                || strcmp(argv[5], config.fullModeGithubActionsInputName.c_str()) == 0) {
                 generateReleaseNotes(ReleaseNoteSources::PullRequests, argv[2], argv[3], argv[4], ReleaseNoteModes::Full);
             }
-            else if (strcmp(argv[5], "short") == 0 || strcmp(argv[5], "Short") == 0) {
+            else if (strcmp(argv[5], config.shortModeCliInputName.c_str()) == 0 
+                     || strcmp(argv[5], config.shortModeGithubActionsInputName.c_str()) == 0) {
                 generateReleaseNotes(ReleaseNoteSources::PullRequests, argv[2], argv[3], argv[4], ReleaseNoteModes::Short);
             }
             else {
@@ -172,7 +501,7 @@ int main(int argc, char* argv[]){
         }
     }
     catch (const exception& e) {
-        cerr << "Failed to generate release notes" << endl;
+        cerr << config.failedToGenerateReleaseNotesMessage << endl;
         cerr << e.what() << endl;
         return 1;
     }
@@ -186,30 +515,27 @@ int main(int argc, char* argv[]){
  */
 void printInputError(InputErrors inputError) {
     if (inputError == InputErrors::NoReleaseNotesSource) {
-        cerr << "Please enter the source you which to use to generate release notes (message or pr)" << endl;
+        cerr << config.noReleaseNotesSourceError << endl;
     }
     else if (inputError == InputErrors::IncorrectReleaseNotesSource) {
-        cerr << "Please enter a valid release notes source (message or pr)" << endl;
+        cerr << config.incorrectReleaseNotesSourceError << endl;
     }
     else if (inputError == InputErrors::NoReleaseNotesMode) {
-        cerr << "Please enter which release notes mode you want for PRs (short or full)" << endl;
+        cerr << config.noReleaseNotesModeError << endl;
     }
     else if (inputError == InputErrors::IncorrectReleaseNotesMode) {
-        cerr << "Please enter a valid release notes mode (short or full)" << endl;
+        cerr << config.incorrectReleaseNotesModeError << endl;
     }
     else if (inputError == InputErrors::NoGithubToken) {
-        cerr << "Please enter a GitHub token to be able to make authenticated requests to the GitHub API" << endl;
+        cerr << config.noGithubTokenError << endl;
     }
     else if (inputError == InputErrors::NoReleaseStartReference) {
-        cerr << "Please enter a git reference (commit SHA or tag name) that references the commit directly before the first commit in the new release, "
-             << "for example, the tag name of the previous release" << endl;
+        cerr << config.noReleaseStartReferenceError << endl;
     }
     else if (inputError == InputErrors::NoReleaseEndReference) {
-        cerr << "Please enter a git reference (commit SHA or tag name) that references the commit that *ends* this release's commit messages" << endl;
+        cerr << config.noReleaseEndReferenceError << endl;
     }
-    cerr << "Expected Syntax:" << endl;
-    cerr << "1 - release_notes_generator message release_start_reference release_end_reference github_token" << endl;
-    cerr << "2 - release_notes_generator pr release_start_reference release_end_reference github_token short/full" << endl;
+    cerr << config.expectedSyntaxMessage << endl;
 }
 
 /**
@@ -254,10 +580,10 @@ string replaceHashIdsWithLinks(string pullRequestBody) {
         string currentNumericId = currentHashIdMatch.str(1);
         // I remove the old hash id and create a new markdown link using it and insert the new link in its place
         result.erase(currentHashIdMatch.position() + numberOfNewCharactersAdded, currentHashIdMatch.length());
-        result.insert(currentHashIdMatch.position() + numberOfNewCharactersAdded, "[#" + currentNumericId + "](" + synfigIssuesUrl + currentNumericId + ")");
+        result.insert(currentHashIdMatch.position() + numberOfNewCharactersAdded, "[#" + currentNumericId + "](" + config.repoIssuesUrl + currentNumericId + ")");
         // Regex smatch.position() was assigned before we replaced hash ids with urls
         // So we must account for that by counting number of new characters we have added, "4" is for the characters "[]()"
-        numberOfNewCharactersAdded += 4 + synfigIssuesUrl.length() + currentNumericId.length();
+        numberOfNewCharactersAdded += 4 + config.repoIssuesUrl.length() + currentNumericId.length();
     }
 
     return result;
@@ -281,8 +607,8 @@ string replaceCommitShasWithLinks(string pullRequestBody) {
         smatch currentShaMatch = *i;
         string currentSha = currentShaMatch.str(1);
         result.erase(currentShaMatch.position() + numberOfNewCharactersAdded, currentShaMatch.length());
-        result.insert(currentShaMatch.position() + numberOfNewCharactersAdded, " [" + currentSha.substr(0, 6) + "](" + synfigCommitsUrl + currentSha + ") ");
-        numberOfNewCharactersAdded += 4 + synfigCommitsUrl.length() + 6;
+        result.insert(currentShaMatch.position() + numberOfNewCharactersAdded, " [" + currentSha.substr(0, 6) + "](" + config.repoCommitsUrl + currentSha + ") ");
+        numberOfNewCharactersAdded += 4 + config.repoCommitsUrl.length() + 6;
     }
 
     return result;
@@ -330,13 +656,16 @@ string addPullRequestInfoInNotes(json pullRequestInfo, string releaseNotesFromPu
         string title = pullRequestInfo["title"];
 
         // Removing the commit type from the title and capitalizing the first letter
-        title = title.substr(title.find(":") + 2);
+        string::size_type colonPosition = title.find(":");
+        if (colonPosition != string::npos) {
+            title = title.substr(colonPosition + 2);
+        }
         title[0] = toupper(title[0]);
 
         if(releaseNotesMode == ReleaseNoteModes::Full)
-            releaseNotesFromPullRequests += "- ### " + title + "\n";
+            releaseNotesFromPullRequests += config.markdownFullModeReleaseNotePrefix + title + "\n";
         else
-            releaseNotesFromPullRequests += "- " + title + "\n";
+            releaseNotesFromPullRequests += config.markdownReleaseNotePrefix + title + "\n";
     }
 
     if (releaseNotesMode == ReleaseNoteModes::Full && !pullRequestInfo["body"].is_null()) {
@@ -374,13 +703,13 @@ size_t handleApiCallBack(char* data, size_t size, size_t numOfBytes, string* buf
  */
 void handleGithubApiErrorCodes(long errorCode, string apiResponse) {
     if (errorCode == 429 || errorCode == 403) {
-        throw runtime_error("Rate limit exceeded while making requests to the GitHub API. Additional information: " + apiResponse);
+        throw runtime_error(config.githubApiRateLimitExceededError + apiResponse);
     }
     else if (errorCode == 401) {
-        throw runtime_error("Unauthorized access to the GitHub API, usually due to an incorrect GitHub token. Additional information: " + apiResponse);
+        throw runtime_error(config.githubApiUnauthorizedAccessError + apiResponse);
     }
     else if (errorCode == 400) {
-        throw runtime_error("Bad request to the GitHub API. Additional information: " + apiResponse);
+        throw runtime_error(config.githubApiBadRequestError + apiResponse);
     }
 }
 
@@ -431,14 +760,14 @@ string getPullRequestInfo(string pullRequestUrl, string githubToken) {
             }
         }
         else {
-            throw runtime_error("Unable to make request to the GitHub API, check internet connection");
+            throw runtime_error(config.githubApiUnableToMakeRequestError);
         }
 
         curl_easy_cleanup(curl);
         curl_slist_free_all(headers);
     }
     else {
-        throw runtime_error("Error initializing libcurl to make requests to the GitHub API");
+        throw runtime_error(config.githubApiLibcurlError);
     }
 
     return jsonResponse;
@@ -451,7 +780,7 @@ string getPullRequestInfo(string pullRequestUrl, string githubToken) {
  * @return The type of match that happened between the two commit types
  */
 CommitTypeMatchResults checkCommitTypeMatch(string commitMessage, int commitTypeIndex) {
-    string correctCommitType = commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName];
+    string correctCommitType = config.commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName];
 
     if (commitMessage.substr(0, commitMessage.find(":")) == correctCommitType) {
         return CommitTypeMatchResults::MatchWithoutSubCategory;
@@ -478,19 +807,19 @@ CommitTypeMatchResults checkCommitTypeMatch(string commitMessage, int commitType
 string getCommitsNotesFromPullRequests(int commitTypeIndex, string releaseStartRef, string releaseEndRef, 
                                        string githubToken, ReleaseNoteModes releaseNotesMode) {
     string commandToRetrieveCommitsMessages = "git log " + releaseStartRef + ".." + releaseEndRef +
-        " --oneline --format=\"%s\" --grep=\"^" + commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName] + "[:(]\"" +
+        " --oneline --format=\"%s\" --grep=\"^" + config.commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName] + "[:(]\"" +
         " --grep=\"#[0-9]\" --all-match";
 
     FILE* pipe = popen(commandToRetrieveCommitsMessages.c_str(), "r");
     if (!pipe) {
-        throw runtime_error("Unable to run and read the git log command output");
+        throw runtime_error(config.gitLogError);
     }
 
     char buffer[150];
     string commitMessage, commitPullRequestNumber, releaseNotesFromPullRequests = "";
 
     // Add the title of this commit type section in the release notes
-    releaseNotesFromPullRequests += "\n" + commitTypes[commitTypeIndex][(int)CommitTypeInfo::MarkdownTitle] + "\n";
+    releaseNotesFromPullRequests += "\n" + config.commitTypes[commitTypeIndex][(int)CommitTypeInfo::MarkdownTitle] + "\n";
 
     bool commitTypeContainsReleaseNotes = 0;
 
@@ -502,15 +831,17 @@ string getCommitsNotesFromPullRequests(int commitTypeIndex, string releaseStartR
         CommitTypeMatchResults matchResult = checkCommitTypeMatch(commitMessage, commitTypeIndex);
 
         if (matchResult != CommitTypeMatchResults::NoMatch) {
-            size_t hashtagPositionInCommitMessage = commitMessage.find("#");
+            // Regular expression to match # followed by one or more digits
+            regex prRegex(R"(#(\d+))");
+            smatch match;
 
             // Validating that a hashtag exists
-            if (hashtagPositionInCommitMessage != string::npos)
+            if (regex_search(commitMessage, match, prRegex))
             {
-                // Extracting the PR number associated with the commit
-                commitPullRequestNumber = commitMessage.substr(hashtagPositionInCommitMessage + 1, 4);
+                // Extracting the PR number associated with the commit from the first capture group
+                commitPullRequestNumber = match.str(1);
 
-                string jsonResponse = getPullRequestInfo(synfigGithubPullRequestsApiUrl + commitPullRequestNumber, githubToken);
+                string jsonResponse = getPullRequestInfo(config.githubRepoPullRequestsApiUrl + commitPullRequestNumber, githubToken);
                 json pullRequestInfo = json::parse(jsonResponse);
 
                 releaseNotesFromPullRequests = addPullRequestInfoInNotes(pullRequestInfo, releaseNotesFromPullRequests, releaseNotesMode) + "\n";
@@ -538,18 +869,18 @@ string getCommitsNotesFromPullRequests(int commitTypeIndex, string releaseStartR
  */
 string getCommitsNotesFromCommitMessages(int commitTypeIndex, string releaseStartRef, string releaseEndRef) {
     string commandToRetrieveCommitsMessages = "git log " + releaseStartRef + ".." + releaseEndRef +
-        " --oneline --format=\"%s\" --grep=\"^" + commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName] + "[:(]\"";
+        " --oneline --format=\"%s\" --grep=\"^" + config.commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName] + "[:(]\"";
 
     FILE* pipe = popen(commandToRetrieveCommitsMessages.c_str(), "r");
     if (!pipe) {
-        throw runtime_error("Unable to run and read the git log command output");
+        throw runtime_error(config.gitLogError);
     }
 
     char buffer[150];
     string commitMessage, releaseNotesFromCommitMessages, subCategoryText;
 
     // Add the title of this commit type section in the release notes
-    releaseNotesFromCommitMessages += "\n" + commitTypes[commitTypeIndex][(int)CommitTypeInfo::MarkdownTitle] + "\n";
+    releaseNotesFromCommitMessages += "\n" + config.commitTypes[commitTypeIndex][(int)CommitTypeInfo::MarkdownTitle] + "\n";
 
     bool commitTypeContainsReleaseNotes = 0;
 
@@ -568,13 +899,13 @@ string getCommitsNotesFromCommitMessages(int commitTypeIndex, string releaseStar
                 subCategoryText = " (" + commitMessage.substr(startPos, commitMessage.find(")") - startPos) + " Related) ";
             }
             
-            commitMessage = "- " + commitMessage.substr(commitMessage.find(":") + 2) + "\n";
+            commitMessage = config.markdownReleaseNotePrefix + commitMessage.substr(commitMessage.find(":") + 2) + "\n";
 
             // Capitalizing the first letter in the commit message
-            commitMessage[2] = toupper(commitMessage[2]);
+            commitMessage[config.markdownReleaseNotePrefix.size()] = toupper(commitMessage[config.markdownReleaseNotePrefix.size()]);
 
             // Inserting the commit type subcategory (will be empty if there is no subcategory)
-            commitMessage.insert(2, subCategoryText);
+            commitMessage.insert(config.markdownReleaseNotePrefix.size(), subCategoryText);
 
             releaseNotesFromCommitMessages += commitMessage;
         }
@@ -605,7 +936,7 @@ string convertMarkdownToHtml(string markdownText, string githubToken) {
     headers = curl_slist_append(headers, ("Authorization: token " + githubToken).c_str());
 
     if (curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, githubMarkdownApiUrl.c_str());
+        curl_easy_setopt(curl, CURLOPT_URL, config.githubMarkdownApiUrl.c_str());
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, handleApiCallBack);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &htmlText);
         curl_easy_setopt(curl, CURLOPT_USERAGENT, "Ahmed-Khaled-dev");
@@ -634,14 +965,14 @@ string convertMarkdownToHtml(string markdownText, string githubToken) {
             }
         }
         else {
-            throw runtime_error("Unable to make request to the GitHub API, check internet connection");
+            throw runtime_error(config.githubApiUnableToMakeRequestError);
         }
 
         curl_easy_cleanup(curl);
         curl_slist_free_all(headers);
     }
     else {
-        throw runtime_error("Error initializing libcurl to make requests to the GitHub API");
+        throw runtime_error(config.githubApiLibcurlError);
     }
 
     return htmlText;
@@ -660,12 +991,12 @@ string convertMarkdownToHtml(string markdownText, string githubToken) {
  */
 void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, string releaseStartRef, string releaseEndRef, 
                           string githubToken, ReleaseNoteModes releaseNoteMode) {
-    cout << "Generating release notes......." << endl;
+    cout << config.generatingReleaseNotesMessage << endl;
 
     string commandToRetrieveCommitsMessages;
     string currentCommitMessage;
     string markdownReleaseNotes = "";
-    for (int i = 0; i < commitTypesCount; i++)
+    for (int i = 0; i < config.commitTypesCount; i++)
     {
         if (releaseNoteSource == ReleaseNoteSources::CommitMessages) {
             markdownReleaseNotes += getCommitsNotesFromCommitMessages(i, releaseStartRef, releaseEndRef);
@@ -675,22 +1006,22 @@ void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, string releaseSt
         }
     }
 
-    ofstream markdownFileOutput(markdownOutputFileName);
+    ofstream markdownFileOutput(config.markdownOutputFileName);
 
     if (!markdownFileOutput.is_open()) {
-        throw runtime_error("Unable to create/open markdown release notes file");
+        throw runtime_error(config.markdownFileError);
     }
 
     markdownFileOutput << markdownReleaseNotes;
     markdownFileOutput.close();
 
-    ofstream htmlFileOutput(htmlOutputFileName);
+    ofstream htmlFileOutput(config.htmlOutputFileName);
 
     if (!htmlFileOutput.is_open()) {
-        throw runtime_error("Unable to create/open HTML release notes file");
+        throw runtime_error(config.htmlFileError);
     }
 
     htmlFileOutput << convertMarkdownToHtml(markdownReleaseNotes, githubToken);
 
-    cout << "Release notes generated successfully, check " + markdownOutputFileName + " and " + htmlOutputFileName + " in the current directory" << endl;
+    cout << "Release notes generated successfully, check " + config.markdownOutputFileName + " and " + config.htmlOutputFileName + " in the current directory" << endl;
 }

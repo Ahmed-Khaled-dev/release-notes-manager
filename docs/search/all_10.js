@@ -1,14 +1,7 @@
 var searchData=
 [
-  ['readme_0',['README',['../md__r_e_a_d_m_e.html',1,'']]],
-  ['readme_2emd_1',['README.md',['../_r_e_a_d_m_e_8md.html',1,'']]],
-  ['refactoring_2',['♻️ Code Refactoring',['../md_release__notes.html#autotoc_md9',1,'']]],
-  ['release_5fnotes_2emd_3',['release_notes.md',['../release__notes_8md.html',1,'']]],
-  ['release_5fnotes_5fgenerator_2ecpp_4',['release_notes_generator.cpp',['../release__notes__generator_8cpp.html',1,'']]],
-  ['releasenotemodes_5',['ReleaseNoteModes',['../release__notes__generator_8cpp.html#ad3a43d5b1acf3669d48fb4b7efd4315d',1,'release_notes_generator.cpp']]],
-  ['releasenotesources_6',['ReleaseNoteSources',['../release__notes__generator_8cpp.html#a2a041843ffe66cf42292281d8a51bf6d',1,'release_notes_generator.cpp']]],
-  ['removeextranewlines_7',['removeExtraNewLines',['../release__notes__generator_8cpp.html#a4487205badbd8aead04f3d63f43292a9',1,'release_notes_generator.cpp']]],
-  ['replacecommitshaswithlinks_8',['replaceCommitShasWithLinks',['../release__notes__generator_8cpp.html#a2910c0333ad9a07480c5486e0131ee27',1,'release_notes_generator.cpp']]],
-  ['replacehashidswithlinks_9',['replaceHashIdsWithLinks',['../release__notes__generator_8cpp.html#a19e0fc5a3595eb380147a5025a1b23f2',1,'release_notes_generator.cpp']]],
-  ['repo_10',['1. Clone the repo',['../md__r_e_a_d_m_e.html#autotoc_md3',1,'']]]
+  ['printinputerror_0',['printInputError',['../release__notes__generator_8cpp.html#a72aef381e81fc4204922f15f83d354b8',1,'release_notes_generator.cpp']]],
+  ['pullrequests_1',['PullRequests',['../release__notes__generator_8cpp.html#a2a041843ffe66cf42292281d8a51bf6dadea4739dd41e08d4b6375262dd2c1bff',1,'release_notes_generator.cpp']]],
+  ['pullrequestssourcecliinputname_2',['pullRequestsSourceCliInputName',['../class_config.html#a18c3c4bc15619015475f9815e4594c89',1,'Config']]],
+  ['pullrequestssourcegithubactionsinputname_3',['pullRequestsSourceGithubActionsInputName',['../class_config.html#a1ca130396997c69fb367ad9732506dfb',1,'Config']]]
 ];

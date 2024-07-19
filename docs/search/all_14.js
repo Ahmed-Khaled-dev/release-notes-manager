@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['♻️_20code_20refactoring_0',['♻️ Code Refactoring',['../md_release__notes.html#autotoc_md9',1,'']]]
+  ['use_0',['How To Use',['../md__r_e_a_d_m_e.html#autotoc_md1',1,'']]]
 ];

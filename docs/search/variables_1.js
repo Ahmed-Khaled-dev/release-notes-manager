@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['githubmarkdownapiurl_0',['githubMarkdownApiUrl',['../release__notes__generator_8cpp.html#a9856ac0e2cbd11e2e8568fd08550bac0',1,'release_notes_generator.cpp']]]
+  ['expectedsyntaxmessage_0',['expectedSyntaxMessage',['../class_config.html#a07c5526f48ca6da64b18a02f992d5243',1,'Config']]]
 ];
