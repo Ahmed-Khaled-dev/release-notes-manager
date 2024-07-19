@@ -78,6 +78,7 @@ public:
     string expectedSyntaxMessage;
     string generatingReleaseNotesMessage;
     string failedToGenerateReleaseNotesMessage;
+    string emptyReleaseNotesMessage;
 
     void load(const string& configFileName) {
         ifstream externalConfigFile(configFileName);
@@ -376,6 +377,13 @@ public:
             }
             else {
                 throw runtime_error("Key 'htmlFileError' not found in the 'outputMessages' category in " + configFileName);
+            }
+
+            if (outputMessages.contains("emptyReleaseNotesMessage")) {
+                emptyReleaseNotesMessage = outputMessages["emptyReleaseNotesMessage"];
+            }
+            else {
+                throw runtime_error("Key 'emptyReleaseNotesMessage' not found in the 'outputMessages' category in " + configFileName);
             }
         }
         else {
@@ -1010,6 +1018,10 @@ void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, string releaseSt
 
     if (!markdownFileOutput.is_open()) {
         throw runtime_error(config.markdownFileError);
+    }
+
+    if (markdownReleaseNotes.size() == 0) {
+        throw runtime_error(config.emptyReleaseNotesMessage);
     }
 
     markdownFileOutput << markdownReleaseNotes;

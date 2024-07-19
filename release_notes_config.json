@@ -2,10 +2,10 @@
     "markdownOutputFileName":"release_notes.md",
     "htmlOutputFileName":"release_notes.html",
     
-    "synfigGithubPullRequestsApiUrl":"https://api.github.com/repos/synfig/synfig/pulls/",
+    "githubRepoPullRequestsApiUrl":"https://api.github.com/repos/synfig/synfig/pulls/",
     "githubMarkdownApiUrl":"https://api.github.com/markdown",
-    "synfigIssuesUrl":"https://github.com/synfig/synfig/issues/",
-    "synfigCommitsUrl":"https://github.com/synfig/synfig/commit/",
+    "repoIssuesUrl":"https://github.com/synfig/synfig/issues/",
+    "repoCommitsUrl":"https://github.com/synfig/synfig/commit/",
     
     "commitTypesCount":10,
     
@@ -52,6 +52,7 @@
         "htmlFileError":"Unable to create/open HTML release notes file",
         "expectedSyntaxMessage":"Expected Syntax:\n1 - release_notes_generator message release_start_reference release_end_reference github_token\n2 - release_notes_generator pr release_start_reference release_end_reference github_token short/full",
         "generatingReleaseNotesMessage":"Generating release notes........",
-        "failedToGenerateReleaseNotesMessage":"Failed to generate release notes"
+        "failedToGenerateReleaseNotesMessage":"Failed to generate release notes",
+        "emptyReleaseNotesMessage":"There are no release notes between the 2 given git references"
     }
 }
