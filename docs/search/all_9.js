@@ -1,10 +1,10 @@
 var searchData=
 [
-  ['generatereleasenotes_0',['generateReleaseNotes',['../release__notes__generator_8cpp.html#a77913687effc90181d118271be59e1e0',1,'release_notes_generator.cpp']]],
+  ['generatereleasenotes_0',['generateReleaseNotes',['../_main_8cpp.html#a77913687effc90181d118271be59e1e0',1,'Main.cpp']]],
   ['generatingreleasenotesmessage_1',['generatingReleaseNotesMessage',['../class_config.html#aa18e039059f6af7089601db30a834ceb',1,'Config']]],
-  ['getcommitsnotesfromcommitmessages_2',['getCommitsNotesFromCommitMessages',['../release__notes__generator_8cpp.html#ae1f202b8fd1f30cbf8678a007236df90',1,'release_notes_generator.cpp']]],
-  ['getcommitsnotesfrompullrequests_3',['getCommitsNotesFromPullRequests',['../release__notes__generator_8cpp.html#a8a024dee16c4aca05a54f0ac7098f7c8',1,'release_notes_generator.cpp']]],
-  ['getpullrequestinfo_4',['getPullRequestInfo',['../release__notes__generator_8cpp.html#ad05166a8ec7339399fa5e531f1ca9856',1,'release_notes_generator.cpp']]],
+  ['getcommitsnotesfromcommitmessages_2',['getCommitsNotesFromCommitMessages',['../_main_8cpp.html#ae1f202b8fd1f30cbf8678a007236df90',1,'Main.cpp']]],
+  ['getcommitsnotesfrompullrequests_3',['getCommitsNotesFromPullRequests',['../_main_8cpp.html#a8a024dee16c4aca05a54f0ac7098f7c8',1,'Main.cpp']]],
+  ['getpullrequestinfo_4',['getPullRequestInfo',['../_main_8cpp.html#ad05166a8ec7339399fa5e531f1ca9856',1,'Main.cpp']]],
   ['githubapibadrequesterror_5',['githubApiBadRequestError',['../class_config.html#ad8d55f1f61294d0141e755336bf9b72a',1,'Config']]],
   ['githubapilibcurlerror_6',['githubApiLibcurlError',['../class_config.html#acf4c736b02cbe0f7719f885630e16f68',1,'Config']]],
   ['githubapiratelimitexceedederror_7',['githubApiRateLimitExceededError',['../class_config.html#a48e7a64e674a28565d7b4225e81bb49d',1,'Config']]],

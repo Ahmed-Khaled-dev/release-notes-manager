@@ -58,7 +58,7 @@ jobs:
         run: wget https://raw.githubusercontent.com/nlohmann/json/develop/single_include/nlohmann/json.hpp
 
       - name: Build the script
-        run: g++ -o release_notes_generator release_notes_generator.cpp -lcurl -I.
+        run: g++ -o release_notes_generator Main.cpp Config.cpp Utils.cpp Format.cpp -lcurl -I.
       
       # I am doing this extra step to make the workflow work with draft releases
       # since a draft release's tag hasn't yet been created in the git history

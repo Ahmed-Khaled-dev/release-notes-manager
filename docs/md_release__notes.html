@@ -76,44 +76,39 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><p><a class="anchor" id="autotoc_md6"></a></p><ul>
-<li>Added outputting release notes in HTML format</li>
-<li>Added remaining commit types, made script detect commit types with subcategories</li>
-<li>Generate short/full .md release notes from merge commits</li>
-<li>Generate .md release notes from normal commits based on type</li>
+<li>Generate release notes from commit messages between a given start/end git references</li>
 </ul>
 <h1><a class="anchor" id="autotoc_md7"></a>
 🐞 Bug Fixes</h1>
 <ul>
-<li>Extra new lines in the retrieved markdown PR description</li>
-<li>PRs/issues/commit-SHA links appearing as plain text in PR descriptions</li>
-<li>Incorrect input error messages</li>
+<li>Script showing success when generated release notes are empty</li>
+<li>Workflow only working on repos with default branch name = master</li>
+<li>(ci Related) Workflow not working on past releases and with new releases on branches other than main</li>
+<li>(ci Related) Release workflow not working with draft releases when running manually</li>
+<li>Commit type categories not containing release notes being displayed</li>
 </ul>
 <h1><a class="anchor" id="autotoc_md8"></a>
 📚 Documentation</h1>
 <ul>
-<li>Fixed json.hpp link in README</li>
-<li>Removed extra new line in README</li>
-<li>Added AppImage bundle + Build docs</li>
-<li>Added extra clarification in "How To Use" section in README</li>
-<li>Added link in README to download a conventional commits repo</li>
-<li>Hosted docs on GitHub pages and added link in README</li>
-<li>Added function headers and generated code docs</li>
+<li>Updated code docs</li>
 </ul>
 <h1><a class="anchor" id="autotoc_md9"></a>
-♻️ Code Refactoring</h1>
+💎 Styles</h1>
 <ul>
-<li>Removed all constants into an external configuration</li>
-<li>GitHub token must be given as input to the script</li>
-<li>(ci Related) Edited some names to be more concise</li>
-<li>Made code more compatible with Linux</li>
-<li>Enhanced UX with feedback messages</li>
-<li>Split the code to smaller functions</li>
+<li>Changed config file name</li>
 </ul>
 <h1><a class="anchor" id="autotoc_md10"></a>
+♻️ Code Refactoring</h1>
+<ul>
+<li>Tremendously improved the external configuration</li>
+<li>Improved exception handling</li>
+<li>Require GitHub token for release notes with commit messages as source</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md11"></a>
 ⚙️ Continuous Integrations</h1>
 <ul>
-<li>Fixed generated release notes containing only last commit</li>
-<li>Generate release notes when a new release is published </li>
+<li>Made release workflow work with draft releases by making it run manually</li>
+<li>Release notes workflow automatically detects new/previous releases tag names and inputs them to the script </li>
 </ul>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

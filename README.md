@@ -121,7 +121,7 @@ during <a href="https://summerofcode.withgoogle.com/" target="_blank">Google Sum
         $ wget https://raw.githubusercontent.com/nlohmann/json/develop/single_include/nlohmann/json.hpp
         ```
   
-  ### 3. Execute the Makefile
+  ### 3. Run the following command
   ```
-  $ make
+  $ g++ -o release_notes_generator Main.cpp Config.cpp Utils.cpp Format.cpp -lcurl -I.
   ```
