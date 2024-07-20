@@ -75,7 +75,15 @@ jobs:
             NEW_RELEASE_REFERENCE=$(gh release view "$NEW_RELEASE_TAG" --json targetCommitish --jq .targetCommitish)
           fi
           echo "NEW_RELEASE_REFERENCE=$NEW_RELEASE_REFERENCE" >> "$GITHUB_OUTPUT"
-        
+      
+      - name: Validate the given previous release reference
+        run: |
+          if ! git rev-parse --quiet --verify "$PREVIOUS_RELEASE_REFERENCE" > /dev/null; then
+            echo "Input error: Given previous reference '$PREVIOUS_RELEASE_REFERENCE' does not exist"
+            echo "Please make sure that the previous reference you input exists in this repository's git history"
+            exit 1
+          fi
+
       # I am using checkout here so that it also works if the new release reference is a commit
       # In the second checkout, I checkout back to the original branch that triggered the GitHub workflow
       - name: If the new release reference is a branch (e.g. v1.4.x) ensure that I have a local branch tracking the remote branch
