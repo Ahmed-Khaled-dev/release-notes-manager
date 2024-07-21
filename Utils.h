@@ -17,3 +17,4 @@ size_t handleApiCallBack(char* data, size_t size, size_t numOfBytes, string* buf
 void handleGithubApiErrorCodes(long errorCode, string apiResponse);
 CommitTypeMatchResults checkCommitTypeMatch(string commitMessage, int commitTypeIndex);
 string convertMarkdownToHtml(string markdownText, string githubToken);
+void writeGeneratedNotesInFiles(string markdownGeneratedNotes, string githubToken);

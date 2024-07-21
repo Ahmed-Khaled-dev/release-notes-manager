@@ -35,6 +35,7 @@ string getCommitsNotesFromPullRequests(int commitTypeIndex, string releaseStartR
 string getCommitsNotesFromCommitMessages(int commitTypeIndex, string releaseStartRef, string releaseEndRef);
 void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, string releaseStartRef, string releaseEndRef, 
                           string githubToken, ReleaseNoteModes releaseNoteMode = ReleaseNoteModes::Short);
+void generatePullRequestChangeNote(string pullRequestNumber, string githubToken);
 
 Config config;
 
@@ -54,47 +55,62 @@ int main(int argc, char* argv[]){
         printInputError(InputErrors::NoReleaseNotesSource);
         return 1;
     }
-    else if (argc <= 2) {
-        printInputError(InputErrors::NoReleaseStartReference);
-        return 1;
-    }
-    else if (argc <= 3) {
-        printInputError(InputErrors::NoReleaseEndReference);
-        return 1;
-    }
-    else if(argc <= 4){
-        printInputError(InputErrors::NoGithubToken);
-        return 1;
-    }
 
     try {
-        if (strcmp(argv[1], config.commitMessagesSourceCliInputName.c_str()) == 0 
-            || strcmp(argv[1], config.commitMessagesSourceGithubActionsInputName.c_str()) == 0) {
-            generateReleaseNotes(ReleaseNoteSources::CommitMessages, argv[2], argv[3], argv[4]);
-        }
-        else if (strcmp(argv[1], config.pullRequestsSourceCliInputName.c_str()) == 0
-                 || strcmp(argv[1], config.pullRequestsSourceGithubActionsInputName.c_str()) == 0) {
-            if (argc <= 5) {
-                printInputError(InputErrors::NoReleaseNotesMode);
+        if (strcmp(argv[1], config.singlePullRequestSourceCliInputName.c_str()) == 0) {
+            if (argc <= 2) {
+                printInputError(InputErrors::NoPullRequestNumber);
+                return 1;
+            }
+            else if (argc <= 3) {
+                printInputError(InputErrors::NoGithubToken);
                 return 1;
             }
 
-            if (strcmp(argv[5], config.fullModeCliInputName.c_str()) == 0 
-                || strcmp(argv[5], config.fullModeGithubActionsInputName.c_str()) == 0) {
-                generateReleaseNotes(ReleaseNoteSources::PullRequests, argv[2], argv[3], argv[4], ReleaseNoteModes::Full);
-            }
-            else if (strcmp(argv[5], config.shortModeCliInputName.c_str()) == 0 
-                     || strcmp(argv[5], config.shortModeGithubActionsInputName.c_str()) == 0) {
-                generateReleaseNotes(ReleaseNoteSources::PullRequests, argv[2], argv[3], argv[4], ReleaseNoteModes::Short);
-            }
-            else {
-                printInputError(InputErrors::IncorrectReleaseNotesMode);
-                return 1;
-            }
+            generatePullRequestChangeNote(argv[2], argv[3]);
         }
         else {
-            printInputError(InputErrors::IncorrectReleaseNotesSource);
-            return 1;
+            if (argc <= 2) {
+                printInputError(InputErrors::NoReleaseStartReference);
+                return 1;
+            }
+            else if (argc <= 3) {
+                printInputError(InputErrors::NoReleaseEndReference);
+                return 1;
+            }
+            else if (argc <= 4) {
+                printInputError(InputErrors::NoGithubToken);
+                return 1;
+            }
+
+            if (strcmp(argv[1], config.commitMessagesSourceCliInputName.c_str()) == 0
+                || strcmp(argv[1], config.commitMessagesSourceGithubActionsInputName.c_str()) == 0) {
+                generateReleaseNotes(ReleaseNoteSources::CommitMessages, argv[2], argv[3], argv[4]);
+            }
+            else if (strcmp(argv[1], config.pullRequestsSourceCliInputName.c_str()) == 0
+                || strcmp(argv[1], config.pullRequestsSourceGithubActionsInputName.c_str()) == 0) {
+                if (argc <= 5) {
+                    printInputError(InputErrors::NoReleaseNotesMode);
+                    return 1;
+                }
+
+                if (strcmp(argv[5], config.fullModeCliInputName.c_str()) == 0
+                    || strcmp(argv[5], config.fullModeGithubActionsInputName.c_str()) == 0) {
+                    generateReleaseNotes(ReleaseNoteSources::PullRequests, argv[2], argv[3], argv[4], ReleaseNoteModes::Full);
+                }
+                else if (strcmp(argv[5], config.shortModeCliInputName.c_str()) == 0
+                    || strcmp(argv[5], config.shortModeGithubActionsInputName.c_str()) == 0) {
+                    generateReleaseNotes(ReleaseNoteSources::PullRequests, argv[2], argv[3], argv[4], ReleaseNoteModes::Short);
+                }
+                else {
+                    printInputError(InputErrors::IncorrectReleaseNotesMode);
+                    return 1;
+                }
+            }
+            else {
+                printInputError(InputErrors::IncorrectReleaseNotesSource);
+                return 1;
+            }
         }
     }
     catch (const exception& e) {
@@ -343,26 +359,34 @@ void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, string releaseSt
         }
     }
 
-    ofstream markdownFileOutput(config.markdownOutputFileName);
-
-    if (!markdownFileOutput.is_open()) {
-        throw runtime_error(config.markdownFileError);
-    }
-
-    if (markdownReleaseNotes.size() == 0) {
-        throw runtime_error(config.emptyReleaseNotesMessage);
-    }
-
-    markdownFileOutput << markdownReleaseNotes;
-    markdownFileOutput.close();
-
-    ofstream htmlFileOutput(config.htmlOutputFileName);
-
-    if (!htmlFileOutput.is_open()) {
-        throw runtime_error(config.htmlFileError);
-    }
-
-    htmlFileOutput << convertMarkdownToHtml(markdownReleaseNotes, githubToken);
+    writeGeneratedNotesInFiles(markdownReleaseNotes, githubToken);
 
     cout << "Release notes generated successfully, check " + config.markdownOutputFileName + " and " + config.htmlOutputFileName + " in the current directory" << endl;
+}
+
+/**
+ * @brief Generates a single change note with it's conventional commit type category
+ * for a single pull request using the GitHub API (Not using commit messages at all)
+ * @param pullRequestNumber The number of the pull request to generate change note for (e.g., 13, 144, 3722, etc.)
+ * @param githubToken The GitHub token used to make authenticated requests to the GitHub API
+ */
+void generatePullRequestChangeNote(string pullRequestNumber, string githubToken) {
+    cout << config.generatingReleaseNotesMessage << endl;
+
+    string jsonResponse = getPullRequestInfo(config.githubRepoPullRequestsApiUrl + pullRequestNumber, githubToken);
+    json pullRequestInfo = json::parse(jsonResponse);
+
+    string pullRequestChangeNote = "";
+    for (int commitTypeIndex = 0; commitTypeIndex < config.commitTypesCount; commitTypeIndex++)
+    {
+        if (checkCommitTypeMatch(pullRequestInfo["title"], commitTypeIndex) != CommitTypeMatchResults::NoMatch) {
+            pullRequestChangeNote += "\n" + config.commitTypes[commitTypeIndex][(int)CommitTypeInfo::MarkdownTitle] + "\n";
+            addPullRequestInfoInNotes(pullRequestInfo, pullRequestChangeNote, ReleaseNoteModes::Full, commitTypeIndex);
+            break;
+        }
+    }
+
+    writeGeneratedNotesInFiles(pullRequestChangeNote, githubToken);
+
+    cout << "Pull request change note generated successfully, check " + config.markdownOutputFileName + " and " + config.htmlOutputFileName + " in the current directory" << endl;
 }

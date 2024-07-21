@@ -23,7 +23,8 @@ enum class InputErrors {
     NoReleaseNotesMode,
     NoGithubToken,
     NoReleaseStartReference,
-    NoReleaseEndReference
+    NoReleaseEndReference,
+    NoPullRequestNumber
 };
 
 /**

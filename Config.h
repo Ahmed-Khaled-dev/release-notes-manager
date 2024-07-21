@@ -41,6 +41,7 @@ public:
     string shortModeGithubActionsInputName;
     string fullModeCliInputName;
     string fullModeGithubActionsInputName;
+    string singlePullRequestSourceCliInputName;
 
     // Variables that determine the looks of the release notes
     string markdownReleaseNotePrefix;
@@ -54,6 +55,7 @@ public:
     string noGithubTokenError;
     string noReleaseStartReferenceError;
     string noReleaseEndReferenceError;
+    string noPullRequestNumber;
     string githubApiRateLimitExceededError;
     string githubApiUnauthorizedAccessError;
     string githubApiBadRequestError;

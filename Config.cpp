@@ -147,6 +147,13 @@ void Config::load(const string& configFileName) {
         throw runtime_error("Key 'fullModeGithubActionsInputName' not found in " + configFileName);
     }
 
+    if (externalConfigData.contains("singlePullRequestSourceCliInputName")) {
+        singlePullRequestSourceCliInputName = externalConfigData["singlePullRequestSourceCliInputName"];
+    }
+    else {
+        throw runtime_error("Key 'singlePullRequestSourceCliInputName' not found in " + configFileName);
+    }
+
     if (!externalConfigData.contains("commitTypes") || !externalConfigData["commitTypes"].is_array()) {
         throw runtime_error("Key 'commitTypes' not found or is not an array in " + configFileName);
     }
@@ -234,6 +241,13 @@ void Config::load(const string& configFileName) {
         }
         else {
             throw runtime_error("Key 'noReleaseEndReferenceError' not found in the 'outputMessages' category in " + configFileName);
+        }
+
+        if (outputMessages.contains("noPullRequestNumber")) {
+            noPullRequestNumber = outputMessages["noPullRequestNumber"];
+        }
+        else {
+            throw runtime_error("Key 'noPullRequestNumber' not found in the 'outputMessages' category in " + configFileName);
         }
 
         if (outputMessages.contains("expectedSyntaxMessage")) {

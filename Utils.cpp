@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <string>
+#include <fstream>
 
 #include <curl/curl.h> // Used to make API requests
 #include <json.hpp>
@@ -44,6 +45,9 @@ void printInputError(InputErrors inputError) {
     }
     else if (inputError == InputErrors::NoReleaseEndReference) {
         cerr << config.noReleaseEndReferenceError << endl;
+    }
+    else if (inputError == InputErrors::NoPullRequestNumber) {
+        cerr << config.noPullRequestNumber << endl;
     }
     cerr << config.expectedSyntaxMessage << endl;
 }
@@ -156,4 +160,33 @@ string convertMarkdownToHtml(string markdownText, string githubToken) {
     }
 
     return htmlText;
+}
+
+/**
+ * @brief Writes the generated markdown notes in the markdown file
+ * and converts these markdown notes to HTML and writes them in the HTML file
+ * @param markdownGeneratedNotes The generated markdown notes to be written
+ * @param githubToken The GitHub token used to make authenticated requests to the GitHub API
+ */
+void writeGeneratedNotesInFiles(string markdownGeneratedNotes, string githubToken) {
+    ofstream markdownFileOutput(config.markdownOutputFileName);
+
+    if (!markdownFileOutput.is_open()) {
+        throw runtime_error(config.markdownFileError);
+    }
+
+    if (markdownGeneratedNotes.size() == 0) {
+        throw runtime_error(config.emptyReleaseNotesMessage);
+    }
+
+    markdownFileOutput << markdownGeneratedNotes;
+    markdownFileOutput.close();
+
+    ofstream htmlFileOutput(config.htmlOutputFileName);
+
+    if (!htmlFileOutput.is_open()) {
+        throw runtime_error(config.htmlFileError);
+    }
+
+    htmlFileOutput << convertMarkdownToHtml(markdownGeneratedNotes, githubToken);
 }

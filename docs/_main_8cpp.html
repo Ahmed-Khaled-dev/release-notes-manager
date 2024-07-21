@@ -110,6 +110,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a77913687effc90181d118271be59e1e0" id="r_a77913687effc90181d118271be59e1e0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a77913687effc90181d118271be59e1e0">generateReleaseNotes</a> (<a class="el" href="_enums_8h.html#a2a041843ffe66cf42292281d8a51bf6d">ReleaseNoteSources</a> releaseNoteSource, string releaseStartRef, string releaseEndRef, string githubToken, <a class="el" href="_enums_8h.html#ad3a43d5b1acf3669d48fb4b7efd4315d">ReleaseNoteModes</a> releaseNoteMode)</td></tr>
 <tr class="memdesc:a77913687effc90181d118271be59e1e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates release notes using commit messages between the start reference and the end reference using the given release notes source and if the source is pull requests then generates them based on the release note mode and using the given GitHub token.  <br /></td></tr>
 <tr class="separator:a77913687effc90181d118271be59e1e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a439eed8e998fa7f5d1229bc950322585" id="r_a439eed8e998fa7f5d1229bc950322585"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a439eed8e998fa7f5d1229bc950322585">generatePullRequestChangeNote</a> (string pullRequestNumber, string githubToken)</td></tr>
+<tr class="memdesc:a439eed8e998fa7f5d1229bc950322585"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates a single change note with it's conventional commit type category for a single pull request using the GitHub API (Not using commit messages at all)  <br /></td></tr>
+<tr class="separator:a439eed8e998fa7f5d1229bc950322585"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0ddf1224851353fc92bfbff6f499fa97" id="r_a0ddf1224851353fc92bfbff6f499fa97"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0ddf1224851353fc92bfbff6f499fa97">main</a> (int argc, char *argv[])</td></tr>
 <tr class="separator:a0ddf1224851353fc92bfbff6f499fa97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -161,41 +164,102 @@ Variables</h2></td></tr>
   </table>
   </dd>
 </dl>
-<div class="fragment"><div class="line"><span class="lineno">  118</span>                                                     {</div>
-<div class="line"><span class="lineno">  119</span>    <span class="keywordflow">if</span> (!pullRequestInfo[<span class="stringliteral">&quot;title&quot;</span>].is_null()) {</div>
-<div class="line"><span class="lineno">  120</span>        <span class="keywordtype">string</span> title = pullRequestInfo[<span class="stringliteral">&quot;title&quot;</span>];</div>
-<div class="line"><span class="lineno">  121</span> </div>
-<div class="line"><span class="lineno">  122</span>        <a class="code hl_enumeration" href="_enums_8h.html#a641234c56fda12244c51e53c78788aad">CommitTypeMatchResults</a> matchResult = <a class="code hl_function" href="_utils_8cpp.html#a50e0cdd7dd7255797ffece8d883afa62">checkCommitTypeMatch</a>(title, commitTypeIndex);</div>
-<div class="line"><span class="lineno">  123</span> </div>
-<div class="line"><span class="lineno">  124</span>        <span class="keywordflow">if</span>(releaseNotesMode == <a class="code hl_enumvalue" href="_enums_8h.html#ad3a43d5b1acf3669d48fb4b7efd4315dabbd47109890259c0127154db1af26c75">ReleaseNoteModes::Full</a>)</div>
-<div class="line"><span class="lineno">  125</span>            pullRequestsReleaseNotes += <a class="code hl_function" href="_format_8cpp.html#a25a12fb7e1cb238a9a72285a7c62ecca">convertConventionalCommitTitleToReleaseNoteTitle</a>(title, matchResult, </div>
-<div class="line"><span class="lineno">  126</span>            <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a0210b8f15df7c720bde06d84213d9979">markdownFullModeReleaseNotePrefix</a>);</div>
-<div class="line"><span class="lineno">  127</span>        <span class="keywordflow">else</span></div>
-<div class="line"><span class="lineno">  128</span>            pullRequestsReleaseNotes += <a class="code hl_function" href="_format_8cpp.html#a25a12fb7e1cb238a9a72285a7c62ecca">convertConventionalCommitTitleToReleaseNoteTitle</a>(title, matchResult, </div>
-<div class="line"><span class="lineno">  129</span>            <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#aefe42f8720b89b550f0d6e6dbe140b6f">markdownReleaseNotePrefix</a>);</div>
-<div class="line"><span class="lineno">  130</span>    }</div>
-<div class="line"><span class="lineno">  131</span> </div>
-<div class="line"><span class="lineno">  132</span>    <span class="keywordflow">if</span> (releaseNotesMode == <a class="code hl_enumvalue" href="_enums_8h.html#ad3a43d5b1acf3669d48fb4b7efd4315dabbd47109890259c0127154db1af26c75">ReleaseNoteModes::Full</a> &amp;&amp; !pullRequestInfo[<span class="stringliteral">&quot;body&quot;</span>].is_null()) {</div>
-<div class="line"><span class="lineno">  133</span>        <span class="keywordtype">string</span> body = pullRequestInfo[<span class="stringliteral">&quot;body&quot;</span>];</div>
-<div class="line"><span class="lineno">  134</span> </div>
-<div class="line"><span class="lineno">  135</span>        <span class="comment">// Capitalizing the first letter of the body</span></div>
-<div class="line"><span class="lineno">  136</span>        body[0] = toupper(body[0]);</div>
-<div class="line"><span class="lineno">  137</span>        body = <a class="code hl_function" href="_format_8cpp.html#a5df66b04e3a36cac75106ba7b27be61f">formatPullRequestBody</a>(body);</div>
-<div class="line"><span class="lineno">  138</span> </div>
-<div class="line"><span class="lineno">  139</span>        pullRequestsReleaseNotes += <a class="code hl_function" href="_format_8cpp.html#a1bd6dc7fa3f3a7a3701c488ec1716d76">indentAllLinesInString</a>(body) + <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><span class="lineno">  140</span>    }</div>
-<div class="line"><span class="lineno">  141</span> </div>
-<div class="line"><span class="lineno">  142</span>    pullRequestsReleaseNotes += <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><span class="lineno">  143</span>}</div>
-<div class="ttc" id="a_enums_8h_html_a641234c56fda12244c51e53c78788aad"><div class="ttname"><a href="_enums_8h.html#a641234c56fda12244c51e53c78788aad">CommitTypeMatchResults</a></div><div class="ttdeci">CommitTypeMatchResults</div><div class="ttdoc">Enumeration for the result of matching a commit type (e.g., fix: or fix(GUI):) against any commit typ...</div><div class="ttdef"><b>Definition</b> Enums.h:40</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  134</span>                                                     {</div>
+<div class="line"><span class="lineno">  135</span>    <span class="keywordflow">if</span> (!pullRequestInfo[<span class="stringliteral">&quot;title&quot;</span>].is_null()) {</div>
+<div class="line"><span class="lineno">  136</span>        <span class="keywordtype">string</span> title = pullRequestInfo[<span class="stringliteral">&quot;title&quot;</span>];</div>
+<div class="line"><span class="lineno">  137</span> </div>
+<div class="line"><span class="lineno">  138</span>        <a class="code hl_enumeration" href="_enums_8h.html#a641234c56fda12244c51e53c78788aad">CommitTypeMatchResults</a> matchResult = <a class="code hl_function" href="_utils_8cpp.html#a50e0cdd7dd7255797ffece8d883afa62">checkCommitTypeMatch</a>(title, commitTypeIndex);</div>
+<div class="line"><span class="lineno">  139</span> </div>
+<div class="line"><span class="lineno">  140</span>        <span class="keywordflow">if</span>(releaseNotesMode == <a class="code hl_enumvalue" href="_enums_8h.html#ad3a43d5b1acf3669d48fb4b7efd4315dabbd47109890259c0127154db1af26c75">ReleaseNoteModes::Full</a>)</div>
+<div class="line"><span class="lineno">  141</span>            pullRequestsReleaseNotes += <a class="code hl_function" href="_format_8cpp.html#a25a12fb7e1cb238a9a72285a7c62ecca">convertConventionalCommitTitleToReleaseNoteTitle</a>(title, matchResult, </div>
+<div class="line"><span class="lineno">  142</span>            <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a0210b8f15df7c720bde06d84213d9979">markdownFullModeReleaseNotePrefix</a>);</div>
+<div class="line"><span class="lineno">  143</span>        <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">  144</span>            pullRequestsReleaseNotes += <a class="code hl_function" href="_format_8cpp.html#a25a12fb7e1cb238a9a72285a7c62ecca">convertConventionalCommitTitleToReleaseNoteTitle</a>(title, matchResult, </div>
+<div class="line"><span class="lineno">  145</span>            <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#aefe42f8720b89b550f0d6e6dbe140b6f">markdownReleaseNotePrefix</a>);</div>
+<div class="line"><span class="lineno">  146</span>    }</div>
+<div class="line"><span class="lineno">  147</span> </div>
+<div class="line"><span class="lineno">  148</span>    <span class="keywordflow">if</span> (releaseNotesMode == <a class="code hl_enumvalue" href="_enums_8h.html#ad3a43d5b1acf3669d48fb4b7efd4315dabbd47109890259c0127154db1af26c75">ReleaseNoteModes::Full</a> &amp;&amp; !pullRequestInfo[<span class="stringliteral">&quot;body&quot;</span>].is_null()) {</div>
+<div class="line"><span class="lineno">  149</span>        <span class="keywordtype">string</span> body = pullRequestInfo[<span class="stringliteral">&quot;body&quot;</span>];</div>
+<div class="line"><span class="lineno">  150</span> </div>
+<div class="line"><span class="lineno">  151</span>        <span class="comment">// Capitalizing the first letter of the body</span></div>
+<div class="line"><span class="lineno">  152</span>        body[0] = toupper(body[0]);</div>
+<div class="line"><span class="lineno">  153</span>        body = <a class="code hl_function" href="_format_8cpp.html#a5df66b04e3a36cac75106ba7b27be61f">formatPullRequestBody</a>(body);</div>
+<div class="line"><span class="lineno">  154</span> </div>
+<div class="line"><span class="lineno">  155</span>        pullRequestsReleaseNotes += <a class="code hl_function" href="_format_8cpp.html#a1bd6dc7fa3f3a7a3701c488ec1716d76">indentAllLinesInString</a>(body) + <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><span class="lineno">  156</span>    }</div>
+<div class="line"><span class="lineno">  157</span> </div>
+<div class="line"><span class="lineno">  158</span>    pullRequestsReleaseNotes += <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><span class="lineno">  159</span>}</div>
+<div class="ttc" id="a_enums_8h_html_a641234c56fda12244c51e53c78788aad"><div class="ttname"><a href="_enums_8h.html#a641234c56fda12244c51e53c78788aad">CommitTypeMatchResults</a></div><div class="ttdeci">CommitTypeMatchResults</div><div class="ttdoc">Enumeration for the result of matching a commit type (e.g., fix: or fix(GUI):) against any commit typ...</div><div class="ttdef"><b>Definition</b> Enums.h:41</div></div>
 <div class="ttc" id="a_enums_8h_html_ad3a43d5b1acf3669d48fb4b7efd4315dabbd47109890259c0127154db1af26c75"><div class="ttname"><a href="_enums_8h.html#ad3a43d5b1acf3669d48fb4b7efd4315dabbd47109890259c0127154db1af26c75">ReleaseNoteModes::Full</a></div><div class="ttdeci">@ Full</div></div>
 <div class="ttc" id="a_format_8cpp_html_a1bd6dc7fa3f3a7a3701c488ec1716d76"><div class="ttname"><a href="_format_8cpp.html#a1bd6dc7fa3f3a7a3701c488ec1716d76">indentAllLinesInString</a></div><div class="ttdeci">string indentAllLinesInString(string s)</div><div class="ttdoc">Indents (puts 4 spaces) before all lines in a string.</div><div class="ttdef"><b>Definition</b> Format.cpp:24</div></div>
 <div class="ttc" id="a_format_8cpp_html_a25a12fb7e1cb238a9a72285a7c62ecca"><div class="ttname"><a href="_format_8cpp.html#a25a12fb7e1cb238a9a72285a7c62ecca">convertConventionalCommitTitleToReleaseNoteTitle</a></div><div class="ttdeci">string convertConventionalCommitTitleToReleaseNoteTitle(string conventionalCommitTitle, CommitTypeMatchResults matchResult, string markdownPrefix)</div><div class="ttdoc">Converts the given conventional commit title to a better markdown title that could be used in the rel...</div><div class="ttdef"><b>Definition</b> Format.cpp:133</div></div>
 <div class="ttc" id="a_format_8cpp_html_a5df66b04e3a36cac75106ba7b27be61f"><div class="ttname"><a href="_format_8cpp.html#a5df66b04e3a36cac75106ba7b27be61f">formatPullRequestBody</a></div><div class="ttdeci">string formatPullRequestBody(string pullRequestBody)</div><div class="ttdoc">Makes the formatting of the retrieved PR body look like the PR on GitHub.</div><div class="ttdef"><b>Definition</b> Format.cpp:117</div></div>
-<div class="ttc" id="a_main_8cpp_html_a4a8dd3a2de125b72d4fe6251a0a271b5"><div class="ttname"><a href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a></div><div class="ttdeci">Config config</div><div class="ttdef"><b>Definition</b> Main.cpp:39</div></div>
-<div class="ttc" id="a_utils_8cpp_html_a50e0cdd7dd7255797ffece8d883afa62"><div class="ttname"><a href="_utils_8cpp.html#a50e0cdd7dd7255797ffece8d883afa62">checkCommitTypeMatch</a></div><div class="ttdeci">CommitTypeMatchResults checkCommitTypeMatch(string commitMessage, int commitTypeIndex)</div><div class="ttdoc">Checks how the given commit message matches the expected conventional commit type.</div><div class="ttdef"><b>Definition</b> Utils.cpp:89</div></div>
-<div class="ttc" id="aclass_config_html_a0210b8f15df7c720bde06d84213d9979"><div class="ttname"><a href="class_config.html#a0210b8f15df7c720bde06d84213d9979">Config::markdownFullModeReleaseNotePrefix</a></div><div class="ttdeci">string markdownFullModeReleaseNotePrefix</div><div class="ttdef"><b>Definition</b> Config.h:47</div></div>
-<div class="ttc" id="aclass_config_html_aefe42f8720b89b550f0d6e6dbe140b6f"><div class="ttname"><a href="class_config.html#aefe42f8720b89b550f0d6e6dbe140b6f">Config::markdownReleaseNotePrefix</a></div><div class="ttdeci">string markdownReleaseNotePrefix</div><div class="ttdef"><b>Definition</b> Config.h:46</div></div>
+<div class="ttc" id="a_main_8cpp_html_a4a8dd3a2de125b72d4fe6251a0a271b5"><div class="ttname"><a href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a></div><div class="ttdeci">Config config</div><div class="ttdef"><b>Definition</b> Main.cpp:40</div></div>
+<div class="ttc" id="a_utils_8cpp_html_a50e0cdd7dd7255797ffece8d883afa62"><div class="ttname"><a href="_utils_8cpp.html#a50e0cdd7dd7255797ffece8d883afa62">checkCommitTypeMatch</a></div><div class="ttdeci">CommitTypeMatchResults checkCommitTypeMatch(string commitMessage, int commitTypeIndex)</div><div class="ttdoc">Checks how the given commit message matches the expected conventional commit type.</div><div class="ttdef"><b>Definition</b> Utils.cpp:93</div></div>
+<div class="ttc" id="aclass_config_html_a0210b8f15df7c720bde06d84213d9979"><div class="ttname"><a href="class_config.html#a0210b8f15df7c720bde06d84213d9979">Config::markdownFullModeReleaseNotePrefix</a></div><div class="ttdeci">string markdownFullModeReleaseNotePrefix</div><div class="ttdef"><b>Definition</b> Config.h:48</div></div>
+<div class="ttc" id="aclass_config_html_aefe42f8720b89b550f0d6e6dbe140b6f"><div class="ttname"><a href="class_config.html#aefe42f8720b89b550f0d6e6dbe140b6f">Config::markdownReleaseNotePrefix</a></div><div class="ttdeci">string markdownReleaseNotePrefix</div><div class="ttdef"><b>Definition</b> Config.h:47</div></div>
+</div><!-- fragment -->
+</div>
+</div>
+<a id="a439eed8e998fa7f5d1229bc950322585" name="a439eed8e998fa7f5d1229bc950322585"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a439eed8e998fa7f5d1229bc950322585">&#9670;&#160;</a></span>generatePullRequestChangeNote()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void generatePullRequestChangeNote </td>
+          <td>(</td>
+          <td class="paramtype">string</td>          <td class="paramname"><span class="paramname"><em>pullRequestNumber</em>, </span></td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">string</td>          <td class="paramname"><span class="paramname"><em>githubToken</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Generates a single change note with it's conventional commit type category for a single pull request using the GitHub API (Not using commit messages at all) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">pullRequestNumber</td><td>The number of the pull request to generate change note for (e.g., 13, 144, 3722, etc.) </td></tr>
+    <tr><td class="paramname">githubToken</td><td>The GitHub token used to make authenticated requests to the GitHub API </td></tr>
+  </table>
+  </dd>
+</dl>
+<div class="fragment"><div class="line"><span class="lineno">  373</span>                                                                                 {</div>
+<div class="line"><span class="lineno">  374</span>    cout &lt;&lt; <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#aa18e039059f6af7089601db30a834ceb">generatingReleaseNotesMessage</a> &lt;&lt; endl;</div>
+<div class="line"><span class="lineno">  375</span> </div>
+<div class="line"><span class="lineno">  376</span>    <span class="keywordtype">string</span> jsonResponse = <a class="code hl_function" href="#ad05166a8ec7339399fa5e531f1ca9856">getPullRequestInfo</a>(<a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#aac9f38c419a472136630c0db14bb5840">githubRepoPullRequestsApiUrl</a> + pullRequestNumber, githubToken);</div>
+<div class="line"><span class="lineno">  377</span>    json pullRequestInfo = json::parse(jsonResponse);</div>
+<div class="line"><span class="lineno">  378</span> </div>
+<div class="line"><span class="lineno">  379</span>    <span class="keywordtype">string</span> pullRequestChangeNote = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><span class="lineno">  380</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> commitTypeIndex = 0; commitTypeIndex &lt; <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a4cab4eacf5a5df2f6e95485a200b9bef">commitTypesCount</a>; commitTypeIndex++)</div>
+<div class="line"><span class="lineno">  381</span>    {</div>
+<div class="line"><span class="lineno">  382</span>        <span class="keywordflow">if</span> (<a class="code hl_function" href="_utils_8cpp.html#a50e0cdd7dd7255797ffece8d883afa62">checkCommitTypeMatch</a>(pullRequestInfo[<span class="stringliteral">&quot;title&quot;</span>], commitTypeIndex) != <a class="code hl_enumvalue" href="_enums_8h.html#a641234c56fda12244c51e53c78788aadac8b77721c677e0429241a9250972122d">CommitTypeMatchResults::NoMatch</a>) {</div>
+<div class="line"><span class="lineno">  383</span>            pullRequestChangeNote += <span class="stringliteral">&quot;\n&quot;</span> + <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a657f2b1955fc0129403677a7590e4c8f">commitTypes</a>[commitTypeIndex][(int)<a class="code hl_enumvalue" href="_enums_8h.html#a809e24401d7a251436455596cc8395aaa5103c3e690bcd58c65cfc8865a4c6f60">CommitTypeInfo::MarkdownTitle</a>] + <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><span class="lineno">  384</span>            <a class="code hl_function" href="#a4d531121445227649e71248e9512ca94">addPullRequestInfoInNotes</a>(pullRequestInfo, pullRequestChangeNote, <a class="code hl_enumvalue" href="_enums_8h.html#ad3a43d5b1acf3669d48fb4b7efd4315dabbd47109890259c0127154db1af26c75">ReleaseNoteModes::Full</a>, commitTypeIndex);</div>
+<div class="line"><span class="lineno">  385</span>            <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  386</span>        }</div>
+<div class="line"><span class="lineno">  387</span>    }</div>
+<div class="line"><span class="lineno">  388</span> </div>
+<div class="line"><span class="lineno">  389</span>    <a class="code hl_function" href="_utils_8cpp.html#a7ef3a911e8917b20e0f147c039b02f87">writeGeneratedNotesInFiles</a>(pullRequestChangeNote, githubToken);</div>
+<div class="line"><span class="lineno">  390</span> </div>
+<div class="line"><span class="lineno">  391</span>    cout &lt;&lt; <span class="stringliteral">&quot;Pull request change note generated successfully, check &quot;</span> + <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a62759f6a398e2c56465891b146255c84">markdownOutputFileName</a> + <span class="stringliteral">&quot; and &quot;</span> + <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#aa89f4a362faa03e9583c902fb999bff0">htmlOutputFileName</a> + <span class="stringliteral">&quot; in the current directory&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><span class="lineno">  392</span>}</div>
+<div class="ttc" id="a_enums_8h_html_a641234c56fda12244c51e53c78788aadac8b77721c677e0429241a9250972122d"><div class="ttname"><a href="_enums_8h.html#a641234c56fda12244c51e53c78788aadac8b77721c677e0429241a9250972122d">CommitTypeMatchResults::NoMatch</a></div><div class="ttdeci">@ NoMatch</div></div>
+<div class="ttc" id="a_enums_8h_html_a809e24401d7a251436455596cc8395aaa5103c3e690bcd58c65cfc8865a4c6f60"><div class="ttname"><a href="_enums_8h.html#a809e24401d7a251436455596cc8395aaa5103c3e690bcd58c65cfc8865a4c6f60">CommitTypeInfo::MarkdownTitle</a></div><div class="ttdeci">@ MarkdownTitle</div></div>
+<div class="ttc" id="a_main_8cpp_html_a4d531121445227649e71248e9512ca94"><div class="ttname"><a href="#a4d531121445227649e71248e9512ca94">addPullRequestInfoInNotes</a></div><div class="ttdeci">void addPullRequestInfoInNotes(json pullRequestInfo, string &amp;pullRequestsReleaseNotes, ReleaseNoteModes releaseNotesMode, int commitTypeIndex)</div><div class="ttdoc">Formats given pull request information (title, body) into a nice looking markdown format,...</div><div class="ttdef"><b>Definition</b> Main.cpp:133</div></div>
+<div class="ttc" id="a_main_8cpp_html_ad05166a8ec7339399fa5e531f1ca9856"><div class="ttname"><a href="#ad05166a8ec7339399fa5e531f1ca9856">getPullRequestInfo</a></div><div class="ttdeci">string getPullRequestInfo(string pullRequestUrl, string githubToken)</div><div class="ttdoc">Retrieves pull request info from the GitHub API using libcurl.</div><div class="ttdef"><b>Definition</b> Main.cpp:167</div></div>
+<div class="ttc" id="a_utils_8cpp_html_a7ef3a911e8917b20e0f147c039b02f87"><div class="ttname"><a href="_utils_8cpp.html#a7ef3a911e8917b20e0f147c039b02f87">writeGeneratedNotesInFiles</a></div><div class="ttdeci">void writeGeneratedNotesInFiles(string markdownGeneratedNotes, string githubToken)</div><div class="ttdoc">Writes the generated markdown notes in the markdown file and converts these markdown notes to HTML an...</div><div class="ttdef"><b>Definition</b> Utils.cpp:171</div></div>
+<div class="ttc" id="aclass_config_html_a4cab4eacf5a5df2f6e95485a200b9bef"><div class="ttname"><a href="class_config.html#a4cab4eacf5a5df2f6e95485a200b9bef">Config::commitTypesCount</a></div><div class="ttdeci">int commitTypesCount</div><div class="ttdef"><b>Definition</b> Config.h:24</div></div>
+<div class="ttc" id="aclass_config_html_a62759f6a398e2c56465891b146255c84"><div class="ttname"><a href="class_config.html#a62759f6a398e2c56465891b146255c84">Config::markdownOutputFileName</a></div><div class="ttdeci">string markdownOutputFileName</div><div class="ttdef"><b>Definition</b> Config.h:18</div></div>
+<div class="ttc" id="aclass_config_html_a657f2b1955fc0129403677a7590e4c8f"><div class="ttname"><a href="class_config.html#a657f2b1955fc0129403677a7590e4c8f">Config::commitTypes</a></div><div class="ttdeci">string commitTypes[50][2]</div><div class="ttdoc">2d array storing conventional commit types and their corresponding markdown titles The first dimensio...</div><div class="ttdef"><b>Definition</b> Config.h:29</div></div>
+<div class="ttc" id="aclass_config_html_aa18e039059f6af7089601db30a834ceb"><div class="ttname"><a href="class_config.html#aa18e039059f6af7089601db30a834ceb">Config::generatingReleaseNotesMessage</a></div><div class="ttdeci">string generatingReleaseNotesMessage</div><div class="ttdef"><b>Definition</b> Config.h:68</div></div>
+<div class="ttc" id="aclass_config_html_aa89f4a362faa03e9583c902fb999bff0"><div class="ttname"><a href="class_config.html#aa89f4a362faa03e9583c902fb999bff0">Config::htmlOutputFileName</a></div><div class="ttdeci">string htmlOutputFileName</div><div class="ttdef"><b>Definition</b> Config.h:19</div></div>
+<div class="ttc" id="aclass_config_html_aac9f38c419a472136630c0db14bb5840"><div class="ttname"><a href="class_config.html#aac9f38c419a472136630c0db14bb5840">Config::githubRepoPullRequestsApiUrl</a></div><div class="ttdeci">string githubRepoPullRequestsApiUrl</div><div class="ttdef"><b>Definition</b> Config.h:20</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -244,57 +308,30 @@ Variables</h2></td></tr>
   </table>
   </dd>
 </dl>
-<div class="fragment"><div class="line"><span class="lineno">  330</span>                                                                                {</div>
-<div class="line"><span class="lineno">  331</span>    cout &lt;&lt; <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#aa18e039059f6af7089601db30a834ceb">generatingReleaseNotesMessage</a> &lt;&lt; endl;</div>
-<div class="line"><span class="lineno">  332</span> </div>
-<div class="line"><span class="lineno">  333</span>    <span class="keywordtype">string</span> commandToRetrieveCommitsMessages;</div>
-<div class="line"><span class="lineno">  334</span>    <span class="keywordtype">string</span> currentCommitMessage;</div>
-<div class="line"><span class="lineno">  335</span>    <span class="keywordtype">string</span> markdownReleaseNotes = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><span class="lineno">  336</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a4cab4eacf5a5df2f6e95485a200b9bef">commitTypesCount</a>; i++)</div>
-<div class="line"><span class="lineno">  337</span>    {</div>
-<div class="line"><span class="lineno">  338</span>        <span class="keywordflow">if</span> (releaseNoteSource == <a class="code hl_enumvalue" href="_enums_8h.html#a2a041843ffe66cf42292281d8a51bf6da67bbcadb4d1ea300163e5c88f9a8e460">ReleaseNoteSources::CommitMessages</a>) {</div>
-<div class="line"><span class="lineno">  339</span>            markdownReleaseNotes += <a class="code hl_function" href="#ae1f202b8fd1f30cbf8678a007236df90">getCommitsNotesFromCommitMessages</a>(i, releaseStartRef, releaseEndRef);</div>
-<div class="line"><span class="lineno">  340</span>        }</div>
-<div class="line"><span class="lineno">  341</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (releaseNoteSource == <a class="code hl_enumvalue" href="_enums_8h.html#a2a041843ffe66cf42292281d8a51bf6dadea4739dd41e08d4b6375262dd2c1bff">ReleaseNoteSources::PullRequests</a>) {</div>
-<div class="line"><span class="lineno">  342</span>            markdownReleaseNotes += <a class="code hl_function" href="#a8a024dee16c4aca05a54f0ac7098f7c8">getCommitsNotesFromPullRequests</a>(i, releaseStartRef, releaseEndRef, githubToken, releaseNoteMode);</div>
-<div class="line"><span class="lineno">  343</span>        }</div>
-<div class="line"><span class="lineno">  344</span>    }</div>
-<div class="line"><span class="lineno">  345</span> </div>
-<div class="line"><span class="lineno">  346</span>    ofstream markdownFileOutput(<a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a62759f6a398e2c56465891b146255c84">markdownOutputFileName</a>);</div>
-<div class="line"><span class="lineno">  347</span> </div>
-<div class="line"><span class="lineno">  348</span>    <span class="keywordflow">if</span> (!markdownFileOutput.is_open()) {</div>
-<div class="line"><span class="lineno">  349</span>        <span class="keywordflow">throw</span> runtime_error(<a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#afb267a1753c93822a4ec7f85df994cfb">markdownFileError</a>);</div>
-<div class="line"><span class="lineno">  350</span>    }</div>
-<div class="line"><span class="lineno">  351</span> </div>
-<div class="line"><span class="lineno">  352</span>    <span class="keywordflow">if</span> (markdownReleaseNotes.size() == 0) {</div>
-<div class="line"><span class="lineno">  353</span>        <span class="keywordflow">throw</span> runtime_error(<a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a782de69b8774d8619d6913ed7990c0a7">emptyReleaseNotesMessage</a>);</div>
-<div class="line"><span class="lineno">  354</span>    }</div>
-<div class="line"><span class="lineno">  355</span> </div>
-<div class="line"><span class="lineno">  356</span>    markdownFileOutput &lt;&lt; markdownReleaseNotes;</div>
-<div class="line"><span class="lineno">  357</span>    markdownFileOutput.close();</div>
-<div class="line"><span class="lineno">  358</span> </div>
-<div class="line"><span class="lineno">  359</span>    ofstream htmlFileOutput(<a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#aa89f4a362faa03e9583c902fb999bff0">htmlOutputFileName</a>);</div>
-<div class="line"><span class="lineno">  360</span> </div>
-<div class="line"><span class="lineno">  361</span>    <span class="keywordflow">if</span> (!htmlFileOutput.is_open()) {</div>
-<div class="line"><span class="lineno">  362</span>        <span class="keywordflow">throw</span> runtime_error(<a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#af7181451de0b06b8aac6fe2dd613c10e">htmlFileError</a>);</div>
-<div class="line"><span class="lineno">  363</span>    }</div>
-<div class="line"><span class="lineno">  364</span> </div>
-<div class="line"><span class="lineno">  365</span>    htmlFileOutput &lt;&lt; <a class="code hl_function" href="_utils_8cpp.html#a94240233bd03f43638fe7d5d3a3265ca">convertMarkdownToHtml</a>(markdownReleaseNotes, githubToken);</div>
-<div class="line"><span class="lineno">  366</span> </div>
-<div class="line"><span class="lineno">  367</span>    cout &lt;&lt; <span class="stringliteral">&quot;Release notes generated successfully, check &quot;</span> + <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a62759f6a398e2c56465891b146255c84">markdownOutputFileName</a> + <span class="stringliteral">&quot; and &quot;</span> + <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#aa89f4a362faa03e9583c902fb999bff0">htmlOutputFileName</a> + <span class="stringliteral">&quot; in the current directory&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><span class="lineno">  368</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno">  346</span>                                                                                {</div>
+<div class="line"><span class="lineno">  347</span>    cout &lt;&lt; <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#aa18e039059f6af7089601db30a834ceb">generatingReleaseNotesMessage</a> &lt;&lt; endl;</div>
+<div class="line"><span class="lineno">  348</span> </div>
+<div class="line"><span class="lineno">  349</span>    <span class="keywordtype">string</span> commandToRetrieveCommitsMessages;</div>
+<div class="line"><span class="lineno">  350</span>    <span class="keywordtype">string</span> currentCommitMessage;</div>
+<div class="line"><span class="lineno">  351</span>    <span class="keywordtype">string</span> markdownReleaseNotes = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><span class="lineno">  352</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a4cab4eacf5a5df2f6e95485a200b9bef">commitTypesCount</a>; i++)</div>
+<div class="line"><span class="lineno">  353</span>    {</div>
+<div class="line"><span class="lineno">  354</span>        <span class="keywordflow">if</span> (releaseNoteSource == <a class="code hl_enumvalue" href="_enums_8h.html#a2a041843ffe66cf42292281d8a51bf6da67bbcadb4d1ea300163e5c88f9a8e460">ReleaseNoteSources::CommitMessages</a>) {</div>
+<div class="line"><span class="lineno">  355</span>            markdownReleaseNotes += <a class="code hl_function" href="#ae1f202b8fd1f30cbf8678a007236df90">getCommitsNotesFromCommitMessages</a>(i, releaseStartRef, releaseEndRef);</div>
+<div class="line"><span class="lineno">  356</span>        }</div>
+<div class="line"><span class="lineno">  357</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (releaseNoteSource == <a class="code hl_enumvalue" href="_enums_8h.html#a2a041843ffe66cf42292281d8a51bf6dadea4739dd41e08d4b6375262dd2c1bff">ReleaseNoteSources::PullRequests</a>) {</div>
+<div class="line"><span class="lineno">  358</span>            markdownReleaseNotes += <a class="code hl_function" href="#a8a024dee16c4aca05a54f0ac7098f7c8">getCommitsNotesFromPullRequests</a>(i, releaseStartRef, releaseEndRef, githubToken, releaseNoteMode);</div>
+<div class="line"><span class="lineno">  359</span>        }</div>
+<div class="line"><span class="lineno">  360</span>    }</div>
+<div class="line"><span class="lineno">  361</span> </div>
+<div class="line"><span class="lineno">  362</span>    <a class="code hl_function" href="_utils_8cpp.html#a7ef3a911e8917b20e0f147c039b02f87">writeGeneratedNotesInFiles</a>(markdownReleaseNotes, githubToken);</div>
+<div class="line"><span class="lineno">  363</span> </div>
+<div class="line"><span class="lineno">  364</span>    cout &lt;&lt; <span class="stringliteral">&quot;Release notes generated successfully, check &quot;</span> + <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a62759f6a398e2c56465891b146255c84">markdownOutputFileName</a> + <span class="stringliteral">&quot; and &quot;</span> + <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#aa89f4a362faa03e9583c902fb999bff0">htmlOutputFileName</a> + <span class="stringliteral">&quot; in the current directory&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><span class="lineno">  365</span>}</div>
 <div class="ttc" id="a_enums_8h_html_a2a041843ffe66cf42292281d8a51bf6da67bbcadb4d1ea300163e5c88f9a8e460"><div class="ttname"><a href="_enums_8h.html#a2a041843ffe66cf42292281d8a51bf6da67bbcadb4d1ea300163e5c88f9a8e460">ReleaseNoteSources::CommitMessages</a></div><div class="ttdeci">@ CommitMessages</div></div>
 <div class="ttc" id="a_enums_8h_html_a2a041843ffe66cf42292281d8a51bf6dadea4739dd41e08d4b6375262dd2c1bff"><div class="ttname"><a href="_enums_8h.html#a2a041843ffe66cf42292281d8a51bf6dadea4739dd41e08d4b6375262dd2c1bff">ReleaseNoteSources::PullRequests</a></div><div class="ttdeci">@ PullRequests</div></div>
-<div class="ttc" id="a_main_8cpp_html_a8a024dee16c4aca05a54f0ac7098f7c8"><div class="ttname"><a href="#a8a024dee16c4aca05a54f0ac7098f7c8">getCommitsNotesFromPullRequests</a></div><div class="ttdeci">string getCommitsNotesFromPullRequests(int commitTypeIndex, string releaseStartRef, string releaseEndRef, string githubToken, ReleaseNoteModes releaseNotesMode)</div><div class="ttdoc">Retrieves release notes from each commit's pull request between the start reference and the end refer...</div><div class="ttdef"><b>Definition</b> Main.cpp:216</div></div>
-<div class="ttc" id="a_main_8cpp_html_ae1f202b8fd1f30cbf8678a007236df90"><div class="ttname"><a href="#ae1f202b8fd1f30cbf8678a007236df90">getCommitsNotesFromCommitMessages</a></div><div class="ttdeci">string getCommitsNotesFromCommitMessages(int commitTypeIndex, string releaseStartRef, string releaseEndRef)</div><div class="ttdoc">Retrieves release notes from each commit's message between the start reference and the end reference ...</div><div class="ttdef"><b>Definition</b> Main.cpp:279</div></div>
-<div class="ttc" id="a_utils_8cpp_html_a94240233bd03f43638fe7d5d3a3265ca"><div class="ttname"><a href="_utils_8cpp.html#a94240233bd03f43638fe7d5d3a3265ca">convertMarkdownToHtml</a></div><div class="ttdeci">string convertMarkdownToHtml(string markdownText, string githubToken)</div><div class="ttdoc">Converts markdown to HTML using the GitHub API markdown endpoint.</div><div class="ttdef"><b>Definition</b> Utils.cpp:109</div></div>
-<div class="ttc" id="aclass_config_html_a4cab4eacf5a5df2f6e95485a200b9bef"><div class="ttname"><a href="class_config.html#a4cab4eacf5a5df2f6e95485a200b9bef">Config::commitTypesCount</a></div><div class="ttdeci">int commitTypesCount</div><div class="ttdef"><b>Definition</b> Config.h:24</div></div>
-<div class="ttc" id="aclass_config_html_a62759f6a398e2c56465891b146255c84"><div class="ttname"><a href="class_config.html#a62759f6a398e2c56465891b146255c84">Config::markdownOutputFileName</a></div><div class="ttdeci">string markdownOutputFileName</div><div class="ttdef"><b>Definition</b> Config.h:18</div></div>
-<div class="ttc" id="aclass_config_html_a782de69b8774d8619d6913ed7990c0a7"><div class="ttname"><a href="class_config.html#a782de69b8774d8619d6913ed7990c0a7">Config::emptyReleaseNotesMessage</a></div><div class="ttdeci">string emptyReleaseNotesMessage</div><div class="ttdef"><b>Definition</b> Config.h:68</div></div>
-<div class="ttc" id="aclass_config_html_aa18e039059f6af7089601db30a834ceb"><div class="ttname"><a href="class_config.html#aa18e039059f6af7089601db30a834ceb">Config::generatingReleaseNotesMessage</a></div><div class="ttdeci">string generatingReleaseNotesMessage</div><div class="ttdef"><b>Definition</b> Config.h:66</div></div>
-<div class="ttc" id="aclass_config_html_aa89f4a362faa03e9583c902fb999bff0"><div class="ttname"><a href="class_config.html#aa89f4a362faa03e9583c902fb999bff0">Config::htmlOutputFileName</a></div><div class="ttdeci">string htmlOutputFileName</div><div class="ttdef"><b>Definition</b> Config.h:19</div></div>
-<div class="ttc" id="aclass_config_html_af7181451de0b06b8aac6fe2dd613c10e"><div class="ttname"><a href="class_config.html#af7181451de0b06b8aac6fe2dd613c10e">Config::htmlFileError</a></div><div class="ttdeci">string htmlFileError</div><div class="ttdef"><b>Definition</b> Config.h:64</div></div>
-<div class="ttc" id="aclass_config_html_afb267a1753c93822a4ec7f85df994cfb"><div class="ttname"><a href="class_config.html#afb267a1753c93822a4ec7f85df994cfb">Config::markdownFileError</a></div><div class="ttdeci">string markdownFileError</div><div class="ttdef"><b>Definition</b> Config.h:63</div></div>
+<div class="ttc" id="a_main_8cpp_html_a8a024dee16c4aca05a54f0ac7098f7c8"><div class="ttname"><a href="#a8a024dee16c4aca05a54f0ac7098f7c8">getCommitsNotesFromPullRequests</a></div><div class="ttdeci">string getCommitsNotesFromPullRequests(int commitTypeIndex, string releaseStartRef, string releaseEndRef, string githubToken, ReleaseNoteModes releaseNotesMode)</div><div class="ttdoc">Retrieves release notes from each commit's pull request between the start reference and the end refer...</div><div class="ttdef"><b>Definition</b> Main.cpp:232</div></div>
+<div class="ttc" id="a_main_8cpp_html_ae1f202b8fd1f30cbf8678a007236df90"><div class="ttname"><a href="#ae1f202b8fd1f30cbf8678a007236df90">getCommitsNotesFromCommitMessages</a></div><div class="ttdeci">string getCommitsNotesFromCommitMessages(int commitTypeIndex, string releaseStartRef, string releaseEndRef)</div><div class="ttdoc">Retrieves release notes from each commit's message between the start reference and the end reference ...</div><div class="ttdef"><b>Definition</b> Main.cpp:295</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -332,49 +369,46 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The generated release notes </dd></dl>
-<div class="fragment"><div class="line"><span class="lineno">  279</span>                                                                                                            {</div>
-<div class="line"><span class="lineno">  280</span>    <span class="keywordtype">string</span> commandToRetrieveCommitsMessages = <span class="stringliteral">&quot;git log &quot;</span> + releaseStartRef + <span class="stringliteral">&quot;..&quot;</span> + releaseEndRef +</div>
-<div class="line"><span class="lineno">  281</span>        <span class="stringliteral">&quot; --oneline --format=\&quot;%s\&quot; --grep=\&quot;^&quot;</span> + <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a657f2b1955fc0129403677a7590e4c8f">commitTypes</a>[commitTypeIndex][(int)<a class="code hl_enumvalue" href="_enums_8h.html#a809e24401d7a251436455596cc8395aaad8c5ccda9a7b4018b85bbfadcc0d233a">CommitTypeInfo::ConventionalName</a>] + <span class="stringliteral">&quot;[:(]\&quot;&quot;</span>;</div>
-<div class="line"><span class="lineno">  282</span> </div>
-<div class="line"><span class="lineno">  283</span>    FILE* pipe = popen(commandToRetrieveCommitsMessages.c_str(), <span class="stringliteral">&quot;r&quot;</span>);</div>
-<div class="line"><span class="lineno">  284</span>    <span class="keywordflow">if</span> (!pipe) {</div>
-<div class="line"><span class="lineno">  285</span>        <span class="keywordflow">throw</span> runtime_error(<a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a062ccc36ab68b4e64a21407f2ae0a6d7">gitLogError</a>);</div>
-<div class="line"><span class="lineno">  286</span>    }</div>
-<div class="line"><span class="lineno">  287</span> </div>
-<div class="line"><span class="lineno">  288</span>    <span class="keywordtype">char</span> buffer[150];</div>
-<div class="line"><span class="lineno">  289</span>    <span class="keywordtype">string</span> commitMessage, releaseNotesFromCommitMessages, subCategoryText;</div>
-<div class="line"><span class="lineno">  290</span> </div>
-<div class="line"><span class="lineno">  291</span>    <span class="comment">// Add the title of this commit type section in the release notes</span></div>
-<div class="line"><span class="lineno">  292</span>    releaseNotesFromCommitMessages += <span class="stringliteral">&quot;\n&quot;</span> + <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a657f2b1955fc0129403677a7590e4c8f">commitTypes</a>[commitTypeIndex][(int)<a class="code hl_enumvalue" href="_enums_8h.html#a809e24401d7a251436455596cc8395aaa5103c3e690bcd58c65cfc8865a4c6f60">CommitTypeInfo::MarkdownTitle</a>] + <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><span class="lineno">  293</span> </div>
-<div class="line"><span class="lineno">  294</span>    <span class="keywordtype">bool</span> commitTypeContainsReleaseNotes = 0;</div>
-<div class="line"><span class="lineno">  295</span> </div>
-<div class="line"><span class="lineno">  296</span>    <span class="comment">// Reading commit messages line-by-line from the output of the git log command</span></div>
-<div class="line"><span class="lineno">  297</span>    <span class="keywordflow">while</span> (fgets(buffer, <span class="keyword">sizeof</span>(buffer), pipe) != NULL) {</div>
-<div class="line"><span class="lineno">  298</span>        commitTypeContainsReleaseNotes = 1;</div>
-<div class="line"><span class="lineno">  299</span>        commitMessage = buffer;</div>
-<div class="line"><span class="lineno">  300</span> </div>
-<div class="line"><span class="lineno">  301</span>        <a class="code hl_enumeration" href="_enums_8h.html#a641234c56fda12244c51e53c78788aad">CommitTypeMatchResults</a> matchResult = <a class="code hl_function" href="_utils_8cpp.html#a50e0cdd7dd7255797ffece8d883afa62">checkCommitTypeMatch</a>(commitMessage, commitTypeIndex);</div>
-<div class="line"><span class="lineno">  302</span> </div>
-<div class="line"><span class="lineno">  303</span>        <span class="keywordflow">if</span> (matchResult != <a class="code hl_enumvalue" href="_enums_8h.html#a641234c56fda12244c51e53c78788aadac8b77721c677e0429241a9250972122d">CommitTypeMatchResults::NoMatch</a>) {</div>
-<div class="line"><span class="lineno">  304</span>            releaseNotesFromCommitMessages += <a class="code hl_function" href="_format_8cpp.html#a25a12fb7e1cb238a9a72285a7c62ecca">convertConventionalCommitTitleToReleaseNoteTitle</a>(commitMessage, matchResult, </div>
-<div class="line"><span class="lineno">  305</span>            <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#aefe42f8720b89b550f0d6e6dbe140b6f">markdownReleaseNotePrefix</a>);</div>
-<div class="line"><span class="lineno">  306</span>        }</div>
-<div class="line"><span class="lineno">  307</span>    }</div>
-<div class="line"><span class="lineno">  308</span> </div>
-<div class="line"><span class="lineno">  309</span>    <span class="comment">// Remove the title of this commit type section if it doesn&#39;t contain any release notes</span></div>
-<div class="line"><span class="lineno">  310</span>    <span class="keywordflow">if</span> (!commitTypeContainsReleaseNotes) {</div>
-<div class="line"><span class="lineno">  311</span>        releaseNotesFromCommitMessages = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><span class="lineno">  312</span>    }</div>
-<div class="line"><span class="lineno">  313</span> </div>
-<div class="line"><span class="lineno">  314</span>    pclose(pipe);</div>
-<div class="line"><span class="lineno">  315</span>    <span class="keywordflow">return</span> releaseNotesFromCommitMessages;</div>
-<div class="line"><span class="lineno">  316</span>}</div>
-<div class="ttc" id="a_enums_8h_html_a641234c56fda12244c51e53c78788aadac8b77721c677e0429241a9250972122d"><div class="ttname"><a href="_enums_8h.html#a641234c56fda12244c51e53c78788aadac8b77721c677e0429241a9250972122d">CommitTypeMatchResults::NoMatch</a></div><div class="ttdeci">@ NoMatch</div></div>
-<div class="ttc" id="a_enums_8h_html_a809e24401d7a251436455596cc8395aaa5103c3e690bcd58c65cfc8865a4c6f60"><div class="ttname"><a href="_enums_8h.html#a809e24401d7a251436455596cc8395aaa5103c3e690bcd58c65cfc8865a4c6f60">CommitTypeInfo::MarkdownTitle</a></div><div class="ttdeci">@ MarkdownTitle</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  295</span>                                                                                                            {</div>
+<div class="line"><span class="lineno">  296</span>    <span class="keywordtype">string</span> commandToRetrieveCommitsMessages = <span class="stringliteral">&quot;git log &quot;</span> + releaseStartRef + <span class="stringliteral">&quot;..&quot;</span> + releaseEndRef +</div>
+<div class="line"><span class="lineno">  297</span>        <span class="stringliteral">&quot; --oneline --format=\&quot;%s\&quot; --grep=\&quot;^&quot;</span> + <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a657f2b1955fc0129403677a7590e4c8f">commitTypes</a>[commitTypeIndex][(int)<a class="code hl_enumvalue" href="_enums_8h.html#a809e24401d7a251436455596cc8395aaad8c5ccda9a7b4018b85bbfadcc0d233a">CommitTypeInfo::ConventionalName</a>] + <span class="stringliteral">&quot;[:(]\&quot;&quot;</span>;</div>
+<div class="line"><span class="lineno">  298</span> </div>
+<div class="line"><span class="lineno">  299</span>    FILE* pipe = popen(commandToRetrieveCommitsMessages.c_str(), <span class="stringliteral">&quot;r&quot;</span>);</div>
+<div class="line"><span class="lineno">  300</span>    <span class="keywordflow">if</span> (!pipe) {</div>
+<div class="line"><span class="lineno">  301</span>        <span class="keywordflow">throw</span> runtime_error(<a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a062ccc36ab68b4e64a21407f2ae0a6d7">gitLogError</a>);</div>
+<div class="line"><span class="lineno">  302</span>    }</div>
+<div class="line"><span class="lineno">  303</span> </div>
+<div class="line"><span class="lineno">  304</span>    <span class="keywordtype">char</span> buffer[150];</div>
+<div class="line"><span class="lineno">  305</span>    <span class="keywordtype">string</span> commitMessage, releaseNotesFromCommitMessages, subCategoryText;</div>
+<div class="line"><span class="lineno">  306</span> </div>
+<div class="line"><span class="lineno">  307</span>    <span class="comment">// Add the title of this commit type section in the release notes</span></div>
+<div class="line"><span class="lineno">  308</span>    releaseNotesFromCommitMessages += <span class="stringliteral">&quot;\n&quot;</span> + <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a657f2b1955fc0129403677a7590e4c8f">commitTypes</a>[commitTypeIndex][(int)<a class="code hl_enumvalue" href="_enums_8h.html#a809e24401d7a251436455596cc8395aaa5103c3e690bcd58c65cfc8865a4c6f60">CommitTypeInfo::MarkdownTitle</a>] + <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><span class="lineno">  309</span> </div>
+<div class="line"><span class="lineno">  310</span>    <span class="keywordtype">bool</span> commitTypeContainsReleaseNotes = 0;</div>
+<div class="line"><span class="lineno">  311</span> </div>
+<div class="line"><span class="lineno">  312</span>    <span class="comment">// Reading commit messages line-by-line from the output of the git log command</span></div>
+<div class="line"><span class="lineno">  313</span>    <span class="keywordflow">while</span> (fgets(buffer, <span class="keyword">sizeof</span>(buffer), pipe) != NULL) {</div>
+<div class="line"><span class="lineno">  314</span>        commitTypeContainsReleaseNotes = 1;</div>
+<div class="line"><span class="lineno">  315</span>        commitMessage = buffer;</div>
+<div class="line"><span class="lineno">  316</span> </div>
+<div class="line"><span class="lineno">  317</span>        <a class="code hl_enumeration" href="_enums_8h.html#a641234c56fda12244c51e53c78788aad">CommitTypeMatchResults</a> matchResult = <a class="code hl_function" href="_utils_8cpp.html#a50e0cdd7dd7255797ffece8d883afa62">checkCommitTypeMatch</a>(commitMessage, commitTypeIndex);</div>
+<div class="line"><span class="lineno">  318</span> </div>
+<div class="line"><span class="lineno">  319</span>        <span class="keywordflow">if</span> (matchResult != <a class="code hl_enumvalue" href="_enums_8h.html#a641234c56fda12244c51e53c78788aadac8b77721c677e0429241a9250972122d">CommitTypeMatchResults::NoMatch</a>) {</div>
+<div class="line"><span class="lineno">  320</span>            releaseNotesFromCommitMessages += <a class="code hl_function" href="_format_8cpp.html#a25a12fb7e1cb238a9a72285a7c62ecca">convertConventionalCommitTitleToReleaseNoteTitle</a>(commitMessage, matchResult, </div>
+<div class="line"><span class="lineno">  321</span>            <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#aefe42f8720b89b550f0d6e6dbe140b6f">markdownReleaseNotePrefix</a>);</div>
+<div class="line"><span class="lineno">  322</span>        }</div>
+<div class="line"><span class="lineno">  323</span>    }</div>
+<div class="line"><span class="lineno">  324</span> </div>
+<div class="line"><span class="lineno">  325</span>    <span class="comment">// Remove the title of this commit type section if it doesn&#39;t contain any release notes</span></div>
+<div class="line"><span class="lineno">  326</span>    <span class="keywordflow">if</span> (!commitTypeContainsReleaseNotes) {</div>
+<div class="line"><span class="lineno">  327</span>        releaseNotesFromCommitMessages = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><span class="lineno">  328</span>    }</div>
+<div class="line"><span class="lineno">  329</span> </div>
+<div class="line"><span class="lineno">  330</span>    pclose(pipe);</div>
+<div class="line"><span class="lineno">  331</span>    <span class="keywordflow">return</span> releaseNotesFromCommitMessages;</div>
+<div class="line"><span class="lineno">  332</span>}</div>
 <div class="ttc" id="a_enums_8h_html_a809e24401d7a251436455596cc8395aaad8c5ccda9a7b4018b85bbfadcc0d233a"><div class="ttname"><a href="_enums_8h.html#a809e24401d7a251436455596cc8395aaad8c5ccda9a7b4018b85bbfadcc0d233a">CommitTypeInfo::ConventionalName</a></div><div class="ttdeci">@ ConventionalName</div></div>
-<div class="ttc" id="aclass_config_html_a062ccc36ab68b4e64a21407f2ae0a6d7"><div class="ttname"><a href="class_config.html#a062ccc36ab68b4e64a21407f2ae0a6d7">Config::gitLogError</a></div><div class="ttdeci">string gitLogError</div><div class="ttdef"><b>Definition</b> Config.h:62</div></div>
-<div class="ttc" id="aclass_config_html_a657f2b1955fc0129403677a7590e4c8f"><div class="ttname"><a href="class_config.html#a657f2b1955fc0129403677a7590e4c8f">Config::commitTypes</a></div><div class="ttdeci">string commitTypes[50][2]</div><div class="ttdoc">2d array storing conventional commit types and their corresponding markdown titles The first dimensio...</div><div class="ttdef"><b>Definition</b> Config.h:29</div></div>
+<div class="ttc" id="aclass_config_html_a062ccc36ab68b4e64a21407f2ae0a6d7"><div class="ttname"><a href="class_config.html#a062ccc36ab68b4e64a21407f2ae0a6d7">Config::gitLogError</a></div><div class="ttdeci">string gitLogError</div><div class="ttdef"><b>Definition</b> Config.h:64</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -424,61 +458,58 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The generated release notes </dd></dl>
-<div class="fragment"><div class="line"><span class="lineno">  217</span>                                                                                              {</div>
-<div class="line"><span class="lineno">  218</span>    <span class="keywordtype">string</span> commandToRetrieveCommitsMessages = <span class="stringliteral">&quot;git log &quot;</span> + releaseStartRef + <span class="stringliteral">&quot;..&quot;</span> + releaseEndRef +</div>
-<div class="line"><span class="lineno">  219</span>            <span class="stringliteral">&quot; --oneline --format=\&quot;%s\&quot; --grep=\&quot;^&quot;</span> + <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a657f2b1955fc0129403677a7590e4c8f">commitTypes</a>[commitTypeIndex][(int)<a class="code hl_enumvalue" href="_enums_8h.html#a809e24401d7a251436455596cc8395aaad8c5ccda9a7b4018b85bbfadcc0d233a">CommitTypeInfo::ConventionalName</a>] + <span class="stringliteral">&quot;[:(]\&quot;&quot;</span> +</div>
-<div class="line"><span class="lineno">  220</span>            <span class="stringliteral">&quot; --grep=\&quot;#[0-9]\&quot; --all-match&quot;</span>;</div>
-<div class="line"><span class="lineno">  221</span> </div>
-<div class="line"><span class="lineno">  222</span>    FILE* pipe = popen(commandToRetrieveCommitsMessages.c_str(), <span class="stringliteral">&quot;r&quot;</span>);</div>
-<div class="line"><span class="lineno">  223</span>    <span class="keywordflow">if</span> (!pipe) {</div>
-<div class="line"><span class="lineno">  224</span>        <span class="keywordflow">throw</span> runtime_error(<a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a062ccc36ab68b4e64a21407f2ae0a6d7">gitLogError</a>);</div>
-<div class="line"><span class="lineno">  225</span>    }</div>
-<div class="line"><span class="lineno">  226</span> </div>
-<div class="line"><span class="lineno">  227</span>    <span class="keywordtype">char</span> buffer[150];</div>
-<div class="line"><span class="lineno">  228</span>    <span class="keywordtype">string</span> commitMessage, commitPullRequestNumber, releaseNotesFromPullRequests = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><span class="lineno">  229</span> </div>
-<div class="line"><span class="lineno">  230</span>    <span class="comment">// Add the title of this commit type section in the release notes</span></div>
-<div class="line"><span class="lineno">  231</span>    releaseNotesFromPullRequests += <span class="stringliteral">&quot;\n&quot;</span> + <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a657f2b1955fc0129403677a7590e4c8f">commitTypes</a>[commitTypeIndex][(int)<a class="code hl_enumvalue" href="_enums_8h.html#a809e24401d7a251436455596cc8395aaa5103c3e690bcd58c65cfc8865a4c6f60">CommitTypeInfo::MarkdownTitle</a>] + <span class="stringliteral">&quot;\n&quot;</span>;</div>
-<div class="line"><span class="lineno">  232</span> </div>
-<div class="line"><span class="lineno">  233</span>    <span class="keywordtype">bool</span> commitTypeContainsReleaseNotes = 0;</div>
-<div class="line"><span class="lineno">  234</span> </div>
-<div class="line"><span class="lineno">  235</span>    <span class="comment">// Reading commit messages line-by-line from the output of the git log command</span></div>
-<div class="line"><span class="lineno">  236</span>    <span class="keywordflow">while</span> (fgets(buffer, <span class="keyword">sizeof</span>(buffer), pipe) != NULL) {</div>
-<div class="line"><span class="lineno">  237</span>        commitTypeContainsReleaseNotes = 1;</div>
-<div class="line"><span class="lineno">  238</span>        commitMessage = buffer;</div>
-<div class="line"><span class="lineno">  239</span> </div>
-<div class="line"><span class="lineno">  240</span>        <a class="code hl_enumeration" href="_enums_8h.html#a641234c56fda12244c51e53c78788aad">CommitTypeMatchResults</a> matchResult = <a class="code hl_function" href="_utils_8cpp.html#a50e0cdd7dd7255797ffece8d883afa62">checkCommitTypeMatch</a>(commitMessage, commitTypeIndex);</div>
-<div class="line"><span class="lineno">  241</span> </div>
-<div class="line"><span class="lineno">  242</span>        <span class="keywordflow">if</span> (matchResult != <a class="code hl_enumvalue" href="_enums_8h.html#a641234c56fda12244c51e53c78788aadac8b77721c677e0429241a9250972122d">CommitTypeMatchResults::NoMatch</a>) {</div>
-<div class="line"><span class="lineno">  243</span>            <span class="comment">// Regular expression to match # followed by one or more digits</span></div>
-<div class="line"><span class="lineno">  244</span>            regex prRegex(R<span class="stringliteral">&quot;(#(\d+))&quot;);</span></div>
-<div class="line"><span class="lineno">  245</span><span class="stringliteral">            smatch match;</span></div>
-<div class="line"><span class="lineno">  246</span><span class="stringliteral"></span> </div>
-<div class="line"><span class="lineno">  247</span><span class="stringliteral">            </span><span class="comment">// Validating that a hashtag exists</span></div>
-<div class="line"><span class="lineno">  248</span>            <span class="keywordflow">if</span> (regex_search(commitMessage, match, prRegex))</div>
-<div class="line"><span class="lineno">  249</span>            {</div>
-<div class="line"><span class="lineno">  250</span>                <span class="comment">// Extracting the PR number associated with the commit from the first capture group</span></div>
-<div class="line"><span class="lineno">  251</span>                commitPullRequestNumber = match.str(1);</div>
-<div class="line"><span class="lineno">  252</span> </div>
-<div class="line"><span class="lineno">  253</span>                <span class="keywordtype">string</span> jsonResponse = <a class="code hl_function" href="#ad05166a8ec7339399fa5e531f1ca9856">getPullRequestInfo</a>(<a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#aac9f38c419a472136630c0db14bb5840">githubRepoPullRequestsApiUrl</a> + commitPullRequestNumber, githubToken);</div>
-<div class="line"><span class="lineno">  254</span>                json pullRequestInfo = json::parse(jsonResponse);</div>
+<div class="fragment"><div class="line"><span class="lineno">  233</span>                                                                                              {</div>
+<div class="line"><span class="lineno">  234</span>    <span class="keywordtype">string</span> commandToRetrieveCommitsMessages = <span class="stringliteral">&quot;git log &quot;</span> + releaseStartRef + <span class="stringliteral">&quot;..&quot;</span> + releaseEndRef +</div>
+<div class="line"><span class="lineno">  235</span>            <span class="stringliteral">&quot; --oneline --format=\&quot;%s\&quot; --grep=\&quot;^&quot;</span> + <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a657f2b1955fc0129403677a7590e4c8f">commitTypes</a>[commitTypeIndex][(int)<a class="code hl_enumvalue" href="_enums_8h.html#a809e24401d7a251436455596cc8395aaad8c5ccda9a7b4018b85bbfadcc0d233a">CommitTypeInfo::ConventionalName</a>] + <span class="stringliteral">&quot;[:(]\&quot;&quot;</span> +</div>
+<div class="line"><span class="lineno">  236</span>            <span class="stringliteral">&quot; --grep=\&quot;#[0-9]\&quot; --all-match&quot;</span>;</div>
+<div class="line"><span class="lineno">  237</span> </div>
+<div class="line"><span class="lineno">  238</span>    FILE* pipe = popen(commandToRetrieveCommitsMessages.c_str(), <span class="stringliteral">&quot;r&quot;</span>);</div>
+<div class="line"><span class="lineno">  239</span>    <span class="keywordflow">if</span> (!pipe) {</div>
+<div class="line"><span class="lineno">  240</span>        <span class="keywordflow">throw</span> runtime_error(<a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a062ccc36ab68b4e64a21407f2ae0a6d7">gitLogError</a>);</div>
+<div class="line"><span class="lineno">  241</span>    }</div>
+<div class="line"><span class="lineno">  242</span> </div>
+<div class="line"><span class="lineno">  243</span>    <span class="keywordtype">char</span> buffer[150];</div>
+<div class="line"><span class="lineno">  244</span>    <span class="keywordtype">string</span> commitMessage, commitPullRequestNumber, releaseNotesFromPullRequests = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><span class="lineno">  245</span> </div>
+<div class="line"><span class="lineno">  246</span>    <span class="comment">// Add the title of this commit type section in the release notes</span></div>
+<div class="line"><span class="lineno">  247</span>    releaseNotesFromPullRequests += <span class="stringliteral">&quot;\n&quot;</span> + <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a657f2b1955fc0129403677a7590e4c8f">commitTypes</a>[commitTypeIndex][(int)<a class="code hl_enumvalue" href="_enums_8h.html#a809e24401d7a251436455596cc8395aaa5103c3e690bcd58c65cfc8865a4c6f60">CommitTypeInfo::MarkdownTitle</a>] + <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><span class="lineno">  248</span> </div>
+<div class="line"><span class="lineno">  249</span>    <span class="keywordtype">bool</span> commitTypeContainsReleaseNotes = 0;</div>
+<div class="line"><span class="lineno">  250</span> </div>
+<div class="line"><span class="lineno">  251</span>    <span class="comment">// Reading commit messages line-by-line from the output of the git log command</span></div>
+<div class="line"><span class="lineno">  252</span>    <span class="keywordflow">while</span> (fgets(buffer, <span class="keyword">sizeof</span>(buffer), pipe) != NULL) {</div>
+<div class="line"><span class="lineno">  253</span>        commitTypeContainsReleaseNotes = 1;</div>
+<div class="line"><span class="lineno">  254</span>        commitMessage = buffer;</div>
 <div class="line"><span class="lineno">  255</span> </div>
-<div class="line"><span class="lineno">  256</span>                <a class="code hl_function" href="#a4d531121445227649e71248e9512ca94">addPullRequestInfoInNotes</a>(pullRequestInfo, releaseNotesFromPullRequests, releaseNotesMode, commitTypeIndex);</div>
-<div class="line"><span class="lineno">  257</span>            }</div>
-<div class="line"><span class="lineno">  258</span>        }</div>
-<div class="line"><span class="lineno">  259</span>    }</div>
-<div class="line"><span class="lineno">  260</span> </div>
-<div class="line"><span class="lineno">  261</span>    <span class="comment">// Remove the title of this commit type section if it doesn&#39;t contain any release notes</span></div>
-<div class="line"><span class="lineno">  262</span>    <span class="keywordflow">if</span> (!commitTypeContainsReleaseNotes) {</div>
-<div class="line"><span class="lineno">  263</span>        releaseNotesFromPullRequests = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><span class="lineno">  264</span>    }</div>
-<div class="line"><span class="lineno">  265</span> </div>
-<div class="line"><span class="lineno">  266</span>    pclose(pipe);</div>
-<div class="line"><span class="lineno">  267</span>    <span class="keywordflow">return</span> releaseNotesFromPullRequests;</div>
-<div class="line"><span class="lineno">  268</span>}</div>
-<div class="ttc" id="a_main_8cpp_html_a4d531121445227649e71248e9512ca94"><div class="ttname"><a href="#a4d531121445227649e71248e9512ca94">addPullRequestInfoInNotes</a></div><div class="ttdeci">void addPullRequestInfoInNotes(json pullRequestInfo, string &amp;pullRequestsReleaseNotes, ReleaseNoteModes releaseNotesMode, int commitTypeIndex)</div><div class="ttdoc">Formats given pull request information (title, body) into a nice looking markdown format,...</div><div class="ttdef"><b>Definition</b> Main.cpp:117</div></div>
-<div class="ttc" id="a_main_8cpp_html_ad05166a8ec7339399fa5e531f1ca9856"><div class="ttname"><a href="#ad05166a8ec7339399fa5e531f1ca9856">getPullRequestInfo</a></div><div class="ttdeci">string getPullRequestInfo(string pullRequestUrl, string githubToken)</div><div class="ttdoc">Retrieves pull request info from the GitHub API using libcurl.</div><div class="ttdef"><b>Definition</b> Main.cpp:151</div></div>
-<div class="ttc" id="aclass_config_html_aac9f38c419a472136630c0db14bb5840"><div class="ttname"><a href="class_config.html#aac9f38c419a472136630c0db14bb5840">Config::githubRepoPullRequestsApiUrl</a></div><div class="ttdeci">string githubRepoPullRequestsApiUrl</div><div class="ttdef"><b>Definition</b> Config.h:20</div></div>
+<div class="line"><span class="lineno">  256</span>        <a class="code hl_enumeration" href="_enums_8h.html#a641234c56fda12244c51e53c78788aad">CommitTypeMatchResults</a> matchResult = <a class="code hl_function" href="_utils_8cpp.html#a50e0cdd7dd7255797ffece8d883afa62">checkCommitTypeMatch</a>(commitMessage, commitTypeIndex);</div>
+<div class="line"><span class="lineno">  257</span> </div>
+<div class="line"><span class="lineno">  258</span>        <span class="keywordflow">if</span> (matchResult != <a class="code hl_enumvalue" href="_enums_8h.html#a641234c56fda12244c51e53c78788aadac8b77721c677e0429241a9250972122d">CommitTypeMatchResults::NoMatch</a>) {</div>
+<div class="line"><span class="lineno">  259</span>            <span class="comment">// Regular expression to match # followed by one or more digits</span></div>
+<div class="line"><span class="lineno">  260</span>            regex prRegex(R<span class="stringliteral">&quot;(#(\d+))&quot;);</span></div>
+<div class="line"><span class="lineno">  261</span><span class="stringliteral">            smatch match;</span></div>
+<div class="line"><span class="lineno">  262</span><span class="stringliteral"></span> </div>
+<div class="line"><span class="lineno">  263</span><span class="stringliteral">            </span><span class="comment">// Validating that a hashtag exists</span></div>
+<div class="line"><span class="lineno">  264</span>            <span class="keywordflow">if</span> (regex_search(commitMessage, match, prRegex))</div>
+<div class="line"><span class="lineno">  265</span>            {</div>
+<div class="line"><span class="lineno">  266</span>                <span class="comment">// Extracting the PR number associated with the commit from the first capture group</span></div>
+<div class="line"><span class="lineno">  267</span>                commitPullRequestNumber = match.str(1);</div>
+<div class="line"><span class="lineno">  268</span> </div>
+<div class="line"><span class="lineno">  269</span>                <span class="keywordtype">string</span> jsonResponse = <a class="code hl_function" href="#ad05166a8ec7339399fa5e531f1ca9856">getPullRequestInfo</a>(<a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#aac9f38c419a472136630c0db14bb5840">githubRepoPullRequestsApiUrl</a> + commitPullRequestNumber, githubToken);</div>
+<div class="line"><span class="lineno">  270</span>                json pullRequestInfo = json::parse(jsonResponse);</div>
+<div class="line"><span class="lineno">  271</span> </div>
+<div class="line"><span class="lineno">  272</span>                <a class="code hl_function" href="#a4d531121445227649e71248e9512ca94">addPullRequestInfoInNotes</a>(pullRequestInfo, releaseNotesFromPullRequests, releaseNotesMode, commitTypeIndex);</div>
+<div class="line"><span class="lineno">  273</span>            }</div>
+<div class="line"><span class="lineno">  274</span>        }</div>
+<div class="line"><span class="lineno">  275</span>    }</div>
+<div class="line"><span class="lineno">  276</span> </div>
+<div class="line"><span class="lineno">  277</span>    <span class="comment">// Remove the title of this commit type section if it doesn&#39;t contain any release notes</span></div>
+<div class="line"><span class="lineno">  278</span>    <span class="keywordflow">if</span> (!commitTypeContainsReleaseNotes) {</div>
+<div class="line"><span class="lineno">  279</span>        releaseNotesFromPullRequests = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><span class="lineno">  280</span>    }</div>
+<div class="line"><span class="lineno">  281</span> </div>
+<div class="line"><span class="lineno">  282</span>    pclose(pipe);</div>
+<div class="line"><span class="lineno">  283</span>    <span class="keywordflow">return</span> releaseNotesFromPullRequests;</div>
+<div class="line"><span class="lineno">  284</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -510,63 +541,63 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The pull request info in JSON </dd></dl>
-<div class="fragment"><div class="line"><span class="lineno">  151</span>                                                                     {</div>
-<div class="line"><span class="lineno">  152</span>    <span class="comment">// Initializing libcurl</span></div>
-<div class="line"><span class="lineno">  153</span>    CURL* curl = curl_easy_init();</div>
-<div class="line"><span class="lineno">  154</span>    CURLcode resultCode;</div>
-<div class="line"><span class="lineno">  155</span>    <span class="keywordtype">string</span> jsonResponse;</div>
-<div class="line"><span class="lineno">  156</span>    <span class="keyword">struct </span>curl_slist* headers = NULL;</div>
-<div class="line"><span class="lineno">  157</span>    headers = curl_slist_append(headers, (<span class="stringliteral">&quot;Authorization: token &quot;</span> + githubToken).c_str());</div>
-<div class="line"><span class="lineno">  158</span> </div>
-<div class="line"><span class="lineno">  159</span>    <span class="keywordflow">if</span> (curl) {</div>
-<div class="line"><span class="lineno">  160</span>        curl_easy_setopt(curl, CURLOPT_URL, pullRequestUrl.c_str());</div>
-<div class="line"><span class="lineno">  161</span>        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, <a class="code hl_function" href="_utils_8cpp.html#ad41caa3d3de0f8558e48bdd5dc407b4a">handleApiCallBack</a>);</div>
-<div class="line"><span class="lineno">  162</span>        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &amp;jsonResponse);</div>
-<div class="line"><span class="lineno">  163</span>        curl_easy_setopt(curl, CURLOPT_USERAGENT, <span class="stringliteral">&quot;Ahmed-Khaled-dev&quot;</span>);</div>
-<div class="line"><span class="lineno">  164</span>        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);</div>
-<div class="line"><span class="lineno">  165</span> </div>
-<div class="line"><span class="lineno">  166</span>        resultCode = curl_easy_perform(curl);</div>
-<div class="line"><span class="lineno">  167</span> </div>
-<div class="line"><span class="lineno">  168</span>        <span class="keywordflow">if</span> (resultCode == CURLE_OK) {</div>
-<div class="line"><span class="lineno">  169</span>            <span class="comment">// Get the HTTP response code</span></div>
-<div class="line"><span class="lineno">  170</span>            <span class="keywordtype">long</span> httpCode;</div>
-<div class="line"><span class="lineno">  171</span>            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &amp;httpCode);</div>
-<div class="line"><span class="lineno">  172</span> </div>
-<div class="line"><span class="lineno">  173</span>            <span class="comment">// All info obtained from https://docs.github.com/en/rest/using-the-rest-api/troubleshooting-the-rest-api?apiVersion=2022-11-28</span></div>
-<div class="line"><span class="lineno">  174</span>            <span class="comment">// and https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#get-a-pull-request</span></div>
-<div class="line"><span class="lineno">  175</span>            <span class="keywordflow">if</span> (httpCode == 200) {</div>
-<div class="line"><span class="lineno">  176</span>                <span class="keywordflow">return</span> jsonResponse;</div>
-<div class="line"><span class="lineno">  177</span>            }</div>
-<div class="line"><span class="lineno">  178</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (httpCode == 503 || httpCode == 500 || httpCode == 422 || httpCode == 406) {</div>
-<div class="line"><span class="lineno">  179</span>                <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;GitHub API request could not be processed to retrieve pull request &quot;</span> + pullRequestUrl</div>
-<div class="line"><span class="lineno">  180</span>                    + <span class="stringliteral">&quot; Additional information : &quot;</span> + jsonResponse);</div>
-<div class="line"><span class="lineno">  181</span>            }</div>
-<div class="line"><span class="lineno">  182</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (httpCode == 404) {</div>
-<div class="line"><span class="lineno">  183</span>                <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;Pull request &quot;</span> + pullRequestUrl + <span class="stringliteral">&quot; not found &quot;</span></div>
-<div class="line"><span class="lineno">  184</span>                    + <span class="stringliteral">&quot;or you are accessing a private repository and the GitHub token used doesn&#39;t have permissions to access pull requests info. &quot;</span></div>
-<div class="line"><span class="lineno">  185</span>                    +  <span class="stringliteral">&quot;Additional information : &quot;</span> + jsonResponse);</div>
-<div class="line"><span class="lineno">  186</span>            }</div>
-<div class="line"><span class="lineno">  187</span>            <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  188</span>                <a class="code hl_function" href="_utils_8cpp.html#a0c8e31c8f6351f144c45cc8999795c44">handleGithubApiErrorCodes</a>(httpCode, jsonResponse);</div>
-<div class="line"><span class="lineno">  189</span>            }</div>
-<div class="line"><span class="lineno">  190</span>        }</div>
-<div class="line"><span class="lineno">  191</span>        <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  192</span>            <span class="keywordflow">throw</span> runtime_error(<a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a903b5e88c845879f426fe5c3705dd0f4">githubApiUnableToMakeRequestError</a>);</div>
-<div class="line"><span class="lineno">  193</span>        }</div>
-<div class="line"><span class="lineno">  194</span> </div>
-<div class="line"><span class="lineno">  195</span>        curl_easy_cleanup(curl);</div>
-<div class="line"><span class="lineno">  196</span>        curl_slist_free_all(headers);</div>
-<div class="line"><span class="lineno">  197</span>    }</div>
-<div class="line"><span class="lineno">  198</span>    <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  199</span>        <span class="keywordflow">throw</span> runtime_error(<a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#acf4c736b02cbe0f7719f885630e16f68">githubApiLibcurlError</a>);</div>
-<div class="line"><span class="lineno">  200</span>    }</div>
-<div class="line"><span class="lineno">  201</span> </div>
-<div class="line"><span class="lineno">  202</span>    <span class="keywordflow">return</span> jsonResponse;</div>
-<div class="line"><span class="lineno">  203</span>}</div>
-<div class="ttc" id="a_utils_8cpp_html_a0c8e31c8f6351f144c45cc8999795c44"><div class="ttname"><a href="_utils_8cpp.html#a0c8e31c8f6351f144c45cc8999795c44">handleGithubApiErrorCodes</a></div><div class="ttdeci">void handleGithubApiErrorCodes(long errorCode, string apiResponse)</div><div class="ttdoc">Throws runtime exceptions with appropriate messages that describe the given GitHub API error code All...</div><div class="ttdef"><b>Definition</b> Utils.cpp:71</div></div>
-<div class="ttc" id="a_utils_8cpp_html_ad41caa3d3de0f8558e48bdd5dc407b4a"><div class="ttname"><a href="_utils_8cpp.html#ad41caa3d3de0f8558e48bdd5dc407b4a">handleApiCallBack</a></div><div class="ttdeci">size_t handleApiCallBack(char *data, size_t size, size_t numOfBytes, string *buffer)</div><div class="ttdoc">Callback function that is required to handle API response in libcurl.</div><div class="ttdef"><b>Definition</b> Utils.cpp:59</div></div>
-<div class="ttc" id="aclass_config_html_a903b5e88c845879f426fe5c3705dd0f4"><div class="ttname"><a href="class_config.html#a903b5e88c845879f426fe5c3705dd0f4">Config::githubApiUnableToMakeRequestError</a></div><div class="ttdeci">string githubApiUnableToMakeRequestError</div><div class="ttdef"><b>Definition</b> Config.h:60</div></div>
-<div class="ttc" id="aclass_config_html_acf4c736b02cbe0f7719f885630e16f68"><div class="ttname"><a href="class_config.html#acf4c736b02cbe0f7719f885630e16f68">Config::githubApiLibcurlError</a></div><div class="ttdeci">string githubApiLibcurlError</div><div class="ttdef"><b>Definition</b> Config.h:61</div></div>
+<div class="fragment"><div class="line"><span class="lineno">  167</span>                                                                     {</div>
+<div class="line"><span class="lineno">  168</span>    <span class="comment">// Initializing libcurl</span></div>
+<div class="line"><span class="lineno">  169</span>    CURL* curl = curl_easy_init();</div>
+<div class="line"><span class="lineno">  170</span>    CURLcode resultCode;</div>
+<div class="line"><span class="lineno">  171</span>    <span class="keywordtype">string</span> jsonResponse;</div>
+<div class="line"><span class="lineno">  172</span>    <span class="keyword">struct </span>curl_slist* headers = NULL;</div>
+<div class="line"><span class="lineno">  173</span>    headers = curl_slist_append(headers, (<span class="stringliteral">&quot;Authorization: token &quot;</span> + githubToken).c_str());</div>
+<div class="line"><span class="lineno">  174</span> </div>
+<div class="line"><span class="lineno">  175</span>    <span class="keywordflow">if</span> (curl) {</div>
+<div class="line"><span class="lineno">  176</span>        curl_easy_setopt(curl, CURLOPT_URL, pullRequestUrl.c_str());</div>
+<div class="line"><span class="lineno">  177</span>        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, <a class="code hl_function" href="_utils_8cpp.html#ad41caa3d3de0f8558e48bdd5dc407b4a">handleApiCallBack</a>);</div>
+<div class="line"><span class="lineno">  178</span>        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &amp;jsonResponse);</div>
+<div class="line"><span class="lineno">  179</span>        curl_easy_setopt(curl, CURLOPT_USERAGENT, <span class="stringliteral">&quot;Ahmed-Khaled-dev&quot;</span>);</div>
+<div class="line"><span class="lineno">  180</span>        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);</div>
+<div class="line"><span class="lineno">  181</span> </div>
+<div class="line"><span class="lineno">  182</span>        resultCode = curl_easy_perform(curl);</div>
+<div class="line"><span class="lineno">  183</span> </div>
+<div class="line"><span class="lineno">  184</span>        <span class="keywordflow">if</span> (resultCode == CURLE_OK) {</div>
+<div class="line"><span class="lineno">  185</span>            <span class="comment">// Get the HTTP response code</span></div>
+<div class="line"><span class="lineno">  186</span>            <span class="keywordtype">long</span> httpCode;</div>
+<div class="line"><span class="lineno">  187</span>            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &amp;httpCode);</div>
+<div class="line"><span class="lineno">  188</span> </div>
+<div class="line"><span class="lineno">  189</span>            <span class="comment">// All info obtained from https://docs.github.com/en/rest/using-the-rest-api/troubleshooting-the-rest-api?apiVersion=2022-11-28</span></div>
+<div class="line"><span class="lineno">  190</span>            <span class="comment">// and https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28#get-a-pull-request</span></div>
+<div class="line"><span class="lineno">  191</span>            <span class="keywordflow">if</span> (httpCode == 200) {</div>
+<div class="line"><span class="lineno">  192</span>                <span class="keywordflow">return</span> jsonResponse;</div>
+<div class="line"><span class="lineno">  193</span>            }</div>
+<div class="line"><span class="lineno">  194</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (httpCode == 503 || httpCode == 500 || httpCode == 422 || httpCode == 406) {</div>
+<div class="line"><span class="lineno">  195</span>                <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;GitHub API request could not be processed to retrieve pull request &quot;</span> + pullRequestUrl</div>
+<div class="line"><span class="lineno">  196</span>                    + <span class="stringliteral">&quot; Additional information : &quot;</span> + jsonResponse);</div>
+<div class="line"><span class="lineno">  197</span>            }</div>
+<div class="line"><span class="lineno">  198</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (httpCode == 404) {</div>
+<div class="line"><span class="lineno">  199</span>                <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;Pull request &quot;</span> + pullRequestUrl + <span class="stringliteral">&quot; not found &quot;</span></div>
+<div class="line"><span class="lineno">  200</span>                    + <span class="stringliteral">&quot;or you are accessing a private repository and the GitHub token used doesn&#39;t have permissions to access pull requests info. &quot;</span></div>
+<div class="line"><span class="lineno">  201</span>                    +  <span class="stringliteral">&quot;Additional information : &quot;</span> + jsonResponse);</div>
+<div class="line"><span class="lineno">  202</span>            }</div>
+<div class="line"><span class="lineno">  203</span>            <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  204</span>                <a class="code hl_function" href="_utils_8cpp.html#a0c8e31c8f6351f144c45cc8999795c44">handleGithubApiErrorCodes</a>(httpCode, jsonResponse);</div>
+<div class="line"><span class="lineno">  205</span>            }</div>
+<div class="line"><span class="lineno">  206</span>        }</div>
+<div class="line"><span class="lineno">  207</span>        <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  208</span>            <span class="keywordflow">throw</span> runtime_error(<a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a903b5e88c845879f426fe5c3705dd0f4">githubApiUnableToMakeRequestError</a>);</div>
+<div class="line"><span class="lineno">  209</span>        }</div>
+<div class="line"><span class="lineno">  210</span> </div>
+<div class="line"><span class="lineno">  211</span>        curl_easy_cleanup(curl);</div>
+<div class="line"><span class="lineno">  212</span>        curl_slist_free_all(headers);</div>
+<div class="line"><span class="lineno">  213</span>    }</div>
+<div class="line"><span class="lineno">  214</span>    <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  215</span>        <span class="keywordflow">throw</span> runtime_error(<a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#acf4c736b02cbe0f7719f885630e16f68">githubApiLibcurlError</a>);</div>
+<div class="line"><span class="lineno">  216</span>    }</div>
+<div class="line"><span class="lineno">  217</span> </div>
+<div class="line"><span class="lineno">  218</span>    <span class="keywordflow">return</span> jsonResponse;</div>
+<div class="line"><span class="lineno">  219</span>}</div>
+<div class="ttc" id="a_utils_8cpp_html_a0c8e31c8f6351f144c45cc8999795c44"><div class="ttname"><a href="_utils_8cpp.html#a0c8e31c8f6351f144c45cc8999795c44">handleGithubApiErrorCodes</a></div><div class="ttdeci">void handleGithubApiErrorCodes(long errorCode, string apiResponse)</div><div class="ttdoc">Throws runtime exceptions with appropriate messages that describe the given GitHub API error code All...</div><div class="ttdef"><b>Definition</b> Utils.cpp:75</div></div>
+<div class="ttc" id="a_utils_8cpp_html_ad41caa3d3de0f8558e48bdd5dc407b4a"><div class="ttname"><a href="_utils_8cpp.html#ad41caa3d3de0f8558e48bdd5dc407b4a">handleApiCallBack</a></div><div class="ttdeci">size_t handleApiCallBack(char *data, size_t size, size_t numOfBytes, string *buffer)</div><div class="ttdoc">Callback function that is required to handle API response in libcurl.</div><div class="ttdef"><b>Definition</b> Utils.cpp:63</div></div>
+<div class="ttc" id="aclass_config_html_a903b5e88c845879f426fe5c3705dd0f4"><div class="ttname"><a href="class_config.html#a903b5e88c845879f426fe5c3705dd0f4">Config::githubApiUnableToMakeRequestError</a></div><div class="ttdeci">string githubApiUnableToMakeRequestError</div><div class="ttdef"><b>Definition</b> Config.h:62</div></div>
+<div class="ttc" id="aclass_config_html_acf4c736b02cbe0f7719f885630e16f68"><div class="ttname"><a href="class_config.html#acf4c736b02cbe0f7719f885630e16f68">Config::githubApiLibcurlError</a></div><div class="ttdeci">string githubApiLibcurlError</div><div class="ttdef"><b>Definition</b> Config.h:63</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -588,93 +619,111 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<div class="fragment"><div class="line"><span class="lineno">   41</span>                                {</div>
-<div class="line"><span class="lineno">   42</span> </div>
-<div class="line"><span class="lineno">   43</span>    <span class="comment">// Reading values from the external configuration file</span></div>
-<div class="line"><span class="lineno">   44</span>    <span class="keyword">const</span> <span class="keywordtype">string</span> releaseNotesConfigFileName = <span class="stringliteral">&quot;release_notes_config.json&quot;</span>;</div>
-<div class="line"><span class="lineno">   45</span>    <span class="keywordflow">try</span> {</div>
-<div class="line"><span class="lineno">   46</span>        <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_function" href="class_config.html#a3ba706104b3e572eea72d63a413d63ca">load</a>(releaseNotesConfigFileName);</div>
-<div class="line"><span class="lineno">   47</span>    }</div>
-<div class="line"><span class="lineno">   48</span>    <span class="keywordflow">catch</span> (<span class="keyword">const</span> exception&amp; e) {</div>
-<div class="line"><span class="lineno">   49</span>        cerr &lt;&lt; e.what() &lt;&lt; endl;</div>
-<div class="line"><span class="lineno">   50</span>        <span class="keywordflow">return</span> 1;</div>
-<div class="line"><span class="lineno">   51</span>    }</div>
-<div class="line"><span class="lineno">   52</span> </div>
-<div class="line"><span class="lineno">   53</span>    <span class="keywordflow">if</span> (argc &lt;= 1) {</div>
-<div class="line"><span class="lineno">   54</span>        <a class="code hl_function" href="_utils_8cpp.html#a72aef381e81fc4204922f15f83d354b8">printInputError</a>(<a class="code hl_enumvalue" href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42a389539cf4f36e93d111c1c69b825967d">InputErrors::NoReleaseNotesSource</a>);</div>
-<div class="line"><span class="lineno">   55</span>        <span class="keywordflow">return</span> 1;</div>
-<div class="line"><span class="lineno">   56</span>    }</div>
-<div class="line"><span class="lineno">   57</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (argc &lt;= 2) {</div>
-<div class="line"><span class="lineno">   58</span>        <a class="code hl_function" href="_utils_8cpp.html#a72aef381e81fc4204922f15f83d354b8">printInputError</a>(<a class="code hl_enumvalue" href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42a347b2aacea1efd3b947c49307468b7c5">InputErrors::NoReleaseStartReference</a>);</div>
-<div class="line"><span class="lineno">   59</span>        <span class="keywordflow">return</span> 1;</div>
-<div class="line"><span class="lineno">   60</span>    }</div>
-<div class="line"><span class="lineno">   61</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (argc &lt;= 3) {</div>
-<div class="line"><span class="lineno">   62</span>        <a class="code hl_function" href="_utils_8cpp.html#a72aef381e81fc4204922f15f83d354b8">printInputError</a>(<a class="code hl_enumvalue" href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42acad21a6432b04897748c0d79a5f90821">InputErrors::NoReleaseEndReference</a>);</div>
-<div class="line"><span class="lineno">   63</span>        <span class="keywordflow">return</span> 1;</div>
-<div class="line"><span class="lineno">   64</span>    }</div>
-<div class="line"><span class="lineno">   65</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(argc &lt;= 4){</div>
-<div class="line"><span class="lineno">   66</span>        <a class="code hl_function" href="_utils_8cpp.html#a72aef381e81fc4204922f15f83d354b8">printInputError</a>(<a class="code hl_enumvalue" href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42af949897f6ed18f13ebde7435a913555e">InputErrors::NoGithubToken</a>);</div>
-<div class="line"><span class="lineno">   67</span>        <span class="keywordflow">return</span> 1;</div>
-<div class="line"><span class="lineno">   68</span>    }</div>
+<div class="fragment"><div class="line"><span class="lineno">   42</span>                                {</div>
+<div class="line"><span class="lineno">   43</span> </div>
+<div class="line"><span class="lineno">   44</span>    <span class="comment">// Reading values from the external configuration file</span></div>
+<div class="line"><span class="lineno">   45</span>    <span class="keyword">const</span> <span class="keywordtype">string</span> releaseNotesConfigFileName = <span class="stringliteral">&quot;release_notes_config.json&quot;</span>;</div>
+<div class="line"><span class="lineno">   46</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">   47</span>        <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_function" href="class_config.html#a3ba706104b3e572eea72d63a413d63ca">load</a>(releaseNotesConfigFileName);</div>
+<div class="line"><span class="lineno">   48</span>    }</div>
+<div class="line"><span class="lineno">   49</span>    <span class="keywordflow">catch</span> (<span class="keyword">const</span> exception&amp; e) {</div>
+<div class="line"><span class="lineno">   50</span>        cerr &lt;&lt; e.what() &lt;&lt; endl;</div>
+<div class="line"><span class="lineno">   51</span>        <span class="keywordflow">return</span> 1;</div>
+<div class="line"><span class="lineno">   52</span>    }</div>
+<div class="line"><span class="lineno">   53</span> </div>
+<div class="line"><span class="lineno">   54</span>    <span class="keywordflow">if</span> (argc &lt;= 1) {</div>
+<div class="line"><span class="lineno">   55</span>        <a class="code hl_function" href="_utils_8cpp.html#a72aef381e81fc4204922f15f83d354b8">printInputError</a>(<a class="code hl_enumvalue" href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42a389539cf4f36e93d111c1c69b825967d">InputErrors::NoReleaseNotesSource</a>);</div>
+<div class="line"><span class="lineno">   56</span>        <span class="keywordflow">return</span> 1;</div>
+<div class="line"><span class="lineno">   57</span>    }</div>
+<div class="line"><span class="lineno">   58</span> </div>
+<div class="line"><span class="lineno">   59</span>    <span class="keywordflow">try</span> {</div>
+<div class="line"><span class="lineno">   60</span>        <span class="keywordflow">if</span> (strcmp(argv[1], <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a54c10715f8b5bb11ce2a69a876bf6d15">singlePullRequestSourceCliInputName</a>.c_str()) == 0) {</div>
+<div class="line"><span class="lineno">   61</span>            <span class="keywordflow">if</span> (argc &lt;= 2) {</div>
+<div class="line"><span class="lineno">   62</span>                <a class="code hl_function" href="_utils_8cpp.html#a72aef381e81fc4204922f15f83d354b8">printInputError</a>(<a class="code hl_enumvalue" href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42a879d6e922bbbda815bd7cacbdbcf876d">InputErrors::NoPullRequestNumber</a>);</div>
+<div class="line"><span class="lineno">   63</span>                <span class="keywordflow">return</span> 1;</div>
+<div class="line"><span class="lineno">   64</span>            }</div>
+<div class="line"><span class="lineno">   65</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (argc &lt;= 3) {</div>
+<div class="line"><span class="lineno">   66</span>                <a class="code hl_function" href="_utils_8cpp.html#a72aef381e81fc4204922f15f83d354b8">printInputError</a>(<a class="code hl_enumvalue" href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42af949897f6ed18f13ebde7435a913555e">InputErrors::NoGithubToken</a>);</div>
+<div class="line"><span class="lineno">   67</span>                <span class="keywordflow">return</span> 1;</div>
+<div class="line"><span class="lineno">   68</span>            }</div>
 <div class="line"><span class="lineno">   69</span> </div>
-<div class="line"><span class="lineno">   70</span>    <span class="keywordflow">try</span> {</div>
-<div class="line"><span class="lineno">   71</span>        <span class="keywordflow">if</span> (strcmp(argv[1], <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#abf798a92181f6365916773933b769268">commitMessagesSourceCliInputName</a>.c_str()) == 0 </div>
-<div class="line"><span class="lineno">   72</span>            || strcmp(argv[1], <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#abe8fbe367e60d5306374312e82c6d5f5">commitMessagesSourceGithubActionsInputName</a>.c_str()) == 0) {</div>
-<div class="line"><span class="lineno">   73</span>            <a class="code hl_function" href="#a77913687effc90181d118271be59e1e0">generateReleaseNotes</a>(<a class="code hl_enumvalue" href="_enums_8h.html#a2a041843ffe66cf42292281d8a51bf6da67bbcadb4d1ea300163e5c88f9a8e460">ReleaseNoteSources::CommitMessages</a>, argv[2], argv[3], argv[4]);</div>
-<div class="line"><span class="lineno">   74</span>        }</div>
-<div class="line"><span class="lineno">   75</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcmp(argv[1], <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a18c3c4bc15619015475f9815e4594c89">pullRequestsSourceCliInputName</a>.c_str()) == 0</div>
-<div class="line"><span class="lineno">   76</span>                 || strcmp(argv[1], <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a1ca130396997c69fb367ad9732506dfb">pullRequestsSourceGithubActionsInputName</a>.c_str()) == 0) {</div>
-<div class="line"><span class="lineno">   77</span>            <span class="keywordflow">if</span> (argc &lt;= 5) {</div>
-<div class="line"><span class="lineno">   78</span>                <a class="code hl_function" href="_utils_8cpp.html#a72aef381e81fc4204922f15f83d354b8">printInputError</a>(<a class="code hl_enumvalue" href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42aeffe3f9641a2174350b3e89175e217d4">InputErrors::NoReleaseNotesMode</a>);</div>
+<div class="line"><span class="lineno">   70</span>            <a class="code hl_function" href="#a439eed8e998fa7f5d1229bc950322585">generatePullRequestChangeNote</a>(argv[2], argv[3]);</div>
+<div class="line"><span class="lineno">   71</span>        }</div>
+<div class="line"><span class="lineno">   72</span>        <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">   73</span>            <span class="keywordflow">if</span> (argc &lt;= 2) {</div>
+<div class="line"><span class="lineno">   74</span>                <a class="code hl_function" href="_utils_8cpp.html#a72aef381e81fc4204922f15f83d354b8">printInputError</a>(<a class="code hl_enumvalue" href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42a347b2aacea1efd3b947c49307468b7c5">InputErrors::NoReleaseStartReference</a>);</div>
+<div class="line"><span class="lineno">   75</span>                <span class="keywordflow">return</span> 1;</div>
+<div class="line"><span class="lineno">   76</span>            }</div>
+<div class="line"><span class="lineno">   77</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (argc &lt;= 3) {</div>
+<div class="line"><span class="lineno">   78</span>                <a class="code hl_function" href="_utils_8cpp.html#a72aef381e81fc4204922f15f83d354b8">printInputError</a>(<a class="code hl_enumvalue" href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42acad21a6432b04897748c0d79a5f90821">InputErrors::NoReleaseEndReference</a>);</div>
 <div class="line"><span class="lineno">   79</span>                <span class="keywordflow">return</span> 1;</div>
 <div class="line"><span class="lineno">   80</span>            }</div>
-<div class="line"><span class="lineno">   81</span> </div>
-<div class="line"><span class="lineno">   82</span>            <span class="keywordflow">if</span> (strcmp(argv[5], <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a3ff573490cef7d760d9c8b0f941c2f8e">fullModeCliInputName</a>.c_str()) == 0 </div>
-<div class="line"><span class="lineno">   83</span>                || strcmp(argv[5], <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#aabd55302c33ca5e5c647271e0549746d">fullModeGithubActionsInputName</a>.c_str()) == 0) {</div>
-<div class="line"><span class="lineno">   84</span>                <a class="code hl_function" href="#a77913687effc90181d118271be59e1e0">generateReleaseNotes</a>(<a class="code hl_enumvalue" href="_enums_8h.html#a2a041843ffe66cf42292281d8a51bf6dadea4739dd41e08d4b6375262dd2c1bff">ReleaseNoteSources::PullRequests</a>, argv[2], argv[3], argv[4], <a class="code hl_enumvalue" href="_enums_8h.html#ad3a43d5b1acf3669d48fb4b7efd4315dabbd47109890259c0127154db1af26c75">ReleaseNoteModes::Full</a>);</div>
-<div class="line"><span class="lineno">   85</span>            }</div>
-<div class="line"><span class="lineno">   86</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcmp(argv[5], <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a57a4015b8e8ffc50c700d61ba3455705">shortModeCliInputName</a>.c_str()) == 0 </div>
-<div class="line"><span class="lineno">   87</span>                     || strcmp(argv[5], <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a8db9d0701bf7d12cafc508b572c5f351">shortModeGithubActionsInputName</a>.c_str()) == 0) {</div>
-<div class="line"><span class="lineno">   88</span>                <a class="code hl_function" href="#a77913687effc90181d118271be59e1e0">generateReleaseNotes</a>(<a class="code hl_enumvalue" href="_enums_8h.html#a2a041843ffe66cf42292281d8a51bf6dadea4739dd41e08d4b6375262dd2c1bff">ReleaseNoteSources::PullRequests</a>, argv[2], argv[3], argv[4], <a class="code hl_enumvalue" href="_enums_8h.html#ad3a43d5b1acf3669d48fb4b7efd4315da30bb747c98bccdd11b3f89e644c4d0ad">ReleaseNoteModes::Short</a>);</div>
+<div class="line"><span class="lineno">   81</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (argc &lt;= 4) {</div>
+<div class="line"><span class="lineno">   82</span>                <a class="code hl_function" href="_utils_8cpp.html#a72aef381e81fc4204922f15f83d354b8">printInputError</a>(<a class="code hl_enumvalue" href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42af949897f6ed18f13ebde7435a913555e">InputErrors::NoGithubToken</a>);</div>
+<div class="line"><span class="lineno">   83</span>                <span class="keywordflow">return</span> 1;</div>
+<div class="line"><span class="lineno">   84</span>            }</div>
+<div class="line"><span class="lineno">   85</span> </div>
+<div class="line"><span class="lineno">   86</span>            <span class="keywordflow">if</span> (strcmp(argv[1], <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#abf798a92181f6365916773933b769268">commitMessagesSourceCliInputName</a>.c_str()) == 0</div>
+<div class="line"><span class="lineno">   87</span>                || strcmp(argv[1], <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#abe8fbe367e60d5306374312e82c6d5f5">commitMessagesSourceGithubActionsInputName</a>.c_str()) == 0) {</div>
+<div class="line"><span class="lineno">   88</span>                <a class="code hl_function" href="#a77913687effc90181d118271be59e1e0">generateReleaseNotes</a>(<a class="code hl_enumvalue" href="_enums_8h.html#a2a041843ffe66cf42292281d8a51bf6da67bbcadb4d1ea300163e5c88f9a8e460">ReleaseNoteSources::CommitMessages</a>, argv[2], argv[3], argv[4]);</div>
 <div class="line"><span class="lineno">   89</span>            }</div>
-<div class="line"><span class="lineno">   90</span>            <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">   91</span>                <a class="code hl_function" href="_utils_8cpp.html#a72aef381e81fc4204922f15f83d354b8">printInputError</a>(<a class="code hl_enumvalue" href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42ad668d09c9588d8564277f3ddab1c6f6b">InputErrors::IncorrectReleaseNotesMode</a>);</div>
-<div class="line"><span class="lineno">   92</span>                <span class="keywordflow">return</span> 1;</div>
-<div class="line"><span class="lineno">   93</span>            }</div>
-<div class="line"><span class="lineno">   94</span>        }</div>
-<div class="line"><span class="lineno">   95</span>        <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">   96</span>            <a class="code hl_function" href="_utils_8cpp.html#a72aef381e81fc4204922f15f83d354b8">printInputError</a>(<a class="code hl_enumvalue" href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42ad925e78736c18035e65396a754e28fa6">InputErrors::IncorrectReleaseNotesSource</a>);</div>
-<div class="line"><span class="lineno">   97</span>            <span class="keywordflow">return</span> 1;</div>
-<div class="line"><span class="lineno">   98</span>        }</div>
-<div class="line"><span class="lineno">   99</span>    }</div>
-<div class="line"><span class="lineno">  100</span>    <span class="keywordflow">catch</span> (<span class="keyword">const</span> exception&amp; e) {</div>
-<div class="line"><span class="lineno">  101</span>        cerr &lt;&lt; <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#ae6ac5aab327bbf997561dfc7411a8094">failedToGenerateReleaseNotesMessage</a> &lt;&lt; endl;</div>
-<div class="line"><span class="lineno">  102</span>        cerr &lt;&lt; e.what() &lt;&lt; endl;</div>
-<div class="line"><span class="lineno">  103</span>        <span class="keywordflow">return</span> 1;</div>
-<div class="line"><span class="lineno">  104</span>    }</div>
-<div class="line"><span class="lineno">  105</span> </div>
-<div class="line"><span class="lineno">  106</span>    <span class="keywordflow">return</span> 0;</div>
-<div class="line"><span class="lineno">  107</span>}</div>
+<div class="line"><span class="lineno">   90</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcmp(argv[1], <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a18c3c4bc15619015475f9815e4594c89">pullRequestsSourceCliInputName</a>.c_str()) == 0</div>
+<div class="line"><span class="lineno">   91</span>                || strcmp(argv[1], <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a1ca130396997c69fb367ad9732506dfb">pullRequestsSourceGithubActionsInputName</a>.c_str()) == 0) {</div>
+<div class="line"><span class="lineno">   92</span>                <span class="keywordflow">if</span> (argc &lt;= 5) {</div>
+<div class="line"><span class="lineno">   93</span>                    <a class="code hl_function" href="_utils_8cpp.html#a72aef381e81fc4204922f15f83d354b8">printInputError</a>(<a class="code hl_enumvalue" href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42aeffe3f9641a2174350b3e89175e217d4">InputErrors::NoReleaseNotesMode</a>);</div>
+<div class="line"><span class="lineno">   94</span>                    <span class="keywordflow">return</span> 1;</div>
+<div class="line"><span class="lineno">   95</span>                }</div>
+<div class="line"><span class="lineno">   96</span> </div>
+<div class="line"><span class="lineno">   97</span>                <span class="keywordflow">if</span> (strcmp(argv[5], <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a3ff573490cef7d760d9c8b0f941c2f8e">fullModeCliInputName</a>.c_str()) == 0</div>
+<div class="line"><span class="lineno">   98</span>                    || strcmp(argv[5], <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#aabd55302c33ca5e5c647271e0549746d">fullModeGithubActionsInputName</a>.c_str()) == 0) {</div>
+<div class="line"><span class="lineno">   99</span>                    <a class="code hl_function" href="#a77913687effc90181d118271be59e1e0">generateReleaseNotes</a>(<a class="code hl_enumvalue" href="_enums_8h.html#a2a041843ffe66cf42292281d8a51bf6dadea4739dd41e08d4b6375262dd2c1bff">ReleaseNoteSources::PullRequests</a>, argv[2], argv[3], argv[4], <a class="code hl_enumvalue" href="_enums_8h.html#ad3a43d5b1acf3669d48fb4b7efd4315dabbd47109890259c0127154db1af26c75">ReleaseNoteModes::Full</a>);</div>
+<div class="line"><span class="lineno">  100</span>                }</div>
+<div class="line"><span class="lineno">  101</span>                <span class="keywordflow">else</span> <span class="keywordflow">if</span> (strcmp(argv[5], <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a57a4015b8e8ffc50c700d61ba3455705">shortModeCliInputName</a>.c_str()) == 0</div>
+<div class="line"><span class="lineno">  102</span>                    || strcmp(argv[5], <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a8db9d0701bf7d12cafc508b572c5f351">shortModeGithubActionsInputName</a>.c_str()) == 0) {</div>
+<div class="line"><span class="lineno">  103</span>                    <a class="code hl_function" href="#a77913687effc90181d118271be59e1e0">generateReleaseNotes</a>(<a class="code hl_enumvalue" href="_enums_8h.html#a2a041843ffe66cf42292281d8a51bf6dadea4739dd41e08d4b6375262dd2c1bff">ReleaseNoteSources::PullRequests</a>, argv[2], argv[3], argv[4], <a class="code hl_enumvalue" href="_enums_8h.html#ad3a43d5b1acf3669d48fb4b7efd4315da30bb747c98bccdd11b3f89e644c4d0ad">ReleaseNoteModes::Short</a>);</div>
+<div class="line"><span class="lineno">  104</span>                }</div>
+<div class="line"><span class="lineno">  105</span>                <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  106</span>                    <a class="code hl_function" href="_utils_8cpp.html#a72aef381e81fc4204922f15f83d354b8">printInputError</a>(<a class="code hl_enumvalue" href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42ad668d09c9588d8564277f3ddab1c6f6b">InputErrors::IncorrectReleaseNotesMode</a>);</div>
+<div class="line"><span class="lineno">  107</span>                    <span class="keywordflow">return</span> 1;</div>
+<div class="line"><span class="lineno">  108</span>                }</div>
+<div class="line"><span class="lineno">  109</span>            }</div>
+<div class="line"><span class="lineno">  110</span>            <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  111</span>                <a class="code hl_function" href="_utils_8cpp.html#a72aef381e81fc4204922f15f83d354b8">printInputError</a>(<a class="code hl_enumvalue" href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42ad925e78736c18035e65396a754e28fa6">InputErrors::IncorrectReleaseNotesSource</a>);</div>
+<div class="line"><span class="lineno">  112</span>                <span class="keywordflow">return</span> 1;</div>
+<div class="line"><span class="lineno">  113</span>            }</div>
+<div class="line"><span class="lineno">  114</span>        }</div>
+<div class="line"><span class="lineno">  115</span>    }</div>
+<div class="line"><span class="lineno">  116</span>    <span class="keywordflow">catch</span> (<span class="keyword">const</span> exception&amp; e) {</div>
+<div class="line"><span class="lineno">  117</span>        cerr &lt;&lt; <a class="code hl_variable" href="#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#ae6ac5aab327bbf997561dfc7411a8094">failedToGenerateReleaseNotesMessage</a> &lt;&lt; endl;</div>
+<div class="line"><span class="lineno">  118</span>        cerr &lt;&lt; e.what() &lt;&lt; endl;</div>
+<div class="line"><span class="lineno">  119</span>        <span class="keywordflow">return</span> 1;</div>
+<div class="line"><span class="lineno">  120</span>    }</div>
+<div class="line"><span class="lineno">  121</span> </div>
+<div class="line"><span class="lineno">  122</span>    <span class="keywordflow">return</span> 0;</div>
+<div class="line"><span class="lineno">  123</span>}</div>
 <div class="ttc" id="a_enums_8h_html_aa9ba5cd8e97388b6ebdef4ae7816fa42a347b2aacea1efd3b947c49307468b7c5"><div class="ttname"><a href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42a347b2aacea1efd3b947c49307468b7c5">InputErrors::NoReleaseStartReference</a></div><div class="ttdeci">@ NoReleaseStartReference</div></div>
 <div class="ttc" id="a_enums_8h_html_aa9ba5cd8e97388b6ebdef4ae7816fa42a389539cf4f36e93d111c1c69b825967d"><div class="ttname"><a href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42a389539cf4f36e93d111c1c69b825967d">InputErrors::NoReleaseNotesSource</a></div><div class="ttdeci">@ NoReleaseNotesSource</div></div>
+<div class="ttc" id="a_enums_8h_html_aa9ba5cd8e97388b6ebdef4ae7816fa42a879d6e922bbbda815bd7cacbdbcf876d"><div class="ttname"><a href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42a879d6e922bbbda815bd7cacbdbcf876d">InputErrors::NoPullRequestNumber</a></div><div class="ttdeci">@ NoPullRequestNumber</div></div>
 <div class="ttc" id="a_enums_8h_html_aa9ba5cd8e97388b6ebdef4ae7816fa42acad21a6432b04897748c0d79a5f90821"><div class="ttname"><a href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42acad21a6432b04897748c0d79a5f90821">InputErrors::NoReleaseEndReference</a></div><div class="ttdeci">@ NoReleaseEndReference</div></div>
 <div class="ttc" id="a_enums_8h_html_aa9ba5cd8e97388b6ebdef4ae7816fa42ad668d09c9588d8564277f3ddab1c6f6b"><div class="ttname"><a href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42ad668d09c9588d8564277f3ddab1c6f6b">InputErrors::IncorrectReleaseNotesMode</a></div><div class="ttdeci">@ IncorrectReleaseNotesMode</div></div>
 <div class="ttc" id="a_enums_8h_html_aa9ba5cd8e97388b6ebdef4ae7816fa42ad925e78736c18035e65396a754e28fa6"><div class="ttname"><a href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42ad925e78736c18035e65396a754e28fa6">InputErrors::IncorrectReleaseNotesSource</a></div><div class="ttdeci">@ IncorrectReleaseNotesSource</div></div>
 <div class="ttc" id="a_enums_8h_html_aa9ba5cd8e97388b6ebdef4ae7816fa42aeffe3f9641a2174350b3e89175e217d4"><div class="ttname"><a href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42aeffe3f9641a2174350b3e89175e217d4">InputErrors::NoReleaseNotesMode</a></div><div class="ttdeci">@ NoReleaseNotesMode</div></div>
 <div class="ttc" id="a_enums_8h_html_aa9ba5cd8e97388b6ebdef4ae7816fa42af949897f6ed18f13ebde7435a913555e"><div class="ttname"><a href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42af949897f6ed18f13ebde7435a913555e">InputErrors::NoGithubToken</a></div><div class="ttdeci">@ NoGithubToken</div></div>
 <div class="ttc" id="a_enums_8h_html_ad3a43d5b1acf3669d48fb4b7efd4315da30bb747c98bccdd11b3f89e644c4d0ad"><div class="ttname"><a href="_enums_8h.html#ad3a43d5b1acf3669d48fb4b7efd4315da30bb747c98bccdd11b3f89e644c4d0ad">ReleaseNoteModes::Short</a></div><div class="ttdeci">@ Short</div></div>
-<div class="ttc" id="a_main_8cpp_html_a77913687effc90181d118271be59e1e0"><div class="ttname"><a href="#a77913687effc90181d118271be59e1e0">generateReleaseNotes</a></div><div class="ttdeci">void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, string releaseStartRef, string releaseEndRef, string githubToken, ReleaseNoteModes releaseNoteMode=ReleaseNoteModes::Short)</div><div class="ttdoc">Generates release notes using commit messages between the start reference and the end reference using...</div><div class="ttdef"><b>Definition</b> Main.cpp:329</div></div>
-<div class="ttc" id="a_utils_8cpp_html_a72aef381e81fc4204922f15f83d354b8"><div class="ttname"><a href="_utils_8cpp.html#a72aef381e81fc4204922f15f83d354b8">printInputError</a></div><div class="ttdeci">void printInputError(InputErrors inputError)</div><div class="ttdoc">Prints error messages when user runs the script with incorrect parameters/input.</div><div class="ttdef"><b>Definition</b> Utils.cpp:26</div></div>
+<div class="ttc" id="a_main_8cpp_html_a439eed8e998fa7f5d1229bc950322585"><div class="ttname"><a href="#a439eed8e998fa7f5d1229bc950322585">generatePullRequestChangeNote</a></div><div class="ttdeci">void generatePullRequestChangeNote(string pullRequestNumber, string githubToken)</div><div class="ttdoc">Generates a single change note with it's conventional commit type category for a single pull request ...</div><div class="ttdef"><b>Definition</b> Main.cpp:373</div></div>
+<div class="ttc" id="a_main_8cpp_html_a77913687effc90181d118271be59e1e0"><div class="ttname"><a href="#a77913687effc90181d118271be59e1e0">generateReleaseNotes</a></div><div class="ttdeci">void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, string releaseStartRef, string releaseEndRef, string githubToken, ReleaseNoteModes releaseNoteMode=ReleaseNoteModes::Short)</div><div class="ttdoc">Generates release notes using commit messages between the start reference and the end reference using...</div><div class="ttdef"><b>Definition</b> Main.cpp:345</div></div>
+<div class="ttc" id="a_utils_8cpp_html_a72aef381e81fc4204922f15f83d354b8"><div class="ttname"><a href="_utils_8cpp.html#a72aef381e81fc4204922f15f83d354b8">printInputError</a></div><div class="ttdeci">void printInputError(InputErrors inputError)</div><div class="ttdoc">Prints error messages when user runs the script with incorrect parameters/input.</div><div class="ttdef"><b>Definition</b> Utils.cpp:27</div></div>
 <div class="ttc" id="aclass_config_html_a18c3c4bc15619015475f9815e4594c89"><div class="ttname"><a href="class_config.html#a18c3c4bc15619015475f9815e4594c89">Config::pullRequestsSourceCliInputName</a></div><div class="ttdeci">string pullRequestsSourceCliInputName</div><div class="ttdef"><b>Definition</b> Config.h:38</div></div>
 <div class="ttc" id="aclass_config_html_a1ca130396997c69fb367ad9732506dfb"><div class="ttname"><a href="class_config.html#a1ca130396997c69fb367ad9732506dfb">Config::pullRequestsSourceGithubActionsInputName</a></div><div class="ttdeci">string pullRequestsSourceGithubActionsInputName</div><div class="ttdef"><b>Definition</b> Config.h:39</div></div>
 <div class="ttc" id="aclass_config_html_a3ba706104b3e572eea72d63a413d63ca"><div class="ttname"><a href="class_config.html#a3ba706104b3e572eea72d63a413d63ca">Config::load</a></div><div class="ttdeci">void load(const string &amp;configFileName)</div><div class="ttdef"><b>Definition</b> Config.cpp:17</div></div>
 <div class="ttc" id="aclass_config_html_a3ff573490cef7d760d9c8b0f941c2f8e"><div class="ttname"><a href="class_config.html#a3ff573490cef7d760d9c8b0f941c2f8e">Config::fullModeCliInputName</a></div><div class="ttdeci">string fullModeCliInputName</div><div class="ttdef"><b>Definition</b> Config.h:42</div></div>
+<div class="ttc" id="aclass_config_html_a54c10715f8b5bb11ce2a69a876bf6d15"><div class="ttname"><a href="class_config.html#a54c10715f8b5bb11ce2a69a876bf6d15">Config::singlePullRequestSourceCliInputName</a></div><div class="ttdeci">string singlePullRequestSourceCliInputName</div><div class="ttdef"><b>Definition</b> Config.h:44</div></div>
 <div class="ttc" id="aclass_config_html_a57a4015b8e8ffc50c700d61ba3455705"><div class="ttname"><a href="class_config.html#a57a4015b8e8ffc50c700d61ba3455705">Config::shortModeCliInputName</a></div><div class="ttdeci">string shortModeCliInputName</div><div class="ttdef"><b>Definition</b> Config.h:40</div></div>
 <div class="ttc" id="aclass_config_html_a8db9d0701bf7d12cafc508b572c5f351"><div class="ttname"><a href="class_config.html#a8db9d0701bf7d12cafc508b572c5f351">Config::shortModeGithubActionsInputName</a></div><div class="ttdeci">string shortModeGithubActionsInputName</div><div class="ttdef"><b>Definition</b> Config.h:41</div></div>
 <div class="ttc" id="aclass_config_html_aabd55302c33ca5e5c647271e0549746d"><div class="ttname"><a href="class_config.html#aabd55302c33ca5e5c647271e0549746d">Config::fullModeGithubActionsInputName</a></div><div class="ttdeci">string fullModeGithubActionsInputName</div><div class="ttdef"><b>Definition</b> Config.h:43</div></div>
 <div class="ttc" id="aclass_config_html_abe8fbe367e60d5306374312e82c6d5f5"><div class="ttname"><a href="class_config.html#abe8fbe367e60d5306374312e82c6d5f5">Config::commitMessagesSourceGithubActionsInputName</a></div><div class="ttdeci">string commitMessagesSourceGithubActionsInputName</div><div class="ttdef"><b>Definition</b> Config.h:37</div></div>
 <div class="ttc" id="aclass_config_html_abf798a92181f6365916773933b769268"><div class="ttname"><a href="class_config.html#abf798a92181f6365916773933b769268">Config::commitMessagesSourceCliInputName</a></div><div class="ttdeci">string commitMessagesSourceCliInputName</div><div class="ttdef"><b>Definition</b> Config.h:36</div></div>
-<div class="ttc" id="aclass_config_html_ae6ac5aab327bbf997561dfc7411a8094"><div class="ttname"><a href="class_config.html#ae6ac5aab327bbf997561dfc7411a8094">Config::failedToGenerateReleaseNotesMessage</a></div><div class="ttdeci">string failedToGenerateReleaseNotesMessage</div><div class="ttdef"><b>Definition</b> Config.h:67</div></div>
+<div class="ttc" id="aclass_config_html_ae6ac5aab327bbf997561dfc7411a8094"><div class="ttname"><a href="class_config.html#ae6ac5aab327bbf997561dfc7411a8094">Config::failedToGenerateReleaseNotesMessage</a></div><div class="ttdeci">string failedToGenerateReleaseNotesMessage</div><div class="ttdef"><b>Definition</b> Config.h:69</div></div>
 </div><!-- fragment -->
 </div>
 </div>
