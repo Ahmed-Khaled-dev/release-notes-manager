@@ -7,7 +7,7 @@
   <br>
 </h1>
 
-
+test
 
 <h4 align="center">A C++ script, done while working at <a href="https://www.synfig.org/" target="_blank">Synfig</a> 
 during <a href="https://summerofcode.withgoogle.com/" target="_blank">Google Summer of Code</a> 2024, the script automatically generates nice-looking markdown/HTML release notes from <a href="https://www.conventionalcommits.org/en/v1.0.0/" target="_blank">conventional git commits</a></h4>
