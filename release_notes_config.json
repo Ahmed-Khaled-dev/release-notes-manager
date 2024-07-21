@@ -30,14 +30,14 @@
     "shortModeGithubActionsInputName":"Short",
     "fullModeCliInputName":"full",
     "fullModeGithubActionsInputName":"Full",
-    "singlePullRequestSourceCliInputName":"single-pr",
+    "singlePullRequestSourceCliInputName":"single_pr",
 
     "markdownReleaseNotePrefix":"- ",
     "markdownFullModeReleaseNotePrefix":"- ### ",
 
     "outputMessages":{
-        "noReleaseNotesSourceError":"Please enter the source you wish to use to generate change notes (message or pr or single-pr)",
-        "incorrectReleaseNotesSourceError":"Please enter a valid change notes source (message or pr or single-pr)",
+        "noReleaseNotesSourceError":"Please enter the source you wish to use to generate change notes (message or pr or single_pr)",
+        "incorrectReleaseNotesSourceError":"Please enter a valid change notes source (message or pr or single_pr)",
         "noReleaseNotesModeError":"Please enter which release notes mode you want for PRs (short or full)",
         "incorrectReleaseNotesModeError":"Please enter a valid release notes mode (short or full)",
         "noGithubTokenError":"Please enter a GitHub token to be able to make authenticated requests to the GitHub API",
@@ -52,7 +52,7 @@
         "gitLogError":"Unable to run and read the git log command output",
         "markdownFileError":"Unable to create/open markdown notes file",
         "htmlFileError":"Unable to create/open HTML notes file",
-        "expectedSyntaxMessage":"Expected Syntax:\n1 - release_notes_generator message release_start_reference release_end_reference github_token\n2 - release_notes_generator prs release_start_reference release_end_reference github_token short/full\n3 - release_notes_generator single-pr pull_request_number github_token",
+        "expectedSyntaxMessage":"Expected Syntax:\n1 - release_notes_generator message release_start_reference release_end_reference github_token\n2 - release_notes_generator prs release_start_reference release_end_reference github_token short/full\n3 - release_notes_generator single_pr pull_request_number github_token",
         "generatingReleaseNotesMessage":"Generating notes........",
         "failedToGenerateReleaseNotesMessage":"Failed to generate change notes",
         "emptyReleaseNotesMessage":"No change notes found, ensure that what you entered contains notes that use conventional commits"
