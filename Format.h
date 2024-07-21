@@ -7,6 +7,7 @@
 #pragma once
 
 #include <string>
+#include "Enums.h"
 
 using namespace std;
 
@@ -15,3 +16,5 @@ string replaceHashIdsWithLinks(string pullRequestBody);
 string replaceCommitShasWithLinks(string pullRequestBody);
 string removeExtraNewLines(string pullRequestBody);
 string formatPullRequestBody(string pullRequestBody);
+string convertConventionalCommitTitleToReleaseNoteTitle(string conventionalCommitTitle, CommitTypeMatchResults matchResult, 
+                                                        string markdownPrefix);

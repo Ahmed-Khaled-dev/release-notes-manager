@@ -9,6 +9,8 @@
 
 #include "Format.h"
 #include "Config.h"
+#include "Enums.h"
+#include "Utils.h"
 
 using namespace std;
 
@@ -118,4 +120,42 @@ string formatPullRequestBody(string pullRequestBody) {
     pullRequestBody = removeExtraNewLines(pullRequestBody);
 
     return pullRequestBody;
+}
+
+/**
+ * @brief Converts the given conventional commit title to a better markdown title that could be used in the release notes
+ * Example: "fix: fixed bug X" gets converted to "### Fixed bug X"
+ * @param conventionalCommitTitle The conventional commit title
+ * @param matchResult CommitTypeMatchResult that this title got with it's conventional commit type (has subcategory or no)
+ * @param markdownPrefix The markdown prefix (e.g. -, ##, ###, etc.) that should be added before the release note title
+ * @return The improved markdown title
+ */
+string convertConventionalCommitTitleToReleaseNoteTitle(string conventionalCommitTitle, CommitTypeMatchResults matchResult, 
+                                                        string markdownPrefix) {
+    string subCategoryText = "";
+
+    if (matchResult == CommitTypeMatchResults::MatchWithSubCategory) {
+        size_t startPos = conventionalCommitTitle.find("(") + 1;
+        // Adding the subcategory title
+        subCategoryText = " (" + conventionalCommitTitle.substr(startPos, conventionalCommitTitle.find(")") - startPos) + " Related) ";
+        // Capitalizing the first letter in the subcategory
+        subCategoryText[2] = toupper(subCategoryText[2]);
+    }
+
+    string releaseNoteTitle = "";
+
+    // Removing the commit type from the conventional commit title and capitalizing the first letter
+    size_t colonPosition = conventionalCommitTitle.find(":");
+    if (colonPosition != string::npos) {
+        releaseNoteTitle = conventionalCommitTitle.substr(colonPosition + 2);
+    }
+    releaseNoteTitle[0] = toupper(releaseNoteTitle[0]);
+
+    // Inserting the commit type subcategory (will be empty if there is no subcategory)
+    releaseNoteTitle.insert(0, subCategoryText);
+
+    // Adding the markdown prefix
+    releaseNoteTitle = markdownPrefix + releaseNoteTitle + "\n";
+
+    return releaseNoteTitle;
 }

@@ -27,7 +27,8 @@
 using namespace std;
 using namespace nlohmann;
 
-string addPullRequestInfoInNotes(json pullRequestInfo, string releaseNotesFromPullRequests, ReleaseNoteModes releaseNotesMode);
+void addPullRequestInfoInNotes(json pullRequestInfo, string &pullRequestsReleaseNotes, ReleaseNoteModes releaseNotesMode, 
+                            int commitTypeIndex);
 string getPullRequestInfo(string pullRequestUrl, string githubToken);
 string getCommitsNotesFromPullRequests(int commitTypeIndex, string releaseStartRef, string releaseEndRef,
                                        string githubToken, ReleaseNoteModes releaseNotesMode);
@@ -106,27 +107,26 @@ int main(int argc, char* argv[]){
 }
 
 /**
- * @brief Adds given pull request information (title, body) in the release notes, based on the release notes mode, using the GitHub API
- * @param pullRequestInfo JSON object containing pull request information
- * @param releaseNotesFromPullRequests Existing release notes generated from pull requests
+ * @brief Formats given pull request information (title, body) into a nice looking markdown format,
+ * then adds them in the given current release notes, based on the release notes mode
+ * @param pullRequestInfo JSON object containing raw pull request information
+ * @param pullRequestsReleaseNotes Existing release notes generated from pull requests
  * @param releaseNotesMode The release notes mode that will decide if the pull request body will be included or not
- * @return The updated release notes after adding the given pull request info, based on the release notes mode
+ * @param commitTypeIndex Index of the commit type in the commit types 2d array that this pull request belongs to
  */
-string addPullRequestInfoInNotes(json pullRequestInfo, string releaseNotesFromPullRequests, ReleaseNoteModes releaseNotesMode) {
+void addPullRequestInfoInNotes(json pullRequestInfo, string &pullRequestsReleaseNotes, ReleaseNoteModes releaseNotesMode,
+                                int commitTypeIndex) {
     if (!pullRequestInfo["title"].is_null()) {
         string title = pullRequestInfo["title"];
 
-        // Removing the commit type from the title and capitalizing the first letter
-        string::size_type colonPosition = title.find(":");
-        if (colonPosition != string::npos) {
-            title = title.substr(colonPosition + 2);
-        }
-        title[0] = toupper(title[0]);
+        CommitTypeMatchResults matchResult = checkCommitTypeMatch(title, commitTypeIndex);
 
         if(releaseNotesMode == ReleaseNoteModes::Full)
-            releaseNotesFromPullRequests += config.markdownFullModeReleaseNotePrefix + title + "\n";
+            pullRequestsReleaseNotes += convertConventionalCommitTitleToReleaseNoteTitle(title, matchResult, 
+            config.markdownFullModeReleaseNotePrefix);
         else
-            releaseNotesFromPullRequests += config.markdownReleaseNotePrefix + title + "\n";
+            pullRequestsReleaseNotes += convertConventionalCommitTitleToReleaseNoteTitle(title, matchResult, 
+            config.markdownReleaseNotePrefix);
     }
 
     if (releaseNotesMode == ReleaseNoteModes::Full && !pullRequestInfo["body"].is_null()) {
@@ -136,17 +136,17 @@ string addPullRequestInfoInNotes(json pullRequestInfo, string releaseNotesFromPu
         body[0] = toupper(body[0]);
         body = formatPullRequestBody(body);
 
-        releaseNotesFromPullRequests += indentAllLinesInString(body) + "\n";
+        pullRequestsReleaseNotes += indentAllLinesInString(body) + "\n";
     }
 
-    return releaseNotesFromPullRequests;
+    pullRequestsReleaseNotes += "\n";
 }
 
 /**
  * @brief Retrieves pull request info from the GitHub API using libcurl
  * @param pullRequestUrl The GitHub API URL of the pull request
  * @param githubToken The GitHub token used to make authenticated requests to the GitHub API
- * @return The pull request info in JSON
+ * @return The pull request info in JSON 
  */
 string getPullRequestInfo(string pullRequestUrl, string githubToken) {
     // Initializing libcurl
@@ -216,8 +216,8 @@ string getPullRequestInfo(string pullRequestUrl, string githubToken) {
 string getCommitsNotesFromPullRequests(int commitTypeIndex, string releaseStartRef, string releaseEndRef, 
                                        string githubToken, ReleaseNoteModes releaseNotesMode) {
     string commandToRetrieveCommitsMessages = "git log " + releaseStartRef + ".." + releaseEndRef +
-        " --oneline --format=\"%s\" --grep=\"^" + config.commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName] + "[:(]\"" +
-        " --grep=\"#[0-9]\" --all-match";
+            " --oneline --format=\"%s\" --grep=\"^" + config.commitTypes[commitTypeIndex][(int)CommitTypeInfo::ConventionalName] + "[:(]\"" +
+            " --grep=\"#[0-9]\" --all-match";
 
     FILE* pipe = popen(commandToRetrieveCommitsMessages.c_str(), "r");
     if (!pipe) {
@@ -253,7 +253,7 @@ string getCommitsNotesFromPullRequests(int commitTypeIndex, string releaseStartR
                 string jsonResponse = getPullRequestInfo(config.githubRepoPullRequestsApiUrl + commitPullRequestNumber, githubToken);
                 json pullRequestInfo = json::parse(jsonResponse);
 
-                releaseNotesFromPullRequests = addPullRequestInfoInNotes(pullRequestInfo, releaseNotesFromPullRequests, releaseNotesMode) + "\n";
+                addPullRequestInfoInNotes(pullRequestInfo, releaseNotesFromPullRequests, releaseNotesMode, commitTypeIndex);
             }
         }
     }
@@ -297,26 +297,12 @@ string getCommitsNotesFromCommitMessages(int commitTypeIndex, string releaseStar
     while (fgets(buffer, sizeof(buffer), pipe) != NULL) {
         commitTypeContainsReleaseNotes = 1;
         commitMessage = buffer;
-        subCategoryText = "";
 
         CommitTypeMatchResults matchResult = checkCommitTypeMatch(commitMessage, commitTypeIndex);
 
         if (matchResult != CommitTypeMatchResults::NoMatch) {
-            if (matchResult == CommitTypeMatchResults::MatchWithSubCategory) {
-                size_t startPos = commitMessage.find("(") + 1;
-                // Adding the sub category title
-                subCategoryText = " (" + commitMessage.substr(startPos, commitMessage.find(")") - startPos) + " Related) ";
-            }
-            
-            commitMessage = config.markdownReleaseNotePrefix + commitMessage.substr(commitMessage.find(":") + 2) + "\n";
-
-            // Capitalizing the first letter in the commit message
-            commitMessage[config.markdownReleaseNotePrefix.size()] = toupper(commitMessage[config.markdownReleaseNotePrefix.size()]);
-
-            // Inserting the commit type subcategory (will be empty if there is no subcategory)
-            commitMessage.insert(config.markdownReleaseNotePrefix.size(), subCategoryText);
-
-            releaseNotesFromCommitMessages += commitMessage;
+            releaseNotesFromCommitMessages += convertConventionalCommitTitleToReleaseNoteTitle(commitMessage, matchResult, 
+            config.markdownReleaseNotePrefix);
         }
     }
 

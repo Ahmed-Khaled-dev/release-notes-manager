@@ -11,5 +11,6 @@ var searchData=
   ['replacehashidswithlinks_8',['replaceHashIdsWithLinks',['../_format_8cpp.html#a19e0fc5a3595eb380147a5025a1b23f2',1,'replaceHashIdsWithLinks(string pullRequestBody):&#160;Format.cpp'],['../_format_8h.html#a19e0fc5a3595eb380147a5025a1b23f2',1,'replaceHashIdsWithLinks(string pullRequestBody):&#160;Format.cpp']]],
   ['repo_9',['1. Clone the repo',['../md__r_e_a_d_m_e.html#autotoc_md3',1,'']]],
   ['repocommitsurl_10',['repoCommitsUrl',['../class_config.html#a77ec0cc469b990ece28c732bcd411fe8',1,'Config']]],
-  ['repoissuesurl_11',['repoIssuesUrl',['../class_config.html#ac6b62f7f8ce2c3280a689082c5c74cd0',1,'Config']]]
+  ['repoissuesurl_11',['repoIssuesUrl',['../class_config.html#ac6b62f7f8ce2c3280a689082c5c74cd0',1,'Config']]],
+  ['run_20the_20following_20command_12',['3. Run the following command',['../md__r_e_a_d_m_e.html#autotoc_md5',1,'']]]
 ];
