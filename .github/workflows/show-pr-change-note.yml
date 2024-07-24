@@ -33,7 +33,7 @@ jobs:
         id: set-extra-message
         env:
           TRIGGER_EVENT: ${{ github.event.action }}
-        run: |
+        run: |   
           if [ "$TRIGGER_EVENT" = "opened" ]; then
             echo "COMMENT_TEXT=Thank you for contributing!<br>Below is how your contribution will look like in Synfig's release notes, review it and improve your pull request's title and description so that your contribution is clear, you can add images, videos and anything you want, have fun!<br>" >> "$GITHUB_OUTPUT"
           elif [ "$TRIGGER_EVENT" = "edited" ]; then
