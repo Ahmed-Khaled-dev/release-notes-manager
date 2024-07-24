@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       new-release-tag:
-        description: 'Tag name of the *new* release'
+        description: 'Tag name of the *new* release'   
         required: true
         type: string
         default: 'e.g., v1.1 or v2.0'
