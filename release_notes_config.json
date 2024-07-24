@@ -2,7 +2,7 @@
     "markdownOutputFileName":"release_notes.md",
     "htmlOutputFileName":"release_notes.html",
     
-    "githubRepoPullRequestsApiUrl":"https://api.github.com/repos/synfig/synfig/pulls/",
+    "githubRepoPullRequestsApiUrl":"https://api.github.com/repos/Ahmed-Khaled-dev/automated-release-notes-generator/pulls/",
     "githubMarkdownApiUrl":"https://api.github.com/markdown",
     "repoIssuesUrl":"https://github.com/synfig/synfig/issues/",
     "repoCommitsUrl":"https://github.com/synfig/synfig/commit/",
