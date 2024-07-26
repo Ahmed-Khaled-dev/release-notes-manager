@@ -7,7 +7,7 @@
     "repoIssuesUrl":"https://github.com/synfig/synfig/issues/",
     "repoCommitsUrl":"https://github.com/synfig/synfig/commit/",
     
-    "commitTypesCount":10,
+    "commitTypesCount":10,   
     
     "commitTypes":[
         {"conventionalType":"feat", "markdownTitle":"## ✨ New Features"},
