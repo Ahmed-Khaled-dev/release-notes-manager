@@ -6,7 +6,7 @@
     "githubMarkdownApiUrl":"https://api.github.com/markdown",
     "repoIssuesUrl":"https://github.com/synfig/synfig/issues/",
     "repoCommitsUrl":"https://github.com/synfig/synfig/commit/",
-    
+      
     "commitTypesCount":10,
     
     "commitTypes":[
