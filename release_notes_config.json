@@ -9,7 +9,7 @@
     
     "commitTypesCount":10,
     
-    "commitTypes":[
+    "commitTypes":[   
         {"conventionalType":"feat", "markdownTitle":"## ✨ New Features"},
         {"conventionalType":"fix", "markdownTitle":"## 🐞 Bug Fixes"},
         {"conventionalType":"docs", "markdownTitle":"## 📚 Documentation"},
