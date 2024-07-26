@@ -8,7 +8,7 @@
 
 #include <string>
 #include "Enums.h"
-
+   
 using namespace std;
 
 string indentAllLinesInString(string s);
