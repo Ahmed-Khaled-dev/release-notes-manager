@@ -73,7 +73,11 @@ string replaceHashIdsWithLinks(string pullRequestBody) {
  * @return Pull request body/description after performing the replacements
  */
 string replaceCommitShasWithLinks(string pullRequestBody) {
-    regex commitShaPattern(R"([ (]([0-9a-f]{6,40})[ )])");
+    // Here I match any commit SHA that starts at the beginning of a line or with a space or "(" before it
+    // and ends with either anything other than a number or a letter or the end of the pull request body
+    // the "?=" is a regex lookahead which detects this pattern but doesn't include it in the match
+    // I am using this specific regex pattern based on how GitHub markdown interprets commit SHAs
+    regex commitShaPattern(R"((^|[ (])([0-9a-f]{6,40})(?=[^0-9a-zA-Z]|$))");
 
     string result = pullRequestBody;
     size_t numberOfNewCharactersAdded = 0;
@@ -83,9 +87,11 @@ string replaceCommitShasWithLinks(string pullRequestBody) {
     for (sregex_iterator i = firstSha; i != lastSha; i++)
     {
         smatch currentShaMatch = *i;
-        string currentSha = currentShaMatch.str(1);
-        result.erase(currentShaMatch.position() + numberOfNewCharactersAdded, currentShaMatch.length());
-        result.insert(currentShaMatch.position() + numberOfNewCharactersAdded, " [" + currentSha.substr(0, 6) + "](" + config.repoCommitsUrl + currentSha + ") ");
+        // Here I have the number "2" as a parameter in the below functions since I am interested in the second capture group
+        // meaning the second "()" in the regex pattern which is the commit SHA itself
+        string currentSha = currentShaMatch.str(2);
+        result.erase(currentShaMatch.position(2) + numberOfNewCharactersAdded, currentShaMatch.length(2));
+        result.insert(currentShaMatch.position(2) + numberOfNewCharactersAdded, "[" + currentSha.substr(0, 6) + "](" + config.repoCommitsUrl + currentSha + ")");
         numberOfNewCharactersAdded += 4 + config.repoCommitsUrl.length() + 6;
     }
 
@@ -137,9 +143,9 @@ string convertConventionalCommitTitleToReleaseNoteTitle(string conventionalCommi
     if (matchResult == CommitTypeMatchResults::MatchWithSubCategory) {
         size_t startPos = conventionalCommitTitle.find("(") + 1;
         // Adding the subcategory title
-        subCategoryText = " (" + conventionalCommitTitle.substr(startPos, conventionalCommitTitle.find(")") - startPos) + " Related) ";
+        subCategoryText = "(" + conventionalCommitTitle.substr(startPos, conventionalCommitTitle.find(")") - startPos) + " Related) ";
         // Capitalizing the first letter in the subcategory
-        subCategoryText[2] = toupper(subCategoryText[2]);
+        subCategoryText[1] = toupper(subCategoryText[1]);
     }
 
     string releaseNoteTitle = "";

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['features_0',['✨ New Features',['../md_release__notes.html',1,'']]]
+  ['readme_0',['README',['../md__r_e_a_d_m_e.html',1,'']]]
 ];

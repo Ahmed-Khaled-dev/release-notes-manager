@@ -144,34 +144,34 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The improved markdown title </dd></dl>
-<div class="fragment"><div class="line"><span class="lineno">  134</span>                                                                               {</div>
-<div class="line"><span class="lineno">  135</span>    <span class="keywordtype">string</span> subCategoryText = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><span class="lineno">  136</span> </div>
-<div class="line"><span class="lineno">  137</span>    <span class="keywordflow">if</span> (matchResult == <a class="code hl_enumvalue" href="_enums_8h.html#a641234c56fda12244c51e53c78788aadab4338cb657712ded12e542d8b416f676">CommitTypeMatchResults::MatchWithSubCategory</a>) {</div>
-<div class="line"><span class="lineno">  138</span>        <span class="keywordtype">size_t</span> startPos = conventionalCommitTitle.find(<span class="stringliteral">&quot;(&quot;</span>) + 1;</div>
-<div class="line"><span class="lineno">  139</span>        <span class="comment">// Adding the subcategory title</span></div>
-<div class="line"><span class="lineno">  140</span>        subCategoryText = <span class="stringliteral">&quot; (&quot;</span> + conventionalCommitTitle.substr(startPos, conventionalCommitTitle.find(<span class="stringliteral">&quot;)&quot;</span>) - startPos) + <span class="stringliteral">&quot; Related) &quot;</span>;</div>
-<div class="line"><span class="lineno">  141</span>        <span class="comment">// Capitalizing the first letter in the subcategory</span></div>
-<div class="line"><span class="lineno">  142</span>        subCategoryText[2] = toupper(subCategoryText[2]);</div>
-<div class="line"><span class="lineno">  143</span>    }</div>
-<div class="line"><span class="lineno">  144</span> </div>
-<div class="line"><span class="lineno">  145</span>    <span class="keywordtype">string</span> releaseNoteTitle = <span class="stringliteral">&quot;&quot;</span>;</div>
-<div class="line"><span class="lineno">  146</span> </div>
-<div class="line"><span class="lineno">  147</span>    <span class="comment">// Removing the commit type from the conventional commit title and capitalizing the first letter</span></div>
-<div class="line"><span class="lineno">  148</span>    <span class="keywordtype">size_t</span> colonPosition = conventionalCommitTitle.find(<span class="stringliteral">&quot;:&quot;</span>);</div>
-<div class="line"><span class="lineno">  149</span>    <span class="keywordflow">if</span> (colonPosition != string::npos) {</div>
-<div class="line"><span class="lineno">  150</span>        releaseNoteTitle = conventionalCommitTitle.substr(colonPosition + 2);</div>
-<div class="line"><span class="lineno">  151</span>    }</div>
-<div class="line"><span class="lineno">  152</span>    releaseNoteTitle[0] = toupper(releaseNoteTitle[0]);</div>
-<div class="line"><span class="lineno">  153</span> </div>
-<div class="line"><span class="lineno">  154</span>    <span class="comment">// Inserting the commit type subcategory (will be empty if there is no subcategory)</span></div>
-<div class="line"><span class="lineno">  155</span>    releaseNoteTitle.insert(0, subCategoryText);</div>
-<div class="line"><span class="lineno">  156</span> </div>
-<div class="line"><span class="lineno">  157</span>    <span class="comment">// Adding the markdown prefix</span></div>
-<div class="line"><span class="lineno">  158</span>    releaseNoteTitle = markdownPrefix + releaseNoteTitle + <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="fragment"><div class="line"><span class="lineno">  140</span>                                                                               {</div>
+<div class="line"><span class="lineno">  141</span>    <span class="keywordtype">string</span> subCategoryText = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><span class="lineno">  142</span> </div>
+<div class="line"><span class="lineno">  143</span>    <span class="keywordflow">if</span> (matchResult == <a class="code hl_enumvalue" href="_enums_8h.html#a641234c56fda12244c51e53c78788aadab4338cb657712ded12e542d8b416f676">CommitTypeMatchResults::MatchWithSubCategory</a>) {</div>
+<div class="line"><span class="lineno">  144</span>        <span class="keywordtype">size_t</span> startPos = conventionalCommitTitle.find(<span class="stringliteral">&quot;(&quot;</span>) + 1;</div>
+<div class="line"><span class="lineno">  145</span>        <span class="comment">// Adding the subcategory title</span></div>
+<div class="line"><span class="lineno">  146</span>        subCategoryText = <span class="stringliteral">&quot;(&quot;</span> + conventionalCommitTitle.substr(startPos, conventionalCommitTitle.find(<span class="stringliteral">&quot;)&quot;</span>) - startPos) + <span class="stringliteral">&quot; Related) &quot;</span>;</div>
+<div class="line"><span class="lineno">  147</span>        <span class="comment">// Capitalizing the first letter in the subcategory</span></div>
+<div class="line"><span class="lineno">  148</span>        subCategoryText[1] = toupper(subCategoryText[1]);</div>
+<div class="line"><span class="lineno">  149</span>    }</div>
+<div class="line"><span class="lineno">  150</span> </div>
+<div class="line"><span class="lineno">  151</span>    <span class="keywordtype">string</span> releaseNoteTitle = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><span class="lineno">  152</span> </div>
+<div class="line"><span class="lineno">  153</span>    <span class="comment">// Removing the commit type from the conventional commit title and capitalizing the first letter</span></div>
+<div class="line"><span class="lineno">  154</span>    <span class="keywordtype">size_t</span> colonPosition = conventionalCommitTitle.find(<span class="stringliteral">&quot;:&quot;</span>);</div>
+<div class="line"><span class="lineno">  155</span>    <span class="keywordflow">if</span> (colonPosition != string::npos) {</div>
+<div class="line"><span class="lineno">  156</span>        releaseNoteTitle = conventionalCommitTitle.substr(colonPosition + 2);</div>
+<div class="line"><span class="lineno">  157</span>    }</div>
+<div class="line"><span class="lineno">  158</span>    releaseNoteTitle[0] = toupper(releaseNoteTitle[0]);</div>
 <div class="line"><span class="lineno">  159</span> </div>
-<div class="line"><span class="lineno">  160</span>    <span class="keywordflow">return</span> releaseNoteTitle;</div>
-<div class="line"><span class="lineno">  161</span>}</div>
+<div class="line"><span class="lineno">  160</span>    <span class="comment">// Inserting the commit type subcategory (will be empty if there is no subcategory)</span></div>
+<div class="line"><span class="lineno">  161</span>    releaseNoteTitle.insert(0, subCategoryText);</div>
+<div class="line"><span class="lineno">  162</span> </div>
+<div class="line"><span class="lineno">  163</span>    <span class="comment">// Adding the markdown prefix</span></div>
+<div class="line"><span class="lineno">  164</span>    releaseNoteTitle = markdownPrefix + releaseNoteTitle + <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><span class="lineno">  165</span> </div>
+<div class="line"><span class="lineno">  166</span>    <span class="keywordflow">return</span> releaseNoteTitle;</div>
+<div class="line"><span class="lineno">  167</span>}</div>
 <div class="ttc" id="a_enums_8h_html_a641234c56fda12244c51e53c78788aadab4338cb657712ded12e542d8b416f676"><div class="ttname"><a href="_enums_8h.html#a641234c56fda12244c51e53c78788aadab4338cb657712ded12e542d8b416f676">CommitTypeMatchResults::MatchWithSubCategory</a></div><div class="ttdeci">@ MatchWithSubCategory</div></div>
 </div><!-- fragment -->
 </div>
@@ -199,16 +199,16 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>PR body/description after formatting it </dd></dl>
-<div class="fragment"><div class="line"><span class="lineno">  117</span>                                                     {</div>
-<div class="line"><span class="lineno">  118</span>    pullRequestBody = <a class="code hl_function" href="_format_8cpp.html#a19e0fc5a3595eb380147a5025a1b23f2">replaceHashIdsWithLinks</a>(pullRequestBody);</div>
-<div class="line"><span class="lineno">  119</span>    pullRequestBody = <a class="code hl_function" href="_format_8cpp.html#a2910c0333ad9a07480c5486e0131ee27">replaceCommitShasWithLinks</a>(pullRequestBody);</div>
-<div class="line"><span class="lineno">  120</span>    pullRequestBody = <a class="code hl_function" href="_format_8cpp.html#a4487205badbd8aead04f3d63f43292a9">removeExtraNewLines</a>(pullRequestBody);</div>
-<div class="line"><span class="lineno">  121</span> </div>
-<div class="line"><span class="lineno">  122</span>    <span class="keywordflow">return</span> pullRequestBody;</div>
-<div class="line"><span class="lineno">  123</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno">  123</span>                                                     {</div>
+<div class="line"><span class="lineno">  124</span>    pullRequestBody = <a class="code hl_function" href="_format_8cpp.html#a19e0fc5a3595eb380147a5025a1b23f2">replaceHashIdsWithLinks</a>(pullRequestBody);</div>
+<div class="line"><span class="lineno">  125</span>    pullRequestBody = <a class="code hl_function" href="_format_8cpp.html#a2910c0333ad9a07480c5486e0131ee27">replaceCommitShasWithLinks</a>(pullRequestBody);</div>
+<div class="line"><span class="lineno">  126</span>    pullRequestBody = <a class="code hl_function" href="_format_8cpp.html#a4487205badbd8aead04f3d63f43292a9">removeExtraNewLines</a>(pullRequestBody);</div>
+<div class="line"><span class="lineno">  127</span> </div>
+<div class="line"><span class="lineno">  128</span>    <span class="keywordflow">return</span> pullRequestBody;</div>
+<div class="line"><span class="lineno">  129</span>}</div>
 <div class="ttc" id="a_format_8cpp_html_a19e0fc5a3595eb380147a5025a1b23f2"><div class="ttname"><a href="_format_8cpp.html#a19e0fc5a3595eb380147a5025a1b23f2">replaceHashIdsWithLinks</a></div><div class="ttdeci">string replaceHashIdsWithLinks(string pullRequestBody)</div><div class="ttdoc">Replaces all plain text hash ids (issue ids and pull request ids (#2777)) with links to these issues/...</div><div class="ttdef"><b>Definition</b> Format.cpp:44</div></div>
 <div class="ttc" id="a_format_8cpp_html_a2910c0333ad9a07480c5486e0131ee27"><div class="ttname"><a href="_format_8cpp.html#a2910c0333ad9a07480c5486e0131ee27">replaceCommitShasWithLinks</a></div><div class="ttdeci">string replaceCommitShasWithLinks(string pullRequestBody)</div><div class="ttdoc">Replaces all plain text commit SHAs (e.g., 219c2149) with links to these commits on GitHub.</div><div class="ttdef"><b>Definition</b> Format.cpp:75</div></div>
-<div class="ttc" id="a_format_8cpp_html_a4487205badbd8aead04f3d63f43292a9"><div class="ttname"><a href="_format_8cpp.html#a4487205badbd8aead04f3d63f43292a9">removeExtraNewLines</a></div><div class="ttdeci">string removeExtraNewLines(string pullRequestBody)</div><div class="ttdoc">Remove extra new lines in retrieved PR description to make it look identical to the PR description on...</div><div class="ttdef"><b>Definition</b> Format.cpp:100</div></div>
+<div class="ttc" id="a_format_8cpp_html_a4487205badbd8aead04f3d63f43292a9"><div class="ttname"><a href="_format_8cpp.html#a4487205badbd8aead04f3d63f43292a9">removeExtraNewLines</a></div><div class="ttdeci">string removeExtraNewLines(string pullRequestBody)</div><div class="ttdoc">Remove extra new lines in retrieved PR description to make it look identical to the PR description on...</div><div class="ttdef"><b>Definition</b> Format.cpp:106</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -275,17 +275,17 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>PR body/description after removing extra new lines </dd></dl>
-<div class="fragment"><div class="line"><span class="lineno">  100</span>                                                   {</div>
-<div class="line"><span class="lineno">  101</span>    <span class="comment">// New lines in the retrieved PR description are represented as &quot;\r\n&quot; and there is no problem with that</span></div>
-<div class="line"><span class="lineno">  102</span>    <span class="comment">// BUT after the script writes the retrieved PR description in the markdown file and I observed the contents of the markdown file</span></div>
-<div class="line"><span class="lineno">  103</span>    <span class="comment">// using a hexadecimal editor, I found out that for some reason an extra &quot;\r&quot; was added when the markdown was written, so new lines were &quot;\r\r\n&quot;</span></div>
-<div class="line"><span class="lineno">  104</span>    <span class="comment">// for some reason that created extra new lines, so when I tried removing this extra &quot;\r&quot; and I added 2 spaces before the new line &quot;  \r\n&quot;</span></div>
-<div class="line"><span class="lineno">  105</span>    <span class="comment">// (these 2 spaces in markdown specify that a new line should occur), it worked!</span></div>
-<div class="line"><span class="lineno">  106</span>    regex pattern(R<span class="stringliteral">&quot;(\r)&quot;);</span></div>
-<div class="line"><span class="lineno">  107</span><span class="stringliteral">    pullRequestBody = regex_replace(pullRequestBody, pattern, </span><span class="stringliteral">&quot;  &quot;</span>);</div>
-<div class="line"><span class="lineno">  108</span> </div>
-<div class="line"><span class="lineno">  109</span>    <span class="keywordflow">return</span> pullRequestBody;</div>
-<div class="line"><span class="lineno">  110</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno">  106</span>                                                   {</div>
+<div class="line"><span class="lineno">  107</span>    <span class="comment">// New lines in the retrieved PR description are represented as &quot;\r\n&quot; and there is no problem with that</span></div>
+<div class="line"><span class="lineno">  108</span>    <span class="comment">// BUT after the script writes the retrieved PR description in the markdown file and I observed the contents of the markdown file</span></div>
+<div class="line"><span class="lineno">  109</span>    <span class="comment">// using a hexadecimal editor, I found out that for some reason an extra &quot;\r&quot; was added when the markdown was written, so new lines were &quot;\r\r\n&quot;</span></div>
+<div class="line"><span class="lineno">  110</span>    <span class="comment">// for some reason that created extra new lines, so when I tried removing this extra &quot;\r&quot; and I added 2 spaces before the new line &quot;  \r\n&quot;</span></div>
+<div class="line"><span class="lineno">  111</span>    <span class="comment">// (these 2 spaces in markdown specify that a new line should occur), it worked!</span></div>
+<div class="line"><span class="lineno">  112</span>    regex pattern(R<span class="stringliteral">&quot;(\r)&quot;);</span></div>
+<div class="line"><span class="lineno">  113</span><span class="stringliteral">    pullRequestBody = regex_replace(pullRequestBody, pattern, </span><span class="stringliteral">&quot;  &quot;</span>);</div>
+<div class="line"><span class="lineno">  114</span> </div>
+<div class="line"><span class="lineno">  115</span>    <span class="keywordflow">return</span> pullRequestBody;</div>
+<div class="line"><span class="lineno">  116</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -313,24 +313,30 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Pull request body/description after performing the replacements </dd></dl>
 <div class="fragment"><div class="line"><span class="lineno">   75</span>                                                          {</div>
-<div class="line"><span class="lineno">   76</span>    regex commitShaPattern(R<span class="stringliteral">&quot;([ (]([0-9a-f]{6,40})[ )])&quot;);</span></div>
-<div class="line"><span class="lineno">   77</span><span class="stringliteral"></span> </div>
-<div class="line"><span class="lineno">   78</span><span class="stringliteral">    </span><span class="keywordtype">string</span> result = pullRequestBody;</div>
-<div class="line"><span class="lineno">   79</span>    <span class="keywordtype">size_t</span> numberOfNewCharactersAdded = 0;</div>
-<div class="line"><span class="lineno">   80</span>    sregex_iterator firstSha(pullRequestBody.begin(), pullRequestBody.end(), commitShaPattern);</div>
-<div class="line"><span class="lineno">   81</span>    sregex_iterator lastSha;</div>
-<div class="line"><span class="lineno">   82</span> </div>
-<div class="line"><span class="lineno">   83</span>    <span class="keywordflow">for</span> (sregex_iterator i = firstSha; i != lastSha; i++)</div>
-<div class="line"><span class="lineno">   84</span>    {</div>
-<div class="line"><span class="lineno">   85</span>        smatch currentShaMatch = *i;</div>
-<div class="line"><span class="lineno">   86</span>        <span class="keywordtype">string</span> currentSha = currentShaMatch.str(1);</div>
-<div class="line"><span class="lineno">   87</span>        result.erase(currentShaMatch.position() + numberOfNewCharactersAdded, currentShaMatch.length());</div>
-<div class="line"><span class="lineno">   88</span>        result.insert(currentShaMatch.position() + numberOfNewCharactersAdded, <span class="stringliteral">&quot; [&quot;</span> + currentSha.substr(0, 6) + <span class="stringliteral">&quot;](&quot;</span> + <a class="code hl_variable" href="_format_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a77ec0cc469b990ece28c732bcd411fe8">repoCommitsUrl</a> + currentSha + <span class="stringliteral">&quot;) &quot;</span>);</div>
-<div class="line"><span class="lineno">   89</span>        numberOfNewCharactersAdded += 4 + <a class="code hl_variable" href="_format_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a77ec0cc469b990ece28c732bcd411fe8">repoCommitsUrl</a>.length() + 6;</div>
-<div class="line"><span class="lineno">   90</span>    }</div>
-<div class="line"><span class="lineno">   91</span> </div>
-<div class="line"><span class="lineno">   92</span>    <span class="keywordflow">return</span> result;</div>
-<div class="line"><span class="lineno">   93</span>}</div>
+<div class="line"><span class="lineno">   76</span>    <span class="comment">// Here I match any commit SHA that starts at the beginning of a line or with a space or &quot;(&quot; before it</span></div>
+<div class="line"><span class="lineno">   77</span>    <span class="comment">// and ends with either anything other than a number or a letter or the end of the pull request body</span></div>
+<div class="line"><span class="lineno">   78</span>    <span class="comment">// the &quot;?=&quot; is a regex lookahead which detects this pattern but doesn&#39;t include it in the match</span></div>
+<div class="line"><span class="lineno">   79</span>    <span class="comment">// I am using this specific regex pattern based on how GitHub markdown interprets commit SHAs</span></div>
+<div class="line"><span class="lineno">   80</span>    regex commitShaPattern(R<span class="stringliteral">&quot;((^|[ (])([0-9a-f]{6,40})(?=[^0-9a-zA-Z]|$))&quot;);</span></div>
+<div class="line"><span class="lineno">   81</span><span class="stringliteral"></span> </div>
+<div class="line"><span class="lineno">   82</span><span class="stringliteral">    </span><span class="keywordtype">string</span> result = pullRequestBody;</div>
+<div class="line"><span class="lineno">   83</span>    <span class="keywordtype">size_t</span> numberOfNewCharactersAdded = 0;</div>
+<div class="line"><span class="lineno">   84</span>    sregex_iterator firstSha(pullRequestBody.begin(), pullRequestBody.end(), commitShaPattern);</div>
+<div class="line"><span class="lineno">   85</span>    sregex_iterator lastSha;</div>
+<div class="line"><span class="lineno">   86</span> </div>
+<div class="line"><span class="lineno">   87</span>    <span class="keywordflow">for</span> (sregex_iterator i = firstSha; i != lastSha; i++)</div>
+<div class="line"><span class="lineno">   88</span>    {</div>
+<div class="line"><span class="lineno">   89</span>        smatch currentShaMatch = *i;</div>
+<div class="line"><span class="lineno">   90</span>        <span class="comment">// Here I have the number &quot;2&quot; as a parameter in the below functions since I am interested in the second capture group</span></div>
+<div class="line"><span class="lineno">   91</span>        <span class="comment">// meaning the second &quot;()&quot; in the regex pattern which is the commit SHA itself</span></div>
+<div class="line"><span class="lineno">   92</span>        <span class="keywordtype">string</span> currentSha = currentShaMatch.str(2);</div>
+<div class="line"><span class="lineno">   93</span>        result.erase(currentShaMatch.position(2) + numberOfNewCharactersAdded, currentShaMatch.length(2));</div>
+<div class="line"><span class="lineno">   94</span>        result.insert(currentShaMatch.position(2) + numberOfNewCharactersAdded, <span class="stringliteral">&quot;[&quot;</span> + currentSha.substr(0, 6) + <span class="stringliteral">&quot;](&quot;</span> + <a class="code hl_variable" href="_format_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a77ec0cc469b990ece28c732bcd411fe8">repoCommitsUrl</a> + currentSha + <span class="stringliteral">&quot;)&quot;</span>);</div>
+<div class="line"><span class="lineno">   95</span>        numberOfNewCharactersAdded += 4 + <a class="code hl_variable" href="_format_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a77ec0cc469b990ece28c732bcd411fe8">repoCommitsUrl</a>.length() + 6;</div>
+<div class="line"><span class="lineno">   96</span>    }</div>
+<div class="line"><span class="lineno">   97</span> </div>
+<div class="line"><span class="lineno">   98</span>    <span class="keywordflow">return</span> result;</div>
+<div class="line"><span class="lineno">   99</span>}</div>
 <div class="ttc" id="a_format_8cpp_html_a4a8dd3a2de125b72d4fe6251a0a271b5"><div class="ttname"><a href="_format_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a></div><div class="ttdeci">Config config</div><div class="ttdef"><b>Definition</b> Main.cpp:40</div></div>
 <div class="ttc" id="aclass_config_html_a77ec0cc469b990ece28c732bcd411fe8"><div class="ttname"><a href="class_config.html#a77ec0cc469b990ece28c732bcd411fe8">Config::repoCommitsUrl</a></div><div class="ttdeci">string repoCommitsUrl</div><div class="ttdef"><b>Definition</b> Config.h:23</div></div>
 </div><!-- fragment -->

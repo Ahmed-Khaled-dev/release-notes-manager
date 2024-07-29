@@ -36,8 +36,8 @@
     "markdownFullModeReleaseNotePrefix":"- ### ",
 
     "outputMessages":{
-        "noReleaseNotesSourceError":"Please enter the source you wish to use to generate change notes (message or pr or single_pr)",
-        "incorrectReleaseNotesSourceError":"Please enter a valid change notes source (message or pr or single_pr)",
+        "noReleaseNotesSourceError":"Please enter the source you wish to use to generate change notes (message or prs or single_pr)",
+        "incorrectReleaseNotesSourceError":"Please enter a valid change notes source (message or prs or single_pr)",
         "noReleaseNotesModeError":"Please enter which release notes mode you want for PRs (short or full)",
         "incorrectReleaseNotesModeError":"Please enter a valid release notes mode (short or full)",
         "noGithubTokenError":"Please enter a GitHub token to be able to make authenticated requests to the GitHub API",
