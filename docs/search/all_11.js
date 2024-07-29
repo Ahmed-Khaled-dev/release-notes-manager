@@ -10,5 +10,6 @@ var searchData=
   ['repo_7',['1. Clone the repo',['../md__r_e_a_d_m_e.html#autotoc_md3',1,'']]],
   ['repocommitsurl_8',['repoCommitsUrl',['../class_config.html#a77ec0cc469b990ece28c732bcd411fe8',1,'Config']]],
   ['repoissuesurl_9',['repoIssuesUrl',['../class_config.html#ac6b62f7f8ce2c3280a689082c5c74cd0',1,'Config']]],
-  ['run_20the_20following_20command_10',['3. Run the following command',['../md__r_e_a_d_m_e.html#autotoc_md5',1,'']]]
+  ['repopullrequestsapiurl_10',['repoPullRequestsApiUrl',['../class_config.html#a112a6fbbe1ed82cfb404f2c4384b7e54',1,'Config']]],
+  ['run_20the_20following_20command_11',['3. Run the following command',['../md__r_e_a_d_m_e.html#autotoc_md5',1,'']]]
 ];

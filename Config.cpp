@@ -52,11 +52,11 @@ void Config::load(const string& configFileName) {
         throw runtime_error("Key 'htmlOutputFileName' not found in " + configFileName);
     }
 
-    if (externalConfigData.contains("githubRepoPullRequestsApiUrl")) {
-        githubRepoPullRequestsApiUrl = externalConfigData["githubRepoPullRequestsApiUrl"];
+    if (externalConfigData.contains("githubReposApiUrl")) {
+        githubReposApiUrl = externalConfigData["githubReposApiUrl"];
     }
     else {
-        throw runtime_error("Key 'githubRepoPullRequestsApiUrl' not found in " + configFileName);
+        throw runtime_error("Key 'githubReposApiUrl' not found in " + configFileName);
     }
 
     if (externalConfigData.contains("githubMarkdownApiUrl")) {
@@ -66,18 +66,11 @@ void Config::load(const string& configFileName) {
         throw runtime_error("Key 'githubMarkdownApiUrl' not found in " + configFileName);
     }
 
-    if (externalConfigData.contains("repoIssuesUrl")) {
-        repoIssuesUrl = externalConfigData["repoIssuesUrl"];
+    if (externalConfigData.contains("githubUrl")) {
+        githubUrl = externalConfigData["githubUrl"];
     }
     else {
-        throw runtime_error("Key 'repoIssuesUrl' not found in " + configFileName);
-    }
-
-    if (externalConfigData.contains("repoCommitsUrl")) {
-        repoCommitsUrl = externalConfigData["repoCommitsUrl"];
-    }
-    else {
-        throw runtime_error("Key 'repoCommitsUrl' not found in " + configFileName);
+        throw runtime_error("Key 'githubUrl' not found in " + configFileName);
     }
 
     if (externalConfigData.contains("commitTypesCount")) {
@@ -243,11 +236,18 @@ void Config::load(const string& configFileName) {
             throw runtime_error("Key 'noReleaseEndReferenceError' not found in the 'outputMessages' category in " + configFileName);
         }
 
-        if (outputMessages.contains("noPullRequestNumber")) {
-            noPullRequestNumber = outputMessages["noPullRequestNumber"];
+        if (outputMessages.contains("noPullRequestNumberError")) {
+            noPullRequestNumberError = outputMessages["noPullRequestNumberError"];
         }
         else {
-            throw runtime_error("Key 'noPullRequestNumber' not found in the 'outputMessages' category in " + configFileName);
+            throw runtime_error("Key 'noPullRequestNumberError' not found in the 'outputMessages' category in " + configFileName);
+        }
+
+        if (outputMessages.contains("noGithubRepositoryError")) {
+            noGithubRepositoryError = outputMessages["noGithubRepositoryError"];
+        }
+        else {
+            throw runtime_error("Key 'noGithubRepositoryError' not found in the 'outputMessages' category in " + configFileName);
         }
 
         if (outputMessages.contains("expectedSyntaxMessage")) {

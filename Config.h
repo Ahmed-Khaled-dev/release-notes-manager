@@ -17,10 +17,12 @@ class Config {
 public:
     string markdownOutputFileName;
     string htmlOutputFileName;
-    string githubRepoPullRequestsApiUrl;
+    string githubUrl;
+    string githubReposApiUrl;
     string githubMarkdownApiUrl;
     string repoIssuesUrl;
     string repoCommitsUrl;
+    string repoPullRequestsApiUrl;
     int commitTypesCount;
     /**
      * @brief 2d array storing conventional commit types and their corresponding markdown titles
@@ -55,7 +57,8 @@ public:
     string noGithubTokenError;
     string noReleaseStartReferenceError;
     string noReleaseEndReferenceError;
-    string noPullRequestNumber;
+    string noPullRequestNumberError;
+    string noGithubRepositoryError;
     string githubApiRateLimitExceededError;
     string githubApiUnauthorizedAccessError;
     string githubApiBadRequestError;

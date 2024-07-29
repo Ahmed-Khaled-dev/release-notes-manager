@@ -27,7 +27,9 @@ jobs:
         run: g++ -o release_notes_generator Main.cpp Config.cpp Utils.cpp Format.cpp -lcurl -I.
 
       - name: Run script to generate pull request change note
-        run: ./release_notes_generator single_pr "$PULL_REQUEST_NUMBER" "$GH_TOKEN"
+        env:
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: ./release_notes_generator single_pr "$PULL_REQUEST_NUMBER" "$GH_TOKEN" "$GITHUB_REPOSITORY"
       
       - name: Set extra comment message based on the trigger event type
         id: set-extra-message

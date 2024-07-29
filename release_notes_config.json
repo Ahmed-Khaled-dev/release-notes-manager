@@ -2,10 +2,9 @@
     "markdownOutputFileName":"release_notes.md",
     "htmlOutputFileName":"release_notes.html",
     
-    "githubRepoPullRequestsApiUrl":"https://api.github.com/repos/Ahmed-Khaled-dev/automated-release-notes-generator/pulls/",
+    "githubUrl":"https://github.com/",
+    "githubReposApiUrl":"https://api.github.com/repos/",
     "githubMarkdownApiUrl":"https://api.github.com/markdown",
-    "repoIssuesUrl":"https://github.com/synfig/synfig/issues/",
-    "repoCommitsUrl":"https://github.com/synfig/synfig/commit/",
     
     "commitTypesCount":10,
     
@@ -43,7 +42,8 @@
         "noGithubTokenError":"Please enter a GitHub token to be able to make authenticated requests to the GitHub API",
         "noReleaseStartReferenceError":"Please enter a git reference (commit SHA or tag name) that references the commit directly before the first commit in the new release, for example, the tag name of the previous release",
         "noReleaseEndReferenceError":"Please enter a git reference (commit SHA or tag name) that references the commit that *ends* this release's commit messages",
-        "noPullRequestNumber":"Please enter a pull request number (e.g., 13, 144, 3722, etc.)",
+        "noPullRequestNumberError":"Please enter a pull request number (e.g., 13, 144, 3722, etc.)",
+        "noGithubRepositoryError":"Please enter the GitHub repository that you wish to generate release notes from, in the form owner/repository, e.g. synfig/synfig",
         "githubApiRateLimitExceededError":"Rate limit exceeded while making requests to the GitHub API. Additional information: ",
         "githubApiUnauthorizedAccessError":"Unauthorized access to the GitHub API, usually due to an incorrect GitHub token. Additional information: ",
         "githubApiBadRequestError":"Bad request to the GitHub API. Additional information: ",
@@ -52,7 +52,7 @@
         "gitLogError":"Unable to run and read the git log command output",
         "markdownFileError":"Unable to create/open markdown notes file",
         "htmlFileError":"Unable to create/open HTML notes file",
-        "expectedSyntaxMessage":"Expected Syntax:\n1 - release_notes_generator message release_start_reference release_end_reference github_token\n2 - release_notes_generator prs release_start_reference release_end_reference github_token short/full\n3 - release_notes_generator single_pr pull_request_number github_token",
+        "expectedSyntaxMessage":"Expected Syntax:\n1 - release_notes_generator message release_start_reference release_end_reference github_token\n2 - release_notes_generator prs release_start_reference release_end_reference github_token short/full github_repository\n3 - release_notes_generator single_pr pull_request_number github_token github_repository",
         "generatingReleaseNotesMessage":"Generating notes........",
         "failedToGenerateReleaseNotesMessage":"Failed to generate change notes",
         "emptyReleaseNotesMessage":"No change notes found, ensure that what you entered contains notes that use conventional commits"

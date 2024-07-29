@@ -138,25 +138,25 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The type of match that happened between the two commit types </dd></dl>
-<div class="fragment"><div class="line"><span class="lineno">   93</span>                                                                                       {</div>
-<div class="line"><span class="lineno">   94</span>    <span class="keywordtype">string</span> correctCommitType = <a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a657f2b1955fc0129403677a7590e4c8f">commitTypes</a>[commitTypeIndex][(int)<a class="code hl_enumvalue" href="_enums_8h.html#a809e24401d7a251436455596cc8395aaad8c5ccda9a7b4018b85bbfadcc0d233a">CommitTypeInfo::ConventionalName</a>];</div>
-<div class="line"><span class="lineno">   95</span> </div>
-<div class="line"><span class="lineno">   96</span>    <span class="keywordflow">if</span> (commitMessage.substr(0, commitMessage.find(<span class="stringliteral">&quot;:&quot;</span>)) == correctCommitType) {</div>
-<div class="line"><span class="lineno">   97</span>        <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="_enums_8h.html#a641234c56fda12244c51e53c78788aada7af92024b251a220df5d44e21a6c7b21">CommitTypeMatchResults::MatchWithoutSubCategory</a>;</div>
-<div class="line"><span class="lineno">   98</span>    }</div>
-<div class="line"><span class="lineno">   99</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (commitMessage.substr(0, commitMessage.find(<span class="stringliteral">&quot;(&quot;</span>)) == correctCommitType) {</div>
-<div class="line"><span class="lineno">  100</span>        <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="_enums_8h.html#a641234c56fda12244c51e53c78788aadab4338cb657712ded12e542d8b416f676">CommitTypeMatchResults::MatchWithSubCategory</a>;</div>
+<div class="fragment"><div class="line"><span class="lineno">   96</span>                                                                                       {</div>
+<div class="line"><span class="lineno">   97</span>    <span class="keywordtype">string</span> correctCommitType = <a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a657f2b1955fc0129403677a7590e4c8f">commitTypes</a>[commitTypeIndex][(int)<a class="code hl_enumvalue" href="_enums_8h.html#a809e24401d7a251436455596cc8395aaad8c5ccda9a7b4018b85bbfadcc0d233a">CommitTypeInfo::ConventionalName</a>];</div>
+<div class="line"><span class="lineno">   98</span> </div>
+<div class="line"><span class="lineno">   99</span>    <span class="keywordflow">if</span> (commitMessage.substr(0, commitMessage.find(<span class="stringliteral">&quot;:&quot;</span>)) == correctCommitType) {</div>
+<div class="line"><span class="lineno">  100</span>        <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="_enums_8h.html#a641234c56fda12244c51e53c78788aada7af92024b251a220df5d44e21a6c7b21">CommitTypeMatchResults::MatchWithoutSubCategory</a>;</div>
 <div class="line"><span class="lineno">  101</span>    }</div>
-<div class="line"><span class="lineno">  102</span>    <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  103</span>        <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="_enums_8h.html#a641234c56fda12244c51e53c78788aadac8b77721c677e0429241a9250972122d">CommitTypeMatchResults::NoMatch</a>;</div>
+<div class="line"><span class="lineno">  102</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (commitMessage.substr(0, commitMessage.find(<span class="stringliteral">&quot;(&quot;</span>)) == correctCommitType) {</div>
+<div class="line"><span class="lineno">  103</span>        <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="_enums_8h.html#a641234c56fda12244c51e53c78788aadab4338cb657712ded12e542d8b416f676">CommitTypeMatchResults::MatchWithSubCategory</a>;</div>
 <div class="line"><span class="lineno">  104</span>    }</div>
-<div class="line"><span class="lineno">  105</span>}</div>
+<div class="line"><span class="lineno">  105</span>    <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  106</span>        <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="_enums_8h.html#a641234c56fda12244c51e53c78788aadac8b77721c677e0429241a9250972122d">CommitTypeMatchResults::NoMatch</a>;</div>
+<div class="line"><span class="lineno">  107</span>    }</div>
+<div class="line"><span class="lineno">  108</span>}</div>
 <div class="ttc" id="a_enums_8h_html_a641234c56fda12244c51e53c78788aada7af92024b251a220df5d44e21a6c7b21"><div class="ttname"><a href="_enums_8h.html#a641234c56fda12244c51e53c78788aada7af92024b251a220df5d44e21a6c7b21">CommitTypeMatchResults::MatchWithoutSubCategory</a></div><div class="ttdeci">@ MatchWithoutSubCategory</div></div>
 <div class="ttc" id="a_enums_8h_html_a641234c56fda12244c51e53c78788aadab4338cb657712ded12e542d8b416f676"><div class="ttname"><a href="_enums_8h.html#a641234c56fda12244c51e53c78788aadab4338cb657712ded12e542d8b416f676">CommitTypeMatchResults::MatchWithSubCategory</a></div><div class="ttdeci">@ MatchWithSubCategory</div></div>
 <div class="ttc" id="a_enums_8h_html_a641234c56fda12244c51e53c78788aadac8b77721c677e0429241a9250972122d"><div class="ttname"><a href="_enums_8h.html#a641234c56fda12244c51e53c78788aadac8b77721c677e0429241a9250972122d">CommitTypeMatchResults::NoMatch</a></div><div class="ttdeci">@ NoMatch</div></div>
 <div class="ttc" id="a_enums_8h_html_a809e24401d7a251436455596cc8395aaad8c5ccda9a7b4018b85bbfadcc0d233a"><div class="ttname"><a href="_enums_8h.html#a809e24401d7a251436455596cc8395aaad8c5ccda9a7b4018b85bbfadcc0d233a">CommitTypeInfo::ConventionalName</a></div><div class="ttdeci">@ ConventionalName</div></div>
 <div class="ttc" id="a_utils_8cpp_html_a4a8dd3a2de125b72d4fe6251a0a271b5"><div class="ttname"><a href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a></div><div class="ttdeci">Config config</div><div class="ttdef"><b>Definition</b> Main.cpp:40</div></div>
-<div class="ttc" id="aclass_config_html_a657f2b1955fc0129403677a7590e4c8f"><div class="ttname"><a href="class_config.html#a657f2b1955fc0129403677a7590e4c8f">Config::commitTypes</a></div><div class="ttdeci">string commitTypes[50][2]</div><div class="ttdoc">2d array storing conventional commit types and their corresponding markdown titles The first dimensio...</div><div class="ttdef"><b>Definition</b> Config.h:29</div></div>
+<div class="ttc" id="aclass_config_html_a657f2b1955fc0129403677a7590e4c8f"><div class="ttname"><a href="class_config.html#a657f2b1955fc0129403677a7590e4c8f">Config::commitTypes</a></div><div class="ttdeci">string commitTypes[50][2]</div><div class="ttdoc">2d array storing conventional commit types and their corresponding markdown titles The first dimensio...</div><div class="ttdef"><b>Definition</b> Config.h:31</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -188,62 +188,62 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The HTML text containing the exact same content as the given markdown </dd></dl>
-<div class="fragment"><div class="line"><span class="lineno">  113</span>                                                                      {</div>
-<div class="line"><span class="lineno">  114</span>    <span class="comment">// Initializing libcurl</span></div>
-<div class="line"><span class="lineno">  115</span>    CURL* curl = curl_easy_init();</div>
-<div class="line"><span class="lineno">  116</span>    CURLcode resultCode;</div>
-<div class="line"><span class="lineno">  117</span>    <span class="keywordtype">string</span> htmlText;</div>
-<div class="line"><span class="lineno">  118</span>    <span class="keyword">struct </span>curl_slist* headers = NULL;</div>
-<div class="line"><span class="lineno">  119</span>    headers = curl_slist_append(headers, ((<span class="keyword">const</span> <span class="keywordtype">string</span>)<span class="stringliteral">&quot;Accept: application/vnd.github+json&quot;</span>).c_str());</div>
-<div class="line"><span class="lineno">  120</span>    headers = curl_slist_append(headers, (<span class="stringliteral">&quot;Authorization: token &quot;</span> + githubToken).c_str());</div>
-<div class="line"><span class="lineno">  121</span> </div>
-<div class="line"><span class="lineno">  122</span>    <span class="keywordflow">if</span> (curl) {</div>
-<div class="line"><span class="lineno">  123</span>        curl_easy_setopt(curl, CURLOPT_URL, <a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a5a92889e1dc677fe8bc0530bf5792801">githubMarkdownApiUrl</a>.c_str());</div>
-<div class="line"><span class="lineno">  124</span>        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, <a class="code hl_function" href="_utils_8cpp.html#ad41caa3d3de0f8558e48bdd5dc407b4a">handleApiCallBack</a>);</div>
-<div class="line"><span class="lineno">  125</span>        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &amp;htmlText);</div>
-<div class="line"><span class="lineno">  126</span>        curl_easy_setopt(curl, CURLOPT_USERAGENT, <span class="stringliteral">&quot;Ahmed-Khaled-dev&quot;</span>);</div>
-<div class="line"><span class="lineno">  127</span>        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);</div>
-<div class="line"><span class="lineno">  128</span> </div>
-<div class="line"><span class="lineno">  129</span>        json postData;</div>
-<div class="line"><span class="lineno">  130</span>        postData[<span class="stringliteral">&quot;text&quot;</span>] = markdownText;</div>
-<div class="line"><span class="lineno">  131</span>        <span class="keywordtype">string</span> postDataString = postData.dump();</div>
-<div class="line"><span class="lineno">  132</span>        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postDataString.c_str());</div>
-<div class="line"><span class="lineno">  133</span> </div>
-<div class="line"><span class="lineno">  134</span>        resultCode = curl_easy_perform(curl);</div>
-<div class="line"><span class="lineno">  135</span> </div>
-<div class="line"><span class="lineno">  136</span>        <span class="keywordflow">if</span> (resultCode == CURLE_OK) {</div>
-<div class="line"><span class="lineno">  137</span>            <span class="comment">// Get the HTTP response code</span></div>
-<div class="line"><span class="lineno">  138</span>            <span class="keywordtype">long</span> httpCode;</div>
-<div class="line"><span class="lineno">  139</span>            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &amp;httpCode);</div>
-<div class="line"><span class="lineno">  140</span> </div>
-<div class="line"><span class="lineno">  141</span>            <span class="keywordflow">if</span> (httpCode == 200) {</div>
-<div class="line"><span class="lineno">  142</span>                <span class="keywordflow">return</span> htmlText;</div>
-<div class="line"><span class="lineno">  143</span>            }</div>
-<div class="line"><span class="lineno">  144</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (httpCode == 404) {</div>
-<div class="line"><span class="lineno">  145</span>                <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;Markdown API url not found&quot;</span>);</div>
+<div class="fragment"><div class="line"><span class="lineno">  116</span>                                                                      {</div>
+<div class="line"><span class="lineno">  117</span>    <span class="comment">// Initializing libcurl</span></div>
+<div class="line"><span class="lineno">  118</span>    CURL* curl = curl_easy_init();</div>
+<div class="line"><span class="lineno">  119</span>    CURLcode resultCode;</div>
+<div class="line"><span class="lineno">  120</span>    <span class="keywordtype">string</span> htmlText;</div>
+<div class="line"><span class="lineno">  121</span>    <span class="keyword">struct </span>curl_slist* headers = NULL;</div>
+<div class="line"><span class="lineno">  122</span>    headers = curl_slist_append(headers, ((<span class="keyword">const</span> <span class="keywordtype">string</span>)<span class="stringliteral">&quot;Accept: application/vnd.github+json&quot;</span>).c_str());</div>
+<div class="line"><span class="lineno">  123</span>    headers = curl_slist_append(headers, (<span class="stringliteral">&quot;Authorization: token &quot;</span> + githubToken).c_str());</div>
+<div class="line"><span class="lineno">  124</span> </div>
+<div class="line"><span class="lineno">  125</span>    <span class="keywordflow">if</span> (curl) {</div>
+<div class="line"><span class="lineno">  126</span>        curl_easy_setopt(curl, CURLOPT_URL, <a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a5a92889e1dc677fe8bc0530bf5792801">githubMarkdownApiUrl</a>.c_str());</div>
+<div class="line"><span class="lineno">  127</span>        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, <a class="code hl_function" href="_utils_8cpp.html#ad41caa3d3de0f8558e48bdd5dc407b4a">handleApiCallBack</a>);</div>
+<div class="line"><span class="lineno">  128</span>        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &amp;htmlText);</div>
+<div class="line"><span class="lineno">  129</span>        curl_easy_setopt(curl, CURLOPT_USERAGENT, <span class="stringliteral">&quot;Ahmed-Khaled-dev&quot;</span>);</div>
+<div class="line"><span class="lineno">  130</span>        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headers);</div>
+<div class="line"><span class="lineno">  131</span> </div>
+<div class="line"><span class="lineno">  132</span>        json postData;</div>
+<div class="line"><span class="lineno">  133</span>        postData[<span class="stringliteral">&quot;text&quot;</span>] = markdownText;</div>
+<div class="line"><span class="lineno">  134</span>        <span class="keywordtype">string</span> postDataString = postData.dump();</div>
+<div class="line"><span class="lineno">  135</span>        curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postDataString.c_str());</div>
+<div class="line"><span class="lineno">  136</span> </div>
+<div class="line"><span class="lineno">  137</span>        resultCode = curl_easy_perform(curl);</div>
+<div class="line"><span class="lineno">  138</span> </div>
+<div class="line"><span class="lineno">  139</span>        <span class="keywordflow">if</span> (resultCode == CURLE_OK) {</div>
+<div class="line"><span class="lineno">  140</span>            <span class="comment">// Get the HTTP response code</span></div>
+<div class="line"><span class="lineno">  141</span>            <span class="keywordtype">long</span> httpCode;</div>
+<div class="line"><span class="lineno">  142</span>            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &amp;httpCode);</div>
+<div class="line"><span class="lineno">  143</span> </div>
+<div class="line"><span class="lineno">  144</span>            <span class="keywordflow">if</span> (httpCode == 200) {</div>
+<div class="line"><span class="lineno">  145</span>                <span class="keywordflow">return</span> htmlText;</div>
 <div class="line"><span class="lineno">  146</span>            }</div>
-<div class="line"><span class="lineno">  147</span>            <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  148</span>                <a class="code hl_function" href="_utils_8cpp.html#a0c8e31c8f6351f144c45cc8999795c44">handleGithubApiErrorCodes</a>(httpCode, htmlText);</div>
+<div class="line"><span class="lineno">  147</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (httpCode == 404) {</div>
+<div class="line"><span class="lineno">  148</span>                <span class="keywordflow">throw</span> runtime_error(<span class="stringliteral">&quot;Markdown API url not found&quot;</span>);</div>
 <div class="line"><span class="lineno">  149</span>            }</div>
-<div class="line"><span class="lineno">  150</span>        }</div>
-<div class="line"><span class="lineno">  151</span>        <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  152</span>            <span class="keywordflow">throw</span> runtime_error(<a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a903b5e88c845879f426fe5c3705dd0f4">githubApiUnableToMakeRequestError</a>);</div>
+<div class="line"><span class="lineno">  150</span>            <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  151</span>                <a class="code hl_function" href="_utils_8cpp.html#a0c8e31c8f6351f144c45cc8999795c44">handleGithubApiErrorCodes</a>(httpCode, htmlText);</div>
+<div class="line"><span class="lineno">  152</span>            }</div>
 <div class="line"><span class="lineno">  153</span>        }</div>
-<div class="line"><span class="lineno">  154</span> </div>
-<div class="line"><span class="lineno">  155</span>        curl_easy_cleanup(curl);</div>
-<div class="line"><span class="lineno">  156</span>        curl_slist_free_all(headers);</div>
-<div class="line"><span class="lineno">  157</span>    }</div>
-<div class="line"><span class="lineno">  158</span>    <span class="keywordflow">else</span> {</div>
-<div class="line"><span class="lineno">  159</span>        <span class="keywordflow">throw</span> runtime_error(<a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#acf4c736b02cbe0f7719f885630e16f68">githubApiLibcurlError</a>);</div>
+<div class="line"><span class="lineno">  154</span>        <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  155</span>            <span class="keywordflow">throw</span> runtime_error(<a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a903b5e88c845879f426fe5c3705dd0f4">githubApiUnableToMakeRequestError</a>);</div>
+<div class="line"><span class="lineno">  156</span>        }</div>
+<div class="line"><span class="lineno">  157</span> </div>
+<div class="line"><span class="lineno">  158</span>        curl_easy_cleanup(curl);</div>
+<div class="line"><span class="lineno">  159</span>        curl_slist_free_all(headers);</div>
 <div class="line"><span class="lineno">  160</span>    }</div>
-<div class="line"><span class="lineno">  161</span> </div>
-<div class="line"><span class="lineno">  162</span>    <span class="keywordflow">return</span> htmlText;</div>
-<div class="line"><span class="lineno">  163</span>}</div>
-<div class="ttc" id="a_utils_8cpp_html_a0c8e31c8f6351f144c45cc8999795c44"><div class="ttname"><a href="_utils_8cpp.html#a0c8e31c8f6351f144c45cc8999795c44">handleGithubApiErrorCodes</a></div><div class="ttdeci">void handleGithubApiErrorCodes(long errorCode, string apiResponse)</div><div class="ttdoc">Throws runtime exceptions with appropriate messages that describe the given GitHub API error code All...</div><div class="ttdef"><b>Definition</b> Utils.cpp:75</div></div>
-<div class="ttc" id="a_utils_8cpp_html_ad41caa3d3de0f8558e48bdd5dc407b4a"><div class="ttname"><a href="_utils_8cpp.html#ad41caa3d3de0f8558e48bdd5dc407b4a">handleApiCallBack</a></div><div class="ttdeci">size_t handleApiCallBack(char *data, size_t size, size_t numOfBytes, string *buffer)</div><div class="ttdoc">Callback function that is required to handle API response in libcurl.</div><div class="ttdef"><b>Definition</b> Utils.cpp:63</div></div>
-<div class="ttc" id="aclass_config_html_a5a92889e1dc677fe8bc0530bf5792801"><div class="ttname"><a href="class_config.html#a5a92889e1dc677fe8bc0530bf5792801">Config::githubMarkdownApiUrl</a></div><div class="ttdeci">string githubMarkdownApiUrl</div><div class="ttdef"><b>Definition</b> Config.h:21</div></div>
-<div class="ttc" id="aclass_config_html_a903b5e88c845879f426fe5c3705dd0f4"><div class="ttname"><a href="class_config.html#a903b5e88c845879f426fe5c3705dd0f4">Config::githubApiUnableToMakeRequestError</a></div><div class="ttdeci">string githubApiUnableToMakeRequestError</div><div class="ttdef"><b>Definition</b> Config.h:62</div></div>
-<div class="ttc" id="aclass_config_html_acf4c736b02cbe0f7719f885630e16f68"><div class="ttname"><a href="class_config.html#acf4c736b02cbe0f7719f885630e16f68">Config::githubApiLibcurlError</a></div><div class="ttdeci">string githubApiLibcurlError</div><div class="ttdef"><b>Definition</b> Config.h:63</div></div>
+<div class="line"><span class="lineno">  161</span>    <span class="keywordflow">else</span> {</div>
+<div class="line"><span class="lineno">  162</span>        <span class="keywordflow">throw</span> runtime_error(<a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#acf4c736b02cbe0f7719f885630e16f68">githubApiLibcurlError</a>);</div>
+<div class="line"><span class="lineno">  163</span>    }</div>
+<div class="line"><span class="lineno">  164</span> </div>
+<div class="line"><span class="lineno">  165</span>    <span class="keywordflow">return</span> htmlText;</div>
+<div class="line"><span class="lineno">  166</span>}</div>
+<div class="ttc" id="a_utils_8cpp_html_a0c8e31c8f6351f144c45cc8999795c44"><div class="ttname"><a href="_utils_8cpp.html#a0c8e31c8f6351f144c45cc8999795c44">handleGithubApiErrorCodes</a></div><div class="ttdeci">void handleGithubApiErrorCodes(long errorCode, string apiResponse)</div><div class="ttdoc">Throws runtime exceptions with appropriate messages that describe the given GitHub API error code All...</div><div class="ttdef"><b>Definition</b> Utils.cpp:78</div></div>
+<div class="ttc" id="a_utils_8cpp_html_ad41caa3d3de0f8558e48bdd5dc407b4a"><div class="ttname"><a href="_utils_8cpp.html#ad41caa3d3de0f8558e48bdd5dc407b4a">handleApiCallBack</a></div><div class="ttdeci">size_t handleApiCallBack(char *data, size_t size, size_t numOfBytes, string *buffer)</div><div class="ttdoc">Callback function that is required to handle API response in libcurl.</div><div class="ttdef"><b>Definition</b> Utils.cpp:66</div></div>
+<div class="ttc" id="aclass_config_html_a5a92889e1dc677fe8bc0530bf5792801"><div class="ttname"><a href="class_config.html#a5a92889e1dc677fe8bc0530bf5792801">Config::githubMarkdownApiUrl</a></div><div class="ttdeci">string githubMarkdownApiUrl</div><div class="ttdef"><b>Definition</b> Config.h:22</div></div>
+<div class="ttc" id="aclass_config_html_a903b5e88c845879f426fe5c3705dd0f4"><div class="ttname"><a href="class_config.html#a903b5e88c845879f426fe5c3705dd0f4">Config::githubApiUnableToMakeRequestError</a></div><div class="ttdeci">string githubApiUnableToMakeRequestError</div><div class="ttdef"><b>Definition</b> Config.h:65</div></div>
+<div class="ttc" id="aclass_config_html_acf4c736b02cbe0f7719f885630e16f68"><div class="ttname"><a href="class_config.html#acf4c736b02cbe0f7719f885630e16f68">Config::githubApiLibcurlError</a></div><div class="ttdeci">string githubApiLibcurlError</div><div class="ttdef"><b>Definition</b> Config.h:66</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -287,11 +287,11 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Total size of the received data </dd></dl>
-<div class="fragment"><div class="line"><span class="lineno">   63</span>                                                                                     {</div>
-<div class="line"><span class="lineno">   64</span>    <span class="keywordtype">size_t</span> totalSize = size * numOfBytes;</div>
-<div class="line"><span class="lineno">   65</span>    buffer-&gt;append(data, totalSize);</div>
-<div class="line"><span class="lineno">   66</span>    <span class="keywordflow">return</span> totalSize;</div>
-<div class="line"><span class="lineno">   67</span>}</div>
+<div class="fragment"><div class="line"><span class="lineno">   66</span>                                                                                     {</div>
+<div class="line"><span class="lineno">   67</span>    <span class="keywordtype">size_t</span> totalSize = size * numOfBytes;</div>
+<div class="line"><span class="lineno">   68</span>    buffer-&gt;append(data, totalSize);</div>
+<div class="line"><span class="lineno">   69</span>    <span class="keywordflow">return</span> totalSize;</div>
+<div class="line"><span class="lineno">   70</span>}</div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -322,20 +322,20 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<div class="fragment"><div class="line"><span class="lineno">   75</span>                                                                   {</div>
-<div class="line"><span class="lineno">   76</span>    <span class="keywordflow">if</span> (errorCode == 429 || errorCode == 403) {</div>
-<div class="line"><span class="lineno">   77</span>        <span class="keywordflow">throw</span> runtime_error(<a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a48e7a64e674a28565d7b4225e81bb49d">githubApiRateLimitExceededError</a> + apiResponse);</div>
-<div class="line"><span class="lineno">   78</span>    }</div>
-<div class="line"><span class="lineno">   79</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (errorCode == 401) {</div>
-<div class="line"><span class="lineno">   80</span>        <span class="keywordflow">throw</span> runtime_error(<a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a439cb4da3585ac76d24cf52da010866c">githubApiUnauthorizedAccessError</a> + apiResponse);</div>
+<div class="fragment"><div class="line"><span class="lineno">   78</span>                                                                   {</div>
+<div class="line"><span class="lineno">   79</span>    <span class="keywordflow">if</span> (errorCode == 429 || errorCode == 403) {</div>
+<div class="line"><span class="lineno">   80</span>        <span class="keywordflow">throw</span> runtime_error(<a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a48e7a64e674a28565d7b4225e81bb49d">githubApiRateLimitExceededError</a> + apiResponse);</div>
 <div class="line"><span class="lineno">   81</span>    }</div>
-<div class="line"><span class="lineno">   82</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (errorCode == 400) {</div>
-<div class="line"><span class="lineno">   83</span>        <span class="keywordflow">throw</span> runtime_error(<a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#ad8d55f1f61294d0141e755336bf9b72a">githubApiBadRequestError</a> + apiResponse);</div>
+<div class="line"><span class="lineno">   82</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (errorCode == 401) {</div>
+<div class="line"><span class="lineno">   83</span>        <span class="keywordflow">throw</span> runtime_error(<a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a439cb4da3585ac76d24cf52da010866c">githubApiUnauthorizedAccessError</a> + apiResponse);</div>
 <div class="line"><span class="lineno">   84</span>    }</div>
-<div class="line"><span class="lineno">   85</span>}</div>
-<div class="ttc" id="aclass_config_html_a439cb4da3585ac76d24cf52da010866c"><div class="ttname"><a href="class_config.html#a439cb4da3585ac76d24cf52da010866c">Config::githubApiUnauthorizedAccessError</a></div><div class="ttdeci">string githubApiUnauthorizedAccessError</div><div class="ttdef"><b>Definition</b> Config.h:60</div></div>
-<div class="ttc" id="aclass_config_html_a48e7a64e674a28565d7b4225e81bb49d"><div class="ttname"><a href="class_config.html#a48e7a64e674a28565d7b4225e81bb49d">Config::githubApiRateLimitExceededError</a></div><div class="ttdeci">string githubApiRateLimitExceededError</div><div class="ttdef"><b>Definition</b> Config.h:59</div></div>
-<div class="ttc" id="aclass_config_html_ad8d55f1f61294d0141e755336bf9b72a"><div class="ttname"><a href="class_config.html#ad8d55f1f61294d0141e755336bf9b72a">Config::githubApiBadRequestError</a></div><div class="ttdeci">string githubApiBadRequestError</div><div class="ttdef"><b>Definition</b> Config.h:61</div></div>
+<div class="line"><span class="lineno">   85</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (errorCode == 400) {</div>
+<div class="line"><span class="lineno">   86</span>        <span class="keywordflow">throw</span> runtime_error(<a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#ad8d55f1f61294d0141e755336bf9b72a">githubApiBadRequestError</a> + apiResponse);</div>
+<div class="line"><span class="lineno">   87</span>    }</div>
+<div class="line"><span class="lineno">   88</span>}</div>
+<div class="ttc" id="aclass_config_html_a439cb4da3585ac76d24cf52da010866c"><div class="ttname"><a href="class_config.html#a439cb4da3585ac76d24cf52da010866c">Config::githubApiUnauthorizedAccessError</a></div><div class="ttdeci">string githubApiUnauthorizedAccessError</div><div class="ttdef"><b>Definition</b> Config.h:63</div></div>
+<div class="ttc" id="aclass_config_html_a48e7a64e674a28565d7b4225e81bb49d"><div class="ttname"><a href="class_config.html#a48e7a64e674a28565d7b4225e81bb49d">Config::githubApiRateLimitExceededError</a></div><div class="ttdeci">string githubApiRateLimitExceededError</div><div class="ttdef"><b>Definition</b> Config.h:62</div></div>
+<div class="ttc" id="aclass_config_html_ad8d55f1f61294d0141e755336bf9b72a"><div class="ttname"><a href="class_config.html#ad8d55f1f61294d0141e755336bf9b72a">Config::githubApiBadRequestError</a></div><div class="ttdeci">string githubApiBadRequestError</div><div class="ttdef"><b>Definition</b> Config.h:64</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -384,27 +384,32 @@ Functions</h2></td></tr>
 <div class="line"><span class="lineno">   47</span>        cerr &lt;&lt; <a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a6c4a9ea7fad345ee60f7aabc5b37ffbf">noReleaseEndReferenceError</a> &lt;&lt; endl;</div>
 <div class="line"><span class="lineno">   48</span>    }</div>
 <div class="line"><span class="lineno">   49</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span> (inputError == <a class="code hl_enumvalue" href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42a879d6e922bbbda815bd7cacbdbcf876d">InputErrors::NoPullRequestNumber</a>) {</div>
-<div class="line"><span class="lineno">   50</span>        cerr &lt;&lt; <a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#aebed980d688e0b1b48dc010b1ff63447">noPullRequestNumber</a> &lt;&lt; endl;</div>
+<div class="line"><span class="lineno">   50</span>        cerr &lt;&lt; <a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a11bd70377b7eb612669e05afc4063286">noPullRequestNumberError</a> &lt;&lt; endl;</div>
 <div class="line"><span class="lineno">   51</span>    }</div>
-<div class="line"><span class="lineno">   52</span>    cerr &lt;&lt; <a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a07c5526f48ca6da64b18a02f992d5243">expectedSyntaxMessage</a> &lt;&lt; endl;</div>
-<div class="line"><span class="lineno">   53</span>}</div>
+<div class="line"><span class="lineno">   52</span>    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(inputError == <a class="code hl_enumvalue" href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42ac692740f751944fd5c8ee92a692b1a4a">InputErrors::NoGithubRepository</a>) {</div>
+<div class="line"><span class="lineno">   53</span>        cerr &lt;&lt; <a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a52a095d3a0136ffc8d2d13e7e7f159a0">noGithubRepositoryError</a> &lt;&lt; endl;</div>
+<div class="line"><span class="lineno">   54</span>    }</div>
+<div class="line"><span class="lineno">   55</span>    cerr &lt;&lt; <a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a07c5526f48ca6da64b18a02f992d5243">expectedSyntaxMessage</a> &lt;&lt; endl;</div>
+<div class="line"><span class="lineno">   56</span>}</div>
 <div class="ttc" id="a_enums_8h_html_aa9ba5cd8e97388b6ebdef4ae7816fa42a347b2aacea1efd3b947c49307468b7c5"><div class="ttname"><a href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42a347b2aacea1efd3b947c49307468b7c5">InputErrors::NoReleaseStartReference</a></div><div class="ttdeci">@ NoReleaseStartReference</div></div>
 <div class="ttc" id="a_enums_8h_html_aa9ba5cd8e97388b6ebdef4ae7816fa42a389539cf4f36e93d111c1c69b825967d"><div class="ttname"><a href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42a389539cf4f36e93d111c1c69b825967d">InputErrors::NoReleaseNotesSource</a></div><div class="ttdeci">@ NoReleaseNotesSource</div></div>
 <div class="ttc" id="a_enums_8h_html_aa9ba5cd8e97388b6ebdef4ae7816fa42a879d6e922bbbda815bd7cacbdbcf876d"><div class="ttname"><a href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42a879d6e922bbbda815bd7cacbdbcf876d">InputErrors::NoPullRequestNumber</a></div><div class="ttdeci">@ NoPullRequestNumber</div></div>
+<div class="ttc" id="a_enums_8h_html_aa9ba5cd8e97388b6ebdef4ae7816fa42ac692740f751944fd5c8ee92a692b1a4a"><div class="ttname"><a href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42ac692740f751944fd5c8ee92a692b1a4a">InputErrors::NoGithubRepository</a></div><div class="ttdeci">@ NoGithubRepository</div></div>
 <div class="ttc" id="a_enums_8h_html_aa9ba5cd8e97388b6ebdef4ae7816fa42acad21a6432b04897748c0d79a5f90821"><div class="ttname"><a href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42acad21a6432b04897748c0d79a5f90821">InputErrors::NoReleaseEndReference</a></div><div class="ttdeci">@ NoReleaseEndReference</div></div>
 <div class="ttc" id="a_enums_8h_html_aa9ba5cd8e97388b6ebdef4ae7816fa42ad668d09c9588d8564277f3ddab1c6f6b"><div class="ttname"><a href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42ad668d09c9588d8564277f3ddab1c6f6b">InputErrors::IncorrectReleaseNotesMode</a></div><div class="ttdeci">@ IncorrectReleaseNotesMode</div></div>
 <div class="ttc" id="a_enums_8h_html_aa9ba5cd8e97388b6ebdef4ae7816fa42ad925e78736c18035e65396a754e28fa6"><div class="ttname"><a href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42ad925e78736c18035e65396a754e28fa6">InputErrors::IncorrectReleaseNotesSource</a></div><div class="ttdeci">@ IncorrectReleaseNotesSource</div></div>
 <div class="ttc" id="a_enums_8h_html_aa9ba5cd8e97388b6ebdef4ae7816fa42aeffe3f9641a2174350b3e89175e217d4"><div class="ttname"><a href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42aeffe3f9641a2174350b3e89175e217d4">InputErrors::NoReleaseNotesMode</a></div><div class="ttdeci">@ NoReleaseNotesMode</div></div>
 <div class="ttc" id="a_enums_8h_html_aa9ba5cd8e97388b6ebdef4ae7816fa42af949897f6ed18f13ebde7435a913555e"><div class="ttname"><a href="_enums_8h.html#aa9ba5cd8e97388b6ebdef4ae7816fa42af949897f6ed18f13ebde7435a913555e">InputErrors::NoGithubToken</a></div><div class="ttdeci">@ NoGithubToken</div></div>
-<div class="ttc" id="aclass_config_html_a07c5526f48ca6da64b18a02f992d5243"><div class="ttname"><a href="class_config.html#a07c5526f48ca6da64b18a02f992d5243">Config::expectedSyntaxMessage</a></div><div class="ttdeci">string expectedSyntaxMessage</div><div class="ttdef"><b>Definition</b> Config.h:67</div></div>
-<div class="ttc" id="aclass_config_html_a18388e7875b761801d9eabd62440d2be"><div class="ttname"><a href="class_config.html#a18388e7875b761801d9eabd62440d2be">Config::noReleaseNotesModeError</a></div><div class="ttdeci">string noReleaseNotesModeError</div><div class="ttdef"><b>Definition</b> Config.h:53</div></div>
-<div class="ttc" id="aclass_config_html_a1f392c429d63fbccb8f9b8f4b55c1613"><div class="ttname"><a href="class_config.html#a1f392c429d63fbccb8f9b8f4b55c1613">Config::noReleaseStartReferenceError</a></div><div class="ttdeci">string noReleaseStartReferenceError</div><div class="ttdef"><b>Definition</b> Config.h:56</div></div>
-<div class="ttc" id="aclass_config_html_a20877f270c4950e90460bc5c28c98bba"><div class="ttname"><a href="class_config.html#a20877f270c4950e90460bc5c28c98bba">Config::incorrectReleaseNotesModeError</a></div><div class="ttdeci">string incorrectReleaseNotesModeError</div><div class="ttdef"><b>Definition</b> Config.h:54</div></div>
-<div class="ttc" id="aclass_config_html_a2b3f23eea8c1ffab097d7e6fe8ff2b26"><div class="ttname"><a href="class_config.html#a2b3f23eea8c1ffab097d7e6fe8ff2b26">Config::incorrectReleaseNotesSourceError</a></div><div class="ttdeci">string incorrectReleaseNotesSourceError</div><div class="ttdef"><b>Definition</b> Config.h:52</div></div>
-<div class="ttc" id="aclass_config_html_a6c4a9ea7fad345ee60f7aabc5b37ffbf"><div class="ttname"><a href="class_config.html#a6c4a9ea7fad345ee60f7aabc5b37ffbf">Config::noReleaseEndReferenceError</a></div><div class="ttdeci">string noReleaseEndReferenceError</div><div class="ttdef"><b>Definition</b> Config.h:57</div></div>
-<div class="ttc" id="aclass_config_html_a92c8d063bba88782cfa12eb6196516e2"><div class="ttname"><a href="class_config.html#a92c8d063bba88782cfa12eb6196516e2">Config::noGithubTokenError</a></div><div class="ttdeci">string noGithubTokenError</div><div class="ttdef"><b>Definition</b> Config.h:55</div></div>
-<div class="ttc" id="aclass_config_html_abf83b617da52fadd2938917329248ae2"><div class="ttname"><a href="class_config.html#abf83b617da52fadd2938917329248ae2">Config::noReleaseNotesSourceError</a></div><div class="ttdeci">string noReleaseNotesSourceError</div><div class="ttdef"><b>Definition</b> Config.h:51</div></div>
-<div class="ttc" id="aclass_config_html_aebed980d688e0b1b48dc010b1ff63447"><div class="ttname"><a href="class_config.html#aebed980d688e0b1b48dc010b1ff63447">Config::noPullRequestNumber</a></div><div class="ttdeci">string noPullRequestNumber</div><div class="ttdef"><b>Definition</b> Config.h:58</div></div>
+<div class="ttc" id="aclass_config_html_a07c5526f48ca6da64b18a02f992d5243"><div class="ttname"><a href="class_config.html#a07c5526f48ca6da64b18a02f992d5243">Config::expectedSyntaxMessage</a></div><div class="ttdeci">string expectedSyntaxMessage</div><div class="ttdef"><b>Definition</b> Config.h:70</div></div>
+<div class="ttc" id="aclass_config_html_a11bd70377b7eb612669e05afc4063286"><div class="ttname"><a href="class_config.html#a11bd70377b7eb612669e05afc4063286">Config::noPullRequestNumberError</a></div><div class="ttdeci">string noPullRequestNumberError</div><div class="ttdef"><b>Definition</b> Config.h:60</div></div>
+<div class="ttc" id="aclass_config_html_a18388e7875b761801d9eabd62440d2be"><div class="ttname"><a href="class_config.html#a18388e7875b761801d9eabd62440d2be">Config::noReleaseNotesModeError</a></div><div class="ttdeci">string noReleaseNotesModeError</div><div class="ttdef"><b>Definition</b> Config.h:55</div></div>
+<div class="ttc" id="aclass_config_html_a1f392c429d63fbccb8f9b8f4b55c1613"><div class="ttname"><a href="class_config.html#a1f392c429d63fbccb8f9b8f4b55c1613">Config::noReleaseStartReferenceError</a></div><div class="ttdeci">string noReleaseStartReferenceError</div><div class="ttdef"><b>Definition</b> Config.h:58</div></div>
+<div class="ttc" id="aclass_config_html_a20877f270c4950e90460bc5c28c98bba"><div class="ttname"><a href="class_config.html#a20877f270c4950e90460bc5c28c98bba">Config::incorrectReleaseNotesModeError</a></div><div class="ttdeci">string incorrectReleaseNotesModeError</div><div class="ttdef"><b>Definition</b> Config.h:56</div></div>
+<div class="ttc" id="aclass_config_html_a2b3f23eea8c1ffab097d7e6fe8ff2b26"><div class="ttname"><a href="class_config.html#a2b3f23eea8c1ffab097d7e6fe8ff2b26">Config::incorrectReleaseNotesSourceError</a></div><div class="ttdeci">string incorrectReleaseNotesSourceError</div><div class="ttdef"><b>Definition</b> Config.h:54</div></div>
+<div class="ttc" id="aclass_config_html_a52a095d3a0136ffc8d2d13e7e7f159a0"><div class="ttname"><a href="class_config.html#a52a095d3a0136ffc8d2d13e7e7f159a0">Config::noGithubRepositoryError</a></div><div class="ttdeci">string noGithubRepositoryError</div><div class="ttdef"><b>Definition</b> Config.h:61</div></div>
+<div class="ttc" id="aclass_config_html_a6c4a9ea7fad345ee60f7aabc5b37ffbf"><div class="ttname"><a href="class_config.html#a6c4a9ea7fad345ee60f7aabc5b37ffbf">Config::noReleaseEndReferenceError</a></div><div class="ttdeci">string noReleaseEndReferenceError</div><div class="ttdef"><b>Definition</b> Config.h:59</div></div>
+<div class="ttc" id="aclass_config_html_a92c8d063bba88782cfa12eb6196516e2"><div class="ttname"><a href="class_config.html#a92c8d063bba88782cfa12eb6196516e2">Config::noGithubTokenError</a></div><div class="ttdeci">string noGithubTokenError</div><div class="ttdef"><b>Definition</b> Config.h:57</div></div>
+<div class="ttc" id="aclass_config_html_abf83b617da52fadd2938917329248ae2"><div class="ttname"><a href="class_config.html#abf83b617da52fadd2938917329248ae2">Config::noReleaseNotesSourceError</a></div><div class="ttdeci">string noReleaseNotesSourceError</div><div class="ttdef"><b>Definition</b> Config.h:53</div></div>
 </div><!-- fragment -->
 </div>
 </div>
@@ -435,34 +440,34 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<div class="fragment"><div class="line"><span class="lineno">  171</span>                                                                                   {</div>
-<div class="line"><span class="lineno">  172</span>    ofstream markdownFileOutput(<a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a62759f6a398e2c56465891b146255c84">markdownOutputFileName</a>);</div>
-<div class="line"><span class="lineno">  173</span> </div>
-<div class="line"><span class="lineno">  174</span>    <span class="keywordflow">if</span> (!markdownFileOutput.is_open()) {</div>
-<div class="line"><span class="lineno">  175</span>        <span class="keywordflow">throw</span> runtime_error(<a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#afb267a1753c93822a4ec7f85df994cfb">markdownFileError</a>);</div>
-<div class="line"><span class="lineno">  176</span>    }</div>
-<div class="line"><span class="lineno">  177</span> </div>
-<div class="line"><span class="lineno">  178</span>    <span class="keywordflow">if</span> (markdownGeneratedNotes.size() == 0) {</div>
-<div class="line"><span class="lineno">  179</span>        <span class="keywordflow">throw</span> runtime_error(<a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a782de69b8774d8619d6913ed7990c0a7">emptyReleaseNotesMessage</a>);</div>
-<div class="line"><span class="lineno">  180</span>    }</div>
-<div class="line"><span class="lineno">  181</span> </div>
-<div class="line"><span class="lineno">  182</span>    markdownFileOutput &lt;&lt; markdownGeneratedNotes;</div>
-<div class="line"><span class="lineno">  183</span>    markdownFileOutput.close();</div>
+<div class="fragment"><div class="line"><span class="lineno">  174</span>                                                                                   {</div>
+<div class="line"><span class="lineno">  175</span>    ofstream markdownFileOutput(<a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a62759f6a398e2c56465891b146255c84">markdownOutputFileName</a>);</div>
+<div class="line"><span class="lineno">  176</span> </div>
+<div class="line"><span class="lineno">  177</span>    <span class="keywordflow">if</span> (!markdownFileOutput.is_open()) {</div>
+<div class="line"><span class="lineno">  178</span>        <span class="keywordflow">throw</span> runtime_error(<a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#afb267a1753c93822a4ec7f85df994cfb">markdownFileError</a>);</div>
+<div class="line"><span class="lineno">  179</span>    }</div>
+<div class="line"><span class="lineno">  180</span> </div>
+<div class="line"><span class="lineno">  181</span>    <span class="keywordflow">if</span> (markdownGeneratedNotes.size() == 0) {</div>
+<div class="line"><span class="lineno">  182</span>        <span class="keywordflow">throw</span> runtime_error(<a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#a782de69b8774d8619d6913ed7990c0a7">emptyReleaseNotesMessage</a>);</div>
+<div class="line"><span class="lineno">  183</span>    }</div>
 <div class="line"><span class="lineno">  184</span> </div>
-<div class="line"><span class="lineno">  185</span>    ofstream htmlFileOutput(<a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#aa89f4a362faa03e9583c902fb999bff0">htmlOutputFileName</a>);</div>
-<div class="line"><span class="lineno">  186</span> </div>
-<div class="line"><span class="lineno">  187</span>    <span class="keywordflow">if</span> (!htmlFileOutput.is_open()) {</div>
-<div class="line"><span class="lineno">  188</span>        <span class="keywordflow">throw</span> runtime_error(<a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#af7181451de0b06b8aac6fe2dd613c10e">htmlFileError</a>);</div>
-<div class="line"><span class="lineno">  189</span>    }</div>
-<div class="line"><span class="lineno">  190</span> </div>
-<div class="line"><span class="lineno">  191</span>    htmlFileOutput &lt;&lt; <a class="code hl_function" href="_utils_8cpp.html#a94240233bd03f43638fe7d5d3a3265ca">convertMarkdownToHtml</a>(markdownGeneratedNotes, githubToken);</div>
-<div class="line"><span class="lineno">  192</span>}</div>
-<div class="ttc" id="a_utils_8cpp_html_a94240233bd03f43638fe7d5d3a3265ca"><div class="ttname"><a href="_utils_8cpp.html#a94240233bd03f43638fe7d5d3a3265ca">convertMarkdownToHtml</a></div><div class="ttdeci">string convertMarkdownToHtml(string markdownText, string githubToken)</div><div class="ttdoc">Converts markdown to HTML using the GitHub API markdown endpoint.</div><div class="ttdef"><b>Definition</b> Utils.cpp:113</div></div>
+<div class="line"><span class="lineno">  185</span>    markdownFileOutput &lt;&lt; markdownGeneratedNotes;</div>
+<div class="line"><span class="lineno">  186</span>    markdownFileOutput.close();</div>
+<div class="line"><span class="lineno">  187</span> </div>
+<div class="line"><span class="lineno">  188</span>    ofstream htmlFileOutput(<a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#aa89f4a362faa03e9583c902fb999bff0">htmlOutputFileName</a>);</div>
+<div class="line"><span class="lineno">  189</span> </div>
+<div class="line"><span class="lineno">  190</span>    <span class="keywordflow">if</span> (!htmlFileOutput.is_open()) {</div>
+<div class="line"><span class="lineno">  191</span>        <span class="keywordflow">throw</span> runtime_error(<a class="code hl_variable" href="_utils_8cpp.html#a4a8dd3a2de125b72d4fe6251a0a271b5">config</a>.<a class="code hl_variable" href="class_config.html#af7181451de0b06b8aac6fe2dd613c10e">htmlFileError</a>);</div>
+<div class="line"><span class="lineno">  192</span>    }</div>
+<div class="line"><span class="lineno">  193</span> </div>
+<div class="line"><span class="lineno">  194</span>    htmlFileOutput &lt;&lt; <a class="code hl_function" href="_utils_8cpp.html#a94240233bd03f43638fe7d5d3a3265ca">convertMarkdownToHtml</a>(markdownGeneratedNotes, githubToken);</div>
+<div class="line"><span class="lineno">  195</span>}</div>
+<div class="ttc" id="a_utils_8cpp_html_a94240233bd03f43638fe7d5d3a3265ca"><div class="ttname"><a href="_utils_8cpp.html#a94240233bd03f43638fe7d5d3a3265ca">convertMarkdownToHtml</a></div><div class="ttdeci">string convertMarkdownToHtml(string markdownText, string githubToken)</div><div class="ttdoc">Converts markdown to HTML using the GitHub API markdown endpoint.</div><div class="ttdef"><b>Definition</b> Utils.cpp:116</div></div>
 <div class="ttc" id="aclass_config_html_a62759f6a398e2c56465891b146255c84"><div class="ttname"><a href="class_config.html#a62759f6a398e2c56465891b146255c84">Config::markdownOutputFileName</a></div><div class="ttdeci">string markdownOutputFileName</div><div class="ttdef"><b>Definition</b> Config.h:18</div></div>
-<div class="ttc" id="aclass_config_html_a782de69b8774d8619d6913ed7990c0a7"><div class="ttname"><a href="class_config.html#a782de69b8774d8619d6913ed7990c0a7">Config::emptyReleaseNotesMessage</a></div><div class="ttdeci">string emptyReleaseNotesMessage</div><div class="ttdef"><b>Definition</b> Config.h:70</div></div>
+<div class="ttc" id="aclass_config_html_a782de69b8774d8619d6913ed7990c0a7"><div class="ttname"><a href="class_config.html#a782de69b8774d8619d6913ed7990c0a7">Config::emptyReleaseNotesMessage</a></div><div class="ttdeci">string emptyReleaseNotesMessage</div><div class="ttdef"><b>Definition</b> Config.h:73</div></div>
 <div class="ttc" id="aclass_config_html_aa89f4a362faa03e9583c902fb999bff0"><div class="ttname"><a href="class_config.html#aa89f4a362faa03e9583c902fb999bff0">Config::htmlOutputFileName</a></div><div class="ttdeci">string htmlOutputFileName</div><div class="ttdef"><b>Definition</b> Config.h:19</div></div>
-<div class="ttc" id="aclass_config_html_af7181451de0b06b8aac6fe2dd613c10e"><div class="ttname"><a href="class_config.html#af7181451de0b06b8aac6fe2dd613c10e">Config::htmlFileError</a></div><div class="ttdeci">string htmlFileError</div><div class="ttdef"><b>Definition</b> Config.h:66</div></div>
-<div class="ttc" id="aclass_config_html_afb267a1753c93822a4ec7f85df994cfb"><div class="ttname"><a href="class_config.html#afb267a1753c93822a4ec7f85df994cfb">Config::markdownFileError</a></div><div class="ttdeci">string markdownFileError</div><div class="ttdef"><b>Definition</b> Config.h:65</div></div>
+<div class="ttc" id="aclass_config_html_af7181451de0b06b8aac6fe2dd613c10e"><div class="ttname"><a href="class_config.html#af7181451de0b06b8aac6fe2dd613c10e">Config::htmlFileError</a></div><div class="ttdeci">string htmlFileError</div><div class="ttdef"><b>Definition</b> Config.h:69</div></div>
+<div class="ttc" id="aclass_config_html_afb267a1753c93822a4ec7f85df994cfb"><div class="ttname"><a href="class_config.html#afb267a1753c93822a4ec7f85df994cfb">Config::markdownFileError</a></div><div class="ttdeci">string markdownFileError</div><div class="ttdef"><b>Definition</b> Config.h:68</div></div>
 </div><!-- fragment -->
 </div>
 </div>

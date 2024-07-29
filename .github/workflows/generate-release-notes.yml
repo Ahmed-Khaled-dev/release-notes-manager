@@ -96,7 +96,8 @@ jobs:
       - name: Run the release notes script with the needed parameters
         env:
           NEW_RELEASE_REFERENCE: ${{ steps.get-new-release-git-reference.outputs.NEW_RELEASE_REFERENCE }}
-        run: ./release_notes_generator "$RELEASE_NOTES_SOURCE" "$PREVIOUS_RELEASE_REFERENCE" "$NEW_RELEASE_REFERENCE" "$GH_TOKEN" "$RELEASE_NOTES_MODE"
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: ./release_notes_generator "$RELEASE_NOTES_SOURCE" "$PREVIOUS_RELEASE_REFERENCE" "$NEW_RELEASE_REFERENCE" "$GH_TOKEN" "$RELEASE_NOTES_MODE" "$GITHUB_REPOSITORY"
       
       # GitHub's cli tool "gh" automatically uses the GH_TOKEN environment variable
       - name: Update the new GitHub release description with the generated markdown release notes

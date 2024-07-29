@@ -66,6 +66,14 @@ int main(int argc, char* argv[]){
                 printInputError(InputErrors::NoGithubToken);
                 return 1;
             }
+            else if (argc <= 4) {
+                printInputError(InputErrors::NoGithubRepository);
+                return 1;
+            }
+
+            config.repoCommitsUrl = config.githubUrl + argv[4] + "/commit/";
+            config.repoIssuesUrl = config.githubUrl + argv[4] + "/issues/";
+            config.repoPullRequestsApiUrl = config.githubReposApiUrl + argv[4] + "/pulls/";
 
             generatePullRequestChangeNote(argv[2], argv[3]);
         }
@@ -93,6 +101,14 @@ int main(int argc, char* argv[]){
                     printInputError(InputErrors::NoReleaseNotesMode);
                     return 1;
                 }
+                else if(argc <= 6) {
+                    printInputError(InputErrors::NoGithubRepository);
+                    return 1;
+                }
+
+                config.repoCommitsUrl = config.githubUrl + argv[6] + "/commit/";
+                config.repoIssuesUrl = config.githubUrl + argv[6] + "/issues/";
+                config.repoPullRequestsApiUrl = config.githubReposApiUrl + argv[6] + "/pulls/";
 
                 if (strcmp(argv[5], config.fullModeCliInputName.c_str()) == 0
                     || strcmp(argv[5], config.fullModeGithubActionsInputName.c_str()) == 0) {
@@ -266,7 +282,7 @@ string getCommitsNotesFromPullRequests(int commitTypeIndex, string releaseStartR
                 // Extracting the PR number associated with the commit from the first capture group
                 commitPullRequestNumber = match.str(1);
 
-                string jsonResponse = getPullRequestInfo(config.githubRepoPullRequestsApiUrl + commitPullRequestNumber, githubToken);
+                string jsonResponse = getPullRequestInfo(config.repoPullRequestsApiUrl + commitPullRequestNumber, githubToken);
                 json pullRequestInfo = json::parse(jsonResponse);
 
                 addPullRequestInfoInNotes(pullRequestInfo, releaseNotesFromPullRequests, releaseNotesMode, commitTypeIndex);
@@ -373,7 +389,7 @@ void generateReleaseNotes(ReleaseNoteSources releaseNoteSource, string releaseSt
 void generatePullRequestChangeNote(string pullRequestNumber, string githubToken) {
     cout << config.generatingReleaseNotesMessage << endl;
 
-    string jsonResponse = getPullRequestInfo(config.githubRepoPullRequestsApiUrl + pullRequestNumber, githubToken);
+    string jsonResponse = getPullRequestInfo(config.repoPullRequestsApiUrl + pullRequestNumber, githubToken);
     json pullRequestInfo = json::parse(jsonResponse);
 
     string pullRequestChangeNote = "";

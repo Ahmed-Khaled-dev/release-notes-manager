@@ -24,7 +24,8 @@ enum class InputErrors {
     NoGithubToken,
     NoReleaseStartReference,
     NoReleaseEndReference,
-    NoPullRequestNumber
+    NoPullRequestNumber,
+    NoGithubRepository
 };
 
 /**

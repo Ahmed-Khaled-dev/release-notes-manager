@@ -12,6 +12,7 @@ var searchData=
   ['githubapiunabletomakerequesterror_9',['githubApiUnableToMakeRequestError',['../class_config.html#a903b5e88c845879f426fe5c3705dd0f4',1,'Config']]],
   ['githubapiunauthorizedaccesserror_10',['githubApiUnauthorizedAccessError',['../class_config.html#a439cb4da3585ac76d24cf52da010866c',1,'Config']]],
   ['githubmarkdownapiurl_11',['githubMarkdownApiUrl',['../class_config.html#a5a92889e1dc677fe8bc0530bf5792801',1,'Config']]],
-  ['githubrepopullrequestsapiurl_12',['githubRepoPullRequestsApiUrl',['../class_config.html#aac9f38c419a472136630c0db14bb5840',1,'Config']]],
-  ['gitlogerror_13',['gitLogError',['../class_config.html#a062ccc36ab68b4e64a21407f2ae0a6d7',1,'Config']]]
+  ['githubreposapiurl_12',['githubReposApiUrl',['../class_config.html#a40a73f346827f40d27217fc1e36922f2',1,'Config']]],
+  ['githuburl_13',['githubUrl',['../class_config.html#a0e557acad335a2a7bff1ad19ef47ee6d',1,'Config']]],
+  ['gitlogerror_14',['gitLogError',['../class_config.html#a062ccc36ab68b4e64a21407f2ae0a6d7',1,'Config']]]
 ];

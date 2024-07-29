@@ -47,7 +47,10 @@ void printInputError(InputErrors inputError) {
         cerr << config.noReleaseEndReferenceError << endl;
     }
     else if (inputError == InputErrors::NoPullRequestNumber) {
-        cerr << config.noPullRequestNumber << endl;
+        cerr << config.noPullRequestNumberError << endl;
+    }
+    else if(inputError == InputErrors::NoGithubRepository) {
+        cerr << config.noGithubRepositoryError << endl;
     }
     cerr << config.expectedSyntaxMessage << endl;
 }
