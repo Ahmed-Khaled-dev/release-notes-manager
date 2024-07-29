@@ -107,7 +107,7 @@ jobs:
         # If HTML release notes are already added as an asset to the release, then uploading release_notes.html will give an error
         # this means that the workflow is used to update release notes for an already existing release
         # I check if the upload failed, and if yes, I delete the existing HTML file and upload the newly generated one
-        # I use "set +e" to disable the GitHub workflow to exit if any command fails, then I renable it with "set -e"
+        # I use "set +e" to disable the GitHub workflow to exit if any command fails, then I reenable it with "set -e"
         run: |
           set +e
           gh release upload "$NEW_RELEASE_TAG" release_notes.html > /dev/null 2>&1

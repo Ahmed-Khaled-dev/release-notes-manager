@@ -1,0 +1,149 @@
+name: 'Release Notes Maintainer'
+description: 'Generate release notes or show how pull requests affect the release notes'
+author: 'Ahmed Khaled ahmed.khaled.yousry@gmail.com'
+
+inputs:
+  action-type:
+    description: 'Type of action to perform (release or pr)'
+    required: true
+    default: 'release'
+    type: choice
+    options:
+      - release
+      - pr
+  new-release-tag:
+    description: 'Tag name of the new release'
+    required: false
+    type: string
+  previous-release-reference:
+    description: 'Tag name of the previous release or commit SHA right before the first commit in the new release'
+    required: false
+    type: string
+  release-notes-source:
+    description: 'Release Notes Source'
+    required: false
+    default: 'Pull Requests'
+    type: choice
+    options:
+      - Commit Messages
+      - Pull Requests
+  pr-release-notes-mode:
+    description: 'Release Notes Mode (only affects release notes generation if you chose source as Pull Requests)'
+    required: false
+    default: 'Full'
+    type: choice
+    options:
+      - Short
+      - Full
+  pull-request-number:
+    description: 'Pull Request Number'
+    required: false
+    type: string
+  pull-request-trigger-event:
+    description: 'Event that triggered the workflow when type is pr'
+    required: false
+    type: string
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        # By default actions/checkout fetches the .git folder with only a small part of the git history
+        # usually the latest commit only, and my release notes script needs all the git history
+        # so I need to add this "fetch-depth: 0", which makes it fetch ALL the git history/commit messages
+        fetch-depth: 0
+
+    - name: Install libcurl
+      run: sudo apt install libcurl4-openssl-dev
+      shell: bash
+
+    - name: Download nlohmann json.hpp header file
+      run: wget https://raw.githubusercontent.com/nlohmann/json/develop/single_include/nlohmann/json.hpp
+      shell: bash
+
+    - name: Build the script
+      env:
+        GITHUB_ACTION_PATH: ${{ github.action_path }}
+      run: g++ -o release_notes_generator "$GITHUB_ACTION_PATH"/Main.cpp "$GITHUB_ACTION_PATH"/Config.cpp "$GITHUB_ACTION_PATH"/Utils.cpp "$GITHUB_ACTION_PATH"/Format.cpp -lcurl -I.
+      shell: bash
+    
+    # I am doing this extra step to make the workflow work with draft releases
+    # since a draft release's tag hasn't yet been created in the git history
+    # I can't use its tag in the release notes script as a reference to the last commit in the release
+    - name: Get the git reference (commit SHA/branch name) that the new release tag is on
+      if: ${{ inputs.action-type == 'release' }}
+      id: get-new-release-git-reference
+      # I check if the tag exists in the git history, >/dev/null is used to not show the output generated from the command
+      # if the tag exists then I get the commit SHA it's on, if not, then the release being created is a draft release
+      # with a new tag, so I get the commit SHA of the location the new tag will be added to, using the GitHub API
+      env:
+        NEW_RELEASE_TAG: ${{ inputs.new-release-tag }}
+      run: |
+        if git rev-parse --quiet --verify "$NEW_RELEASE_TAG" > /dev/null; then
+          NEW_RELEASE_REFERENCE=$(git rev-parse "$NEW_RELEASE_TAG")
+        else
+          NEW_RELEASE_REFERENCE=$(gh release view "$NEW_RELEASE_TAG" --json targetCommitish --jq .targetCommitish)
+        fi
+        echo "NEW_RELEASE_REFERENCE=$NEW_RELEASE_REFERENCE" >> "$GITHUB_OUTPUT"
+      shell: bash
+      
+    - name: Validate the given previous release reference
+      if: ${{ inputs.action-type == 'release' }}
+      env:
+        PREVIOUS_RELEASE_REFERENCE: ${{ inputs.previous-release-reference }}
+      run: |
+        if ! git rev-parse --quiet --verify "$PREVIOUS_RELEASE_REFERENCE" > /dev/null; then
+          echo "Input error: Given previous reference '$PREVIOUS_RELEASE_REFERENCE' does not exist"
+          echo "Please make sure that the previous reference you input exists in this repository's git history"
+          exit 1
+        fi
+      shell: bash
+    
+    # I am using checkout here so that it also works if the new release reference is a commit
+    # In the second checkout, I checkout back to the original branch that triggered the GitHub workflow
+    - name: If the new release reference is a branch (e.g. v1.4.x) ensure that I have a local branch tracking the remote branch
+      if: ${{ inputs.action-type == 'release' }}
+      env:
+        NEW_RELEASE_REFERENCE: ${{ steps.get-new-release-git-reference.outputs.NEW_RELEASE_REFERENCE }}
+      run: |
+        git checkout "$NEW_RELEASE_REFERENCE" > /dev/null 2>&1
+        git checkout ${{ github.ref_name }} > /dev/null 2>&1
+      shell: bash
+
+    - name: Run the release notes script with the needed parameters
+      if: ${{ inputs.action-type == 'release' }}
+      env:
+        RELEASE_NOTES_SOURCE: ${{ inputs.release-notes-source }}
+        PREVIOUS_RELEASE_REFERENCE: ${{ inputs.previous-release-reference }}
+        NEW_RELEASE_REFERENCE: ${{ steps.get-new-release-git-reference.outputs.NEW_RELEASE_REFERENCE }}
+        RELEASE_NOTES_MODE: ${{ inputs.pr-release-notes-mode }}
+      run: ./release_notes_generator "$RELEASE_NOTES_SOURCE" "$PREVIOUS_RELEASE_REFERENCE" "$NEW_RELEASE_REFERENCE" "$GH_TOKEN" "$RELEASE_NOTES_MODE" "$GITHUB_REPOSITORY"
+      shell: bash
+
+    # GitHub's cli tool "gh" automatically uses the GITHUB_TOKEN environment variable
+    - name: Update the new GitHub release description with the generated markdown release notes
+      env:
+        NEW_RELEASE_TAG: ${{ inputs.new-release-tag }}
+      run: gh release edit "$NEW_RELEASE_TAG" --notes-file release_notes.md
+      shell: bash
+
+    - name: Upload to the new GitHub release assets the generated HTML release notes
+      if: ${{ inputs.action-type == 'release' }}
+      # If HTML release notes are already added as an asset to the release, then uploading release_notes.html will give an error
+      # this means that the workflow is used to update release notes for an already existing release
+      # I check if the upload failed, and if yes, I delete the existing HTML file and upload the newly generated one
+      # I use "set +e" to disable the GitHub workflow to exit if any command fails, then I reenable it with "set -e"
+      env:
+        NEW_RELEASE_TAG: ${{ inputs.new-release-tag }}
+      run: |
+        set +e
+        gh release upload "$NEW_RELEASE_TAG" release_notes.html > /dev/null 2>&1
+        html_upload_status=$?
+        set -e
+        if [ $html_upload_status -ne 0 ]; then
+          gh release delete-asset "$NEW_RELEASE_TAG" release_notes.html
+          gh release upload "$NEW_RELEASE_TAG" release_notes.html
+        fi
+      shell: bash
