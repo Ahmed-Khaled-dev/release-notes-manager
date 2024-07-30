@@ -69,6 +69,12 @@ runs:
       run: g++ -o release_notes_generator "$GITHUB_ACTION_PATH"/Main.cpp "$GITHUB_ACTION_PATH"/Config.cpp "$GITHUB_ACTION_PATH"/Utils.cpp "$GITHUB_ACTION_PATH"/Format.cpp -lcurl -I.
       shell: bash
     
+    - name: Copy script external configuration file from GitHub Action repo
+      env:
+        GITHUB_ACTION_PATH: ${{ github.action_path }}
+      run: cp "$GITHUB_ACTION_PATH"/release_notes_config.json .
+      shell: bash
+    
     # I am doing this extra step to make the workflow work with draft releases
     # since a draft release's tag hasn't yet been created in the git history
     # I can't use its tag in the release notes script as a reference to the last commit in the release
