@@ -124,6 +124,7 @@ runs:
 
     # GitHub's cli tool "gh" automatically uses the GITHUB_TOKEN environment variable
     - name: Update the new GitHub release description with the generated markdown release notes
+      if: ${{ inputs.action-type == 'release' }}
       env:
         NEW_RELEASE_TAG: ${{ inputs.new-release-tag }}
       run: gh release edit "$NEW_RELEASE_TAG" --notes-file release_notes.md
@@ -146,4 +147,32 @@ runs:
           gh release delete-asset "$NEW_RELEASE_TAG" release_notes.html
           gh release upload "$NEW_RELEASE_TAG" release_notes.html
         fi
+      shell: bash
+
+    - name: Run script to generate pull request change note
+      if: ${{ inputs.action-type == 'pr' }}
+      env:
+        PULL_REQUEST_NUMBER: ${{ inputs.pull-request-number }}
+      run: ./release_notes_generator single_pr "$PULL_REQUEST_NUMBER" "$GH_TOKEN" "$GITHUB_REPOSITORY"
+      shell: bash
+      
+    - name: Set extra comment message based on the trigger event type
+      if: ${{ inputs.action-type == 'pr' }}
+      id: set-extra-message
+      env:
+        TRIGGER_EVENT: ${{ inputs.pull-request-trigger-event }}
+      run: |
+        if [ "$TRIGGER_EVENT" = "opened" ]; then
+          echo "COMMENT_TEXT=Thank you for contributing!<br>Below is how your contribution will look like in Synfig's release notes, review it and improve your pull request's title and description so that your contribution is clear, you can add images, videos and anything you want, have fun!<br>" >> "$GITHUB_OUTPUT"
+        elif [ "$TRIGGER_EVENT" = "edited" ]; then
+          echo "COMMENT_TEXT=Thank you for trying to improve your contribution description!<br>Below is how your updated contribution will look like in Synfig's release notes, review it and improve it till you are satisfied!<br>" >> "$GITHUB_OUTPUT"
+        fi
+      shell: bash
+    
+    - name: Comment in the pull request with the generated change note and extra message
+      if: ${{ inputs.action-type == 'pr' }}
+      env:
+        COMMENT_TEXT: ${{ steps.set-extra-message.outputs.COMMENT_TEXT }}
+        PULL_REQUEST_NUMBER: ${{ inputs.pull-request-number }}
+      run: gh pr comment "$PULL_REQUEST_NUMBER" --body "$COMMENT_TEXT$(cat release_notes.md)"
       shell: bash
