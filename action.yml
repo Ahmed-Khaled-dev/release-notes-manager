@@ -4,7 +4,7 @@ author: 'Ahmed Khaled ahmed.khaled.yousry@gmail.com'
 
 inputs:
   action-type:
-    description: 'Type of action to perform (release or pr)'
+    description: "Type of action to perform (release or pr)"
     required: true
     default: 'release'
     type: choice
@@ -12,15 +12,15 @@ inputs:
       - release
       - pr
   new-release-tag:
-    description: 'Tag name of the new release'
+    description: "Tag name of the new release"
     required: false
     type: string
   previous-release-reference:
-    description: 'Tag name of the previous release or commit SHA right before the first commit in the new release'
+    description: "Tag name of the previous release or commit SHA right before the first commit in the new release"
     required: false
     type: string
   release-notes-source:
-    description: 'Release Notes Source'
+    description: "Release Notes Source"
     required: false
     default: 'Pull Requests'
     type: choice
@@ -28,7 +28,7 @@ inputs:
       - Commit Messages
       - Pull Requests
   pr-release-notes-mode:
-    description: 'Release Notes Mode (only affects release notes generation if you chose source as Pull Requests)'
+    description: "Release Notes Mode (only affects release notes generation if you chose source as Pull Requests)"
     required: false
     default: 'Full'
     type: choice
@@ -36,11 +36,15 @@ inputs:
       - Short
       - Full
   pull-request-number:
-    description: 'Pull Request Number'
+    description: "Pull Request Number"
     required: false
     type: string
   pull-request-trigger-event:
-    description: 'Event that triggered the workflow when type is pr'
+    description: "Event that triggered the workflow when type is pr"
+    required: false
+    type: string
+  github-repository:
+    description: "The GitHub repository to use to get the pull requests' info, in the form owner/repo"
     required: false
     type: string
 
@@ -125,7 +129,8 @@ runs:
         PREVIOUS_RELEASE_REFERENCE: ${{ inputs.previous-release-reference }}
         NEW_RELEASE_REFERENCE: ${{ steps.get-new-release-git-reference.outputs.NEW_RELEASE_REFERENCE }}
         RELEASE_NOTES_MODE: ${{ inputs.pr-release-notes-mode }}
-      run: ./release_notes_generator "$RELEASE_NOTES_SOURCE" "$PREVIOUS_RELEASE_REFERENCE" "$NEW_RELEASE_REFERENCE" "$GH_TOKEN" "$RELEASE_NOTES_MODE" "$GITHUB_REPOSITORY"
+        REPOSITORY: ${{ inputs.github-repository }}
+      run: ./release_notes_generator "$RELEASE_NOTES_SOURCE" "$PREVIOUS_RELEASE_REFERENCE" "$NEW_RELEASE_REFERENCE" "$GH_TOKEN" "$RELEASE_NOTES_MODE" "$REPOSITORY"
       shell: bash
 
     # GitHub's cli tool "gh" automatically uses the GITHUB_TOKEN environment variable
@@ -159,7 +164,8 @@ runs:
       if: ${{ inputs.action-type == 'pr' }}
       env:
         PULL_REQUEST_NUMBER: ${{ inputs.pull-request-number }}
-      run: ./release_notes_generator single_pr "$PULL_REQUEST_NUMBER" "$GH_TOKEN" "$GITHUB_REPOSITORY"
+        REPOSITORY: ${{ inputs.github-repository }}
+      run: ./release_notes_generator single_pr "$PULL_REQUEST_NUMBER" "$GH_TOKEN" "$REPOSITORY"
       shell: bash
       
     - name: Set extra comment message based on the trigger event type
