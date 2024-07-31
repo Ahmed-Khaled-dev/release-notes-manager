@@ -33,6 +33,4 @@
 
 # Other
 .vscode
-*.md
 *.lua
-Doxyfile

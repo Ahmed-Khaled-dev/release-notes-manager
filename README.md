@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-    <img src="images/logo.png" alt="Release Notes Manager Logo" width="100">
+    <img src="docs/images/logo.png" alt="Release Notes Manager Logo" width="100">
   <br>
   Release Notes Manager
   <br>
@@ -22,24 +22,24 @@ Generates accurate markdown/HTML release notes for GitHub releases and shows con
 </p>
 
 <p align="center">
-    <img src="images/release-notes-from-full-prs.png" alt="Markdown Release Notes From Pull Requests in Full Mode">
+    <img src="docs/images/release-notes-from-full-prs.png" alt="Markdown Release Notes From Pull Requests in Full Mode">
 </p>
 
 ## Key Features
 ### 1. Generates markdown/HTML release notes for GitHub releases through a straightforward and customizable GitHub Actions user interface
 
   <p align="center">
-    <img src="images/release-notes-workflow-inputs.png" alt="Release Notes Generation GitHub Actions Workflow Inputs"><br>
-    <img src="images/release-notes-from-full-prs.png" alt="Markdown Release Notes From Pull Requests in Full Mode" width="700">
-    <img src="images/html-release-notes-from-full-prs.png" alt="HTML Release Notes From Pull Requests in Full Mode" width="700">
+    <img src="docs/images/release-notes-workflow-inputs.png" alt="Release Notes Generation GitHub Actions Workflow Inputs"><br>
+    <img src="docs/images/release-notes-from-full-prs.png" alt="Markdown Release Notes From Pull Requests in Full Mode" width="700">
+    <img src="docs/images/html-release-notes-from-full-prs.png" alt="HTML Release Notes From Pull Requests in Full Mode" width="700">
   </p>
 
 ### 2. Automatically shows contributors how their pull requests affect the release notes
 
-  <img src="images/demo-pull-request.png" alt="Demo GitHub Pull Request" width="700">
-  <img src="images/github-bot-comment-on-new-pr.png" alt="GitHub Bot Comment Showing The Contributor How This Demo Pull Request Affects The Release Notes" width="700"><br>
-  <img src="images/demo-pull-request-edited.jpg" alt="Demo GitHub Pull Request After Editing The Description" width="700">
-  <img src="images/github-bot-comment-on-edited-pr.png" alt="GitHub Bot Comment Showing The Contributor How His Edited Demo Pull Request Affects The Release Notes" width="700">
+  <img src="docs/images/demo-pull-request.png" alt="Demo GitHub Pull Request" width="700">
+  <img src="docs/images/github-bot-comment-on-new-pr.png" alt="GitHub Bot Comment Showing The Contributor How This Demo Pull Request Affects The Release Notes" width="700"><br>
+  <img src="docs/images/demo-pull-request-edited.jpg" alt="Demo GitHub Pull Request After Editing The Description" width="700">
+  <img src="docs/images/github-bot-comment-on-edited-pr.png" alt="GitHub Bot Comment Showing The Contributor How His Edited Demo Pull Request Affects The Release Notes" width="700">
 
 ## How To Use
 
@@ -103,13 +103,13 @@ Generates accurate markdown/HTML release notes for GitHub releases and shows con
   5. That's it! Now whenever you want to publish a new release, create a new GitHub draft release with a suitable tag (or don't if you want to generate release notes for an already created release)
   6. Open the GitHub Actions tab
   
-      <img src="images/github-actions-tab.png" alt="GitHub Actions Tab">
+      <img src="docs/images/github-actions-tab.png" alt="GitHub Actions Tab">
   7. Press on the "Release Notes Generator" workflow
 
-      <img src="images/release-notes-generator-workflow.png" alt="Release Notes Generator Workflow">
+      <img src="docs/images/release-notes-generator-workflow.png" alt="Release Notes Generator Workflow">
   8. Press on "Run workflow" and have fun generating release notes!
       
-      <img src="images/run-workflow-button.png" alt="GitHub Actions Run Workflow Button">
+      <img src="docs/images/run-workflow-button.png" alt="GitHub Actions Run Workflow Button">
 
       **Notes**<br>
       - In the "Release Notes Source" drop-down menu, you specify the source that the content of the release notes will be retrieved from, either from the commit messages of the commits that occurred between the two entered releases, or from the pull requests' titles and descriptions that were used to merge these commits
