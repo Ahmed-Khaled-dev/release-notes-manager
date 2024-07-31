@@ -30,10 +30,9 @@ Generates accurate markdown/HTML release notes for GitHub releases and shows con
 
   <p align="center">
     <img src="images/release-notes-workflow-inputs.png" alt="Release Notes Generation GitHub Actions Workflow Inputs"><br>
+    <img src="images/release-notes-from-full-prs.png" alt="Markdown Release Notes From Pull Requests in Full Mode" width="700">
+    <img src="images/html-release-notes-from-full-prs.png" alt="HTML Release Notes From Pull Requests in Full Mode" width="700">
   </p>
-
-  <img src="images/release-notes-from-full-prs.png" alt="Markdown Release Notes From Pull Requests in Full Mode" width="700">
-  <img src="images/html-release-notes-from-full-prs.png" alt="HTML Release Notes From Pull Requests in Full Mode" width="760">
 
 ### 2. Automatically shows contributors how their pull requests affect the release notes
 
