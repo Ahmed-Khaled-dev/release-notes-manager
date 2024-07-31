@@ -10,8 +10,8 @@
 Generates accurate markdown/HTML release notes for GitHub releases and shows contributors how their pull requests will affect the notes, encouraging better pull request descriptions.</h4>
 
 <p align="center">
-<a href="https://ahmed-khaled-dev.github.io/automated-release-notes-generator/files.html">
-        <img src="https://img.shields.io/badge/Code Docs- Webpage-blue?style=for-the-badge&logo=none" >
+<a href="https://ahmed-khaled-dev.github.io/release-notes-manager/doxygen/generated/index.html">
+        <img src="https://img.shields.io/badge/Code Docs-Webpage-blue?style=for-the-badge&logo=none" >
 </a>
 </p>
 
