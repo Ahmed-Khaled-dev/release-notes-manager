@@ -141,7 +141,7 @@ void Config::load(const string& configFileName) {
     }
 
     if (externalConfigData.contains("singlePullRequestSourceCliInputName")) {
-        singlePullRequestSourceCliInputName = externalConfigData["singlePullRequestSourceCliInputName"];
+        singlePullRequestSourceCliInputName = externalConfigData["singlePullRequestSourceCliInputName"];  
     }
     else {
         throw runtime_error("Key 'singlePullRequestSourceCliInputName' not found in " + configFileName);
