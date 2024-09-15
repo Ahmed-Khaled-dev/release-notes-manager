@@ -42,6 +42,13 @@ Generates accurate markdown/HTML release notes for GitHub releases and shows con
 
 ## How To Use
 
+  > [!IMPORTANT]
+  > For the Release Notes Manager to work, you must grant read and write permissions to workflows, since it will either write release notes inside releases or comment in pull requests
+  >
+  > In your repository go to Settings -> Actions -> General -> Scroll down and change it as below
+  > 
+  > <img src="docs/images/workflow-read-write-perms.png" alt="GitHub Bot Comment Showing The Contributor How His Edited Demo Pull Request Affects The Release Notes" width="700">
+
   ### 1. Generating Release Notes
 
   1. Go to your repository and create a folder called ``.github`` if it doesn't already exist
