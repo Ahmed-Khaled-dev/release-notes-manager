@@ -175,7 +175,7 @@ runs:
         TRIGGER_EVENT: ${{ inputs.pull-request-trigger-event }}
       run: |
         if [ "$TRIGGER_EVENT" = "opened" ]; then
-          echo "COMMENT_TEXT=Thank you for contributing!<br>Below is how your contribution will look like in Synfig's release notes, review it and improve your pull request's title and description so that your contribution is clear, you can add images, videos and anything you want, have fun!<br>" >> "$GITHUB_OUTPUT"
+          echo "COMMENT_TEXT=Thank you for contributing!<br>Below is how your contribution will look like in Synfig's release notes, review it and improve your pull request's title and description so that your contribution is clear, you can add images, videos and anything you want.<br>After editing your pull request's title or description, this message will be edited to show how your new pull request content looks like in the release notes, so make sure to check it after each edit to ensure your changes look great in the release notes, have fun!<br>" >> "$GITHUB_OUTPUT"
         elif [ "$TRIGGER_EVENT" = "edited" ]; then
           echo "COMMENT_TEXT=Thank you for trying to improve your contribution description!<br>Below is how your updated contribution will look like in Synfig's release notes, review it and improve it till you are satisfied!<br>" >> "$GITHUB_OUTPUT"
         fi
@@ -186,5 +186,10 @@ runs:
       env:
         COMMENT_TEXT: ${{ steps.set-extra-message.outputs.COMMENT_TEXT }}
         PULL_REQUEST_NUMBER: ${{ inputs.pull-request-number }}
-      run: gh pr comment "$PULL_REQUEST_NUMBER" --body "$COMMENT_TEXT$(cat release_notes.md)"
+      run: |
+        if [ "$TRIGGER_EVENT" = "opened" ]; then
+          gh pr comment "$PULL_REQUEST_NUMBER" --body "$COMMENT_TEXT$(cat release_notes.md)"
+        elif [ "$TRIGGER_EVENT" = "edited" ]; then
+          gh pr comment --edit-last "$PULL_REQUEST_NUMBER" --body "$COMMENT_TEXT$(cat release_notes.md)"
+        fi
       shell: bash
