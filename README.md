@@ -131,7 +131,7 @@ Generates accurate markdown/HTML release notes for GitHub releases and shows con
       name: Show Pull Request Change Note
 
       on: 
-        pull_request:
+        pull_request_target:
             types: [opened, edited]
 
       jobs:
